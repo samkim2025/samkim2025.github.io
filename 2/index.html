@@ -1,1 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CS180 Portfolio - Project 1</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        h1, h2 {
+            color: #333;
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+            margin-bottom: 10px;
+        }
+        .image-container {
+            margin-bottom: 30px;
+        }
+    </style>
+</head>
+<body>
+    <h1>CS180 Fun with Filters and Frequencies! </h1>
 
+    <h2>Overview</h2>
+    
+    <p>In this project, I tried to align the RGB channels of digitized glass plate images from the Prokudin-Gorskii collection. An example image from this collection is shown below.</p>
+
+    <div class="image-container">
+        <h3>Unaligned Cathedral</h3>
+        <img src="media/cathedral.jpg" alt="Unaligned Cathedral">
+    </div>
+    
+    <p>I initially divided the image into three, each representing the blue, green, and red channels respectively (from top to bottom).</p>
+    <p>After dividing them, I sought to align them and produce a color photograph.</p>
+
+    <h2>My Approach</h2>
+    <p>First, I tried to see what would happen if I just divided the image in thirds, and stack them on top of each other.</p>
+    <p>The result is depicted below, and it's not pretty.</p>
+    
+    <div class="image-container">
+        <h3>Simple Stack Cathedral</h3>
+        <img src="media/simple_stacked_cathedral.jpg" alt="Simple Stack Cathedral">
+    </div>
+
+    <p>Seeing that approach fail, I sought a different approach. </p>
+    <p>First, I used the circular_shift function to align the channels. This method shifts an image by a given offset along the vertical and horizontal axes, and enables us to test different alignments.</p>
+    <p>To measure the alignment quality quantitatively, I used the compute_ssd function to calculate sum of squared differences between the reference channel and the shifted target channel. Lower SSD values imply better alignment. </p>
+    <p>Then, I use the align_channels method to carry out a brute-fore search over a given range of shifts performed on the target channel. For every shift in this range, I calculate the SSD, and eventually choose the shift with the lowest SSD value. </p>
+    <p>For large images (i.e. the .tif files), a brute force becomes super expensive and would take a long time to run. To address this, I implemented the pyramid_align method. In this method, we create an image pyramid that is made up of progressively smaller images, each downsampled from the previous one by a factor of 2. The pyramid method aligns the images at the smallest scale, where the search space is minimal. I then refine this shift at higher resolutions by upscaling the shift.</p>
+    <p>To build this image pyramid manually, I've written the manual_downsample and manual_upsample methods, which decreases/increases the image size. </p>
+    <p>Finally, the proess_image method carries out this entire process. It reads the image, divides it into three channels, and crops each channel to remove edges (default factor of 5%). The green and red channels are aligned to the blue channel using the pyramid alignment method. Finally, I stack these aligned channels to form the output image, which is saved and displayed.</p>
+    
+    <h2>Results</h2>
+    <p>Below are the results of my algorithm on the provided example images, along with the calculated offsets for each channel:</p>
+
+    <div class="image-container">
+        <h3>Cathedral</h3>
+        <img src="media/output_cathedral.jpg" alt="Aligned Cathedral">
+        <p>Green channel shift: (5, 2)<br>Red channel shift: (12, 3)</p>
+    </div>
+
+    <div class="image-container">
+        <h3>Monastery</h3>
+        <img src="media/output_monastery.jpg" alt="Aligned Monastery">
+        <p>Green channel shift: (-3, 2)<br>Red channel shift: (3, 2)</p>
+    </div>
+
+    <div class="image-container">
+        <h3>Tobolsk</h3>
+        <img src="media/output_tobolsk.jpg" alt="Aligned Tobolsk">
+        <p>Green channel shift: (3, 3)<br>Red channel shift: (6, 3)</p>
+    </div>
+
+    <div class="image-container">
+        <h3>Church</h3>
+        <img src="media/output_church.jpg" alt="Aligned Church">
+        <p>Green channel shift: (25, 4)<br>Red channel shift: (58, -4)</p>
+    </div>
+
+    <div class="image-container">
+        <h3>Icon</h3>
+        <img src="media/output_icon.jpg" alt="Aligned Icon">
+        <p>Green channel shift: (41, 17)<br>Red channel shift: (89, 23)</p>
+    </div>
+
+     <div class="image-container">
+        <h3>Harvesters</h3>
+        <img src="media/output_harvesters.jpg" alt="Aligned Harvesters">
+        <p>Green channel shift: (59, 16)<br>Red channel shift: (124, 13)</p>
+    </div>
+
+    <div class="image-container">
+        <h3>Lady</h3>
+        <img src="media/output_lady.jpg" alt="Aligned Lady">
+        <p>Green channel shift: (51, 9)<br>Red channel shift: (111, 12)</p>
+    </div>
+    
+    <div class="image-container">
+        <h3>Melons</h3>
+        <img src="media/output_melons.jpg" alt="Aligned Melons">
+        <p>Green channel shift: (81, 10)<br>Red channel shift: (178, 13)</p>
+    </div>
+
+    <div class="image-container">
+        <h3>Onion Church</h3>
+        <img src="media/output_onion_church.jpg" alt="Aligned Onion Church">
+        <p>Green channel shift: (51, 26)<br>Red channel shift: (108, 36)</p>
+    </div>
+
+     <div class="image-container">
+        <h3>Sculpture</h3>
+        <img src="media/output_sculpture.jpg" alt="Aligned Sculpture">
+        <p>Green channel shift: (33, -11)<br>Red channel shift: (140, -27)</p>
+    </div>
+
+    <div class="image-container">
+        <h3>Self Portrait</h3>
+        <img src="media/output_self_portrait.jpg" alt="Aligned Self Portrait">
+        <p>Green channel shift: (78, 29)<br>Red channel shift: (176, 37)</p>
+    </div>
+
+     <div class="image-container">
+        <h3>Three Generations</h3>
+        <img src="media/output_three_generations.jpg" alt="Aligned Three Generations">
+        <p>Green channel shift: (53, 14)<br>Red channel shift: (112, 11)</p>
+    </div>
+
+    <div class="image-container">
+        <h3>Train</h3>
+        <img src="media/output_train.jpg" alt="Aligned Train">
+        <p>Green channel shift: (42, 5)<br>Red channel shift: (87, 32)</p>
+    </div>
+    
+    <div class="image-container">
+        <h3>Emir (Failed Alignment)</h3>
+        <img src="media/output_emir_bad.jpg" alt="Aligned Emir">
+        <p>Green channel shift: (49, 24)<br>Red channel shift: (93, -305)</p>
+        <p>Unlike the other images, it was difficult to align the Emirs. This was because there were significant brightness differences across the channels. </p>
+    </div>
+
+    <div class="image-container">
+        <h3>Emir (original)</h3>
+        <img src="media/emir2.jpg" alt="Unaligned Emir">
+        <p>As you can see here, the darkness/brightness of the Emir's cloak varies greatly across the channels. In the top-most chanel, the Emir's cloak is very bright (white). In the bottom-most channel, the cloak is very dark (almost black). This difference made it difficult to apply the algorithm nicely. </p>
+    </div>
+
+    <h2>Other Images</h2>
+    <p>Here are some other images from the collection that I applied my algorithm to:</p>
+
+    <div class="image-container">
+        <h3>Castle</h3>
+        <img src="media/output_castle.jpg" alt="Aligned Castle">
+        <p>Green channel shift: (25, 11)<br>Red channel shift: (90, 26)</p>
+    </div>
+    
+    <div class="image-container">
+        <h3>Cross</h3>
+        <img src="media/output_cross.jpg" alt="Aligned Cross">
+        <p>Green channel shift: (67, -7)<br>Red channel shift: (142, -19)</p>
+    </div>
+
+    <div class="image-container">
+        <h3>Railroad</h3>
+        <img src="media/output_railroad.jpg" alt="Aligned Railroad">
+        <p>Green channel shift: (44, 12)<br>Red channel shift: (96, 15)</p>
+    </div>
+        
+</body>
+</html>
