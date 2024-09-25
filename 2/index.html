@@ -39,7 +39,7 @@
         <img src="media/Original Image.png" alt="Cameraman">
     </div>
     
-    <p>These derivatives help understand how pixel values change along these axes, which is critical for edge detection..</p>
+    <p>These derivatives help understand how pixel values change along these axes, which is critical for edge detection.</p>
 
      <div class="image-container">
         <h3>Ix</h3>
@@ -49,8 +49,21 @@
 
      <div class="image-container">
         <h3>Iy</h3>
-         <p>Similarly, I applied the finite difference operator along the y axis to compute the derivative in y to highlight horizontal edges.</p>
+        <p>Similarly, I applied the finite difference operator along the y axis to compute the derivative in y to highlight horizontal edges.</p>
         <img src="media/Iy (Derivative in y).png" alt="Iy Cameraman">
+    </div>
+
+    <div class="image-container">
+        <h3>Gradient Magnitude</h3>
+        <p>Next, I calculated the gradient magnitude, which combines the x and y derivatives to detect the overall strength of edges in the image.</p>
+        <p>More specifically, I used this line of code to calculate the gradient magnitude: """ gradient_magnitude = np.sqrt(Ix**2 + Iy**2) """</p>
+        <img src="media/Gradient Magnitude.png" alt="Gradient Magnitude">
+    </div>
+
+    <div class="image-container">
+        <h3>Edge Image</h3>
+        <p>Finally, I found an optimal threshold value based on trial and error to create a binary image that highlights the prominent edges in the image while suppressing noise.</p>
+        <img src="media/Edge Image.png" alt="Edge Image">
     </div>
     
     <p>I initially divided the image into three, each representing the blue, green, and red channels respectively (from top to bottom).</p>
