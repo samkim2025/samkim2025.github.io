@@ -30,12 +30,26 @@
     <h1>CS180 Fun with Filters and Frequencies! </h1>
 
     <h2>Overview</h2>
-    
-    <p>In this project, I tried to align the RGB channels of digitized glass plate images from the Prokudin-Gorskii collection. An example image from this collection is shown below.</p>
 
+    <h3>1.1 Finite Difference Operator</h3>
+    
+    <p>In this part of the project, I used finite difference operators to compute the partial derivatives of the "cameraman" image (shown below) in the x and y directions.</p>
     <div class="image-container">
-        <h3>Unaligned Cathedral</h3>
-        <img src="media/cathedral.jpg" alt="Unaligned Cathedral">
+        <h3>Original Cameraman</h3>
+        <img src="media/Original Image.png" alt="Cameraman">
+    </div>
+    
+    <p>These derivatives help understand how pixel values change along these axes, which is critical for edge detection..</p>
+    <p>Applying the finite difference operator [-1, 1] along the x axis allows us to compute the derivative in x to highlight vertical edges.(</p>
+     <div class="image-container">
+        <h3>Ix</h3>
+        <img src="media/Ix (Derivative in x).png" alt="Ix Cameraman">
+    </div>
+    
+    <p>Similarly, I applied the finite difference operator along the y axis to compute the derivative in y to highlight horizontal edges.</p>
+     <div class="image-container">
+        <h3>Iy</h3>
+        <img src="media/Iy (Derivative in y).png" alt="Iy Cameraman">
     </div>
     
     <p>I initially divided the image into three, each representing the blue, green, and red channels respectively (from top to bottom).</p>
