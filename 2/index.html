@@ -66,6 +66,38 @@
         <img src="media/Edge Image.png" alt="Edge Image">
     </div>
     
+
+    <h3>1.2 Derivative of Gaussian (DoG) Filter</h3>
+
+    <p>In this part of the project, I incorporated a Gaussian filter to improve upon the simple finite difference operator. While the finite difference method is effective at detecting edges, it also may produce a lot of noise. A Gaussian filter helps smooth the image before applying derivative operations.</p>
+    
+    <div class="image-container">
+        <h3>Gaussian Filter Applied</h3>
+        <p>First, I applied a Gaussian filter to the original image, which blurs the image. This also reduces noise and makes the edges more distinct. I achieved this sign the gaussian_filter() function.</p>
+        <img src="media/Blurred Image.png" alt="Gaussian Applied">
+    </div>
+
+    <div class="image-container">
+        <h3>Ix and Iy derivatives of the Gaussian</h3>
+        <p>I then computed the x and y derivatives (Ix and Iy) on the smoothed image by convolving it with the finite difference operators (Dx and Dy). This gives us smoother gradients compared to the unblurred image.</p>
+        <img src="media/Ix (Blurred).png" alt="Blurred derivative of x">
+        <img src="media/Iy (Blurred).png" alt="Blurred derivative of y">
+    </div>
+    
+    <div class="image-container">
+        <h3>Derivative of Gaussian</h3>
+        <p>I then computed the x and y derivatives (Ix and Iy) on the smoothed image by convolving it with the finite difference operators (Dx and Dy). This gives us smoother gradients compared to the unblurred image.</p>
+        <img src="media/Blurred Image.png" alt="Gaussian Applied">
+    </div>
+
+    <div class="image-container">
+        <h3>Ix and Iy derivatives of the Gaussian</h3>
+        <p>I then computed the x and y derivatives (Ix and Iy) on the smoothed image by convolving it with the finite difference operators (Dx and Dy). This gives us smoother gradients compared to the unblurred image.</p>
+        <img src="media/Blurred Image.png" alt="Gaussian Applied">
+    </div>
+
+
+    
     <p>I initially divided the image into three, each representing the blue, green, and red channels respectively (from top to bottom).</p>
     <p>After dividing them, I sought to align them and produce a color photograph.</p>
 
