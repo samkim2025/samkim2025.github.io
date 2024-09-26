@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CS180 Portfolio - Project 1</title>
+    <title>CS180 Portfolio - Project 2</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -31,7 +31,7 @@
 
     <h2>Overview</h2>
 
-    <h3>1.1 Finite Difference Operator</h3>
+    <h2>1.1 Finite Difference Operator</h2>
     
     <p>In this part of the project, I used finite difference operators to compute the partial derivatives of the "cameraman" image (shown below) in the x and y directions.</p>
     <div class="image-container">
@@ -63,11 +63,11 @@
     <div class="image-container">
         <h3>Edge Image</h3>
         <p>Finally, I found an optimal threshold value based on trial and error to create a binary image that highlights the prominent edges in the image while suppressing noise.</p>
-        <img src="media/Edge Image.png" alt="Edge Image">
+        <img src="media/Binarized Magnitude.png" alt="Binarized Magnitude">
     </div>
     
 
-    <h3>1.2 Derivative of Gaussian (DoG) Filter</h3>
+    <h2>1.2 Derivative of Gaussian (DoG) Filter</h2>
 
     <p>In this part of the project, I incorporated a Gaussian filter to improve upon the simple finite difference operator. While the finite difference method is effective at detecting edges, it also may produce a lot of noise. A Gaussian filter helps smooth the image before applying derivative operations.</p>
     
@@ -78,24 +78,42 @@
     </div>
 
     <div class="image-container">
-        <h3>Ix and Iy derivatives of the Gaussian</h3>
+        <h3>Ix and Iy derivatives of the Smoothed Image</h3>
         <p>I then computed the x and y derivatives (Ix and Iy) on the smoothed image by convolving it with the finite difference operators (Dx and Dy). This gives us smoother gradients compared to the unblurred image.</p>
+        <h3>Ix Blurred</h3>
         <img src="media/Ix (Blurred).png" alt="Blurred derivative of x">
+        <h3>Iy Blurred</h3>
         <img src="media/Iy (Blurred).png" alt="Blurred derivative of y">
+        <h3>Gradient Magnitude Double Convolved</h3>
+        <img src="media/Gradient Magnitude 2.png" alt="Gradient Magnitude Double Convolution">
+        <h3>Binarized Magnitude Double Convolved</h3>
+        <img src="media/Binarized Magnitude 2.png" alt="Binarized Magnitude Double Convolution">
     </div>
     
     <div class="image-container">
-        <h3>Derivative of Gaussian</h3>
-        <p>I then computed the x and y derivatives (Ix and Iy) on the smoothed image by convolving it with the finite difference operators (Dx and Dy). This gives us smoother gradients compared to the unblurred image.</p>
-        <img src="media/Blurred Image.png" alt="Gaussian Applied">
+        <h3>Gaussian Filters</h3>
+        <p>Instead of applying Gaussian smoothing followed by the derivative separately, we can combine both operations into a single convolution. We can do this by computing the Derivative of Gaussian filters.</p>
+        <h3>DoGx Filter</h3>
+        <img src="media/DoGx Filter.png" alt="DoGx Filter">
+        <h3>DoGy Filter</h3>
+        <img src="media/DoGy Filter.png" alt="DoGy Filter">
     </div>
 
     <div class="image-container">
-        <h3>Ix and Iy derivatives of the Gaussian</h3>
-        <p>I then computed the x and y derivatives (Ix and Iy) on the smoothed image by convolving it with the finite difference operators (Dx and Dy). This gives us smoother gradients compared to the unblurred image.</p>
-        <img src="media/Blurred Image.png" alt="Gaussian Applied">
+        <h3>DoG Results</h3>
+        <p>I convolved the Gaussian filter with the finite difference operators (Dx and Dy) to produce DoG filters. These filters are then directly applied to the image to compute the x and y derivatives in one single step.</p>
+        <h3>Ix DoG</h3>
+        <img src="media/Ix (DoG).png" alt="Ix DoG">
+        <h3>Iy DoG</h3>
+        <img src="media/Iy (DoG).png" alt="Iy DoG">
+        <h3>Gradient Magnitude DoG</h3>
+        <img src="media/Gradient Magnitude (DoG).png" alt="Gradient Magnitude DoG">
+        <h3>Binarized Magnitude DoG</h3>
+        <img src="media/Binarized Magnitude (DoG).png" alt="Binarized Magnitude DoG">
     </div>
 
+    <h2>1.2 Derivative of Gaussian (DoG) Filter</h2>
+    
 
     
     <p>I initially divided the image into three, each representing the blue, green, and red channels respectively (from top to bottom).</p>
