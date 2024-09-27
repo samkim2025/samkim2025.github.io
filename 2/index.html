@@ -168,16 +168,21 @@
     <div class="image-container">
         <h3>Gaussian Stack</h3>
         <p>Each level in the stack applies a Gaussian filter with increasing sigma (blur strength), but unlike a pyramid, the image size remains constant without downsampling. This stack helps represent the low-frequency components at different scales.</p>
-        <img src="media/Ix (Derivative in x).png" alt="Ix Cameraman">
+        <img src="media/Apple Gaussian Stack_Level_0.png" alt="Apple Gaussian Level 0"> <img src="media/Apple Gaussian Stack_Level_1.png" alt="Apple Gaussian Level 1"> <img src="media/Apple Gaussian Stack_Level_2.png" alt="Apple Gaussian Level 2"> <img src="media/Apple Gaussian Stack_Level_3.png" alt="Apple Gaussian Level 3"> <img src="media/Apple Gaussian Stack_Level_4.png" alt="Apple Gaussian Level 4">
+        <img src="media/Orange Gaussian Stack_Level_0.png" alt="Orange Gaussian Level 0"> <img src="media/Orange Gaussian Stack_Level_1.png" alt="Orange Gaussian Level 1"> <img src="media/Orange Gaussian Stack_Level_2.png" alt="Orange Gaussian Level 2"> <img src="media/Orange Gaussian Stack_Level_3.png" alt="Orange Gaussian Level 3"> <img src="media/Orange Gaussian Stack_Level_4.png" alt="Orange Gaussian Level 4">
     </div>
     
     <h3>2. Laplacian Stack</h3>
     <p>A Laplacian Stack is derived from the Gaussian stack by subtracting the next, more blurred image from the current one. It captures the high-frequency details between each level, which is crucial for multi-resolution blending.</p>
     <div class="image-container">
         <h3>Laplacian Stack</h3>
-        <p>Applying the finite difference operator [-1, 1] along the x axis allows us to compute the derivative in x to highlight vertical edges.</p>
-        <img src="media/Ix (Derivative in x).png" alt="Ix Cameraman">
+        <p>Once the Gaussian stack is built, I omcomputed the Laplacian Stack by subtracting the adjacent levels in the Gaussian stack. This stack highlights the details or high-frequency information at each level. The final Laplaian stack can then be used for image blending by merging the Laplacian stacks of two images while maintaining fine details and smooth transitions.</p>
+        <img src="media/Apple Laplacian Stack_Level_0.png" alt="Apple Laplacian Level 0"> <img src="media/Apple Laplacian Stack_Level_1.png" alt="Apple Laplacian Level 1"> <img src="media/Apple Laplacian Stack_Level_2.png" alt="Apple Laplacian Level 2"> <img src="media/Apple Laplacian Stack_Level_3.png" alt="Apple Laplacian Level 3"> <img src="media/Apple Laplacian Stack_Level_4.png" alt="Apple Laplacian Level 4">
+        <img src="media/Orange Laplacian Stack_Level_0.png" alt="Orange Laplacian Level 0"> <img src="media/Orange Laplacian Stack_Level_1.png" alt="Orange Laplacian Level 1"> <img src="media/Orange Laplacian Stack_Level_2.png" alt="Orange Laplacian Level 2"> <img src="media/Orange Laplacian Stack_Level_3.png" alt="Orange Laplacian Level 3"> <img src="media/Orange Laplacian Stack_Level_4.png" alt="Orange Laplacian Level 4">
     </div>
+
+    <h3>The "Orapple"</h3>
+    <p>With the stacks, we blend the two images. First, I resized both images to match dimensions. Next, I generated the Gaussian stack for each image to capture their low frequency content. From there, I computed the Laplacian stack to isolate the high-frequency details at each level. These stacks allow me to blend the two images smoothly, creating the famous "Orapple".</p>
 
         
 </body>
