@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -168,7 +169,9 @@
     <div class="image-container">
         <h3>Gaussian Stack</h3>
         <p>Each level in the stack applies a Gaussian filter with increasing sigma (blur strength), but unlike a pyramid, the image size remains constant without downsampling. This stack helps represent the low-frequency components at different scales.</p>
+        <h3>Apples</h3>
         <img src="media/Apple Gaussian Stack_Level_0.png" alt="Apple Gaussian Level 0"> <img src="media/Apple Gaussian Stack_Level_1.png" alt="Apple Gaussian Level 1"> <img src="media/Apple Gaussian Stack_Level_2.png" alt="Apple Gaussian Level 2"> <img src="media/Apple Gaussian Stack_Level_3.png" alt="Apple Gaussian Level 3"> <img src="media/Apple Gaussian Stack_Level_4.png" alt="Apple Gaussian Level 4">
+        <h3>Orange</h3>
         <img src="media/Orange Gaussian Stack_Level_0.png" alt="Orange Gaussian Level 0"> <img src="media/Orange Gaussian Stack_Level_1.png" alt="Orange Gaussian Level 1"> <img src="media/Orange Gaussian Stack_Level_2.png" alt="Orange Gaussian Level 2"> <img src="media/Orange Gaussian Stack_Level_3.png" alt="Orange Gaussian Level 3"> <img src="media/Orange Gaussian Stack_Level_4.png" alt="Orange Gaussian Level 4">
     </div>
     
@@ -177,13 +180,20 @@
     <div class="image-container">
         <h3>Laplacian Stack</h3>
         <p>Once the Gaussian stack is built, I omcomputed the Laplacian Stack by subtracting the adjacent levels in the Gaussian stack. This stack highlights the details or high-frequency information at each level. The final Laplaian stack can then be used for image blending by merging the Laplacian stacks of two images while maintaining fine details and smooth transitions.</p>
+        <h3>Apples</h3>
         <img src="media/Apple Laplacian Stack_Level_0.png" alt="Apple Laplacian Level 0"> <img src="media/Apple Laplacian Stack_Level_1.png" alt="Apple Laplacian Level 1"> <img src="media/Apple Laplacian Stack_Level_2.png" alt="Apple Laplacian Level 2"> <img src="media/Apple Laplacian Stack_Level_3.png" alt="Apple Laplacian Level 3"> <img src="media/Apple Laplacian Stack_Level_4.png" alt="Apple Laplacian Level 4">
+        <h3>Orange</h3>
         <img src="media/Orange Laplacian Stack_Level_0.png" alt="Orange Laplacian Level 0"> <img src="media/Orange Laplacian Stack_Level_1.png" alt="Orange Laplacian Level 1"> <img src="media/Orange Laplacian Stack_Level_2.png" alt="Orange Laplacian Level 2"> <img src="media/Orange Laplacian Stack_Level_3.png" alt="Orange Laplacian Level 3"> <img src="media/Orange Laplacian Stack_Level_4.png" alt="Orange Laplacian Level 4">
     </div>
 
     <h3>The "Orapple"</h3>
     <p>With the stacks, we blend the two images. First, I resized both images to match dimensions. Next, I generated the Gaussian stack for each image to capture their low frequency content. From there, I computed the Laplacian stack to isolate the high-frequency details at each level. These stacks allow me to blend the two images smoothly, creating the famous "Orapple".</p>
 
+    <h2>2.4 Fun with Frequencies</h2>
+    <p>In this section, I focused on blending two images together using multiresolution blending. This technique allows us to seamlessly merge two images, such as the classic apple and orange images, to create what is famously known as the "Oraple".</p>
+    <h3>1. Image Mask</h3>
+    <p></p>
+    
         
 </body>
 </html>
