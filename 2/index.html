@@ -41,7 +41,7 @@
     
     <p>These derivatives help understand how pixel values change along these axes, which is critical for edge detection.</p>
 
-     <div class="image-container">
+    <div class="image-container">
         <h3>Ix</h3>
         <p>Applying the finite difference operator [-1, 1] along the x axis allows us to compute the derivative in x to highlight vertical edges.</p>
         <img src="media/Ix (Derivative in x).png" alt="Ix Cameraman">
@@ -157,7 +157,27 @@
         <img src="media/Sharpened Blurred Image.png" alt="Re-sharpened MLK">
     </div>
 
+    <h2>2.2 Fun with Frequencies</h2>
+
+    <h2>2.3 Gaussian and Laplacian Stacks</h2>
+    <p>In this part of the project, I explored multi-resolution blending to combine two images. The goal of this technique is to combine two images seamlessly by creating a spline between the two images at various frequency levels.</p>
+    <p>This technique ensures that blending appears smooth, as it processes the images at different resolutions, minimizing any harsh seams or abrupt transitions.</p>
+    <p>This blending is done using two important tools: 1. Gaussian Stack  2. Laplacian Stack.</p>
+    <h3>1. Gaussian Stack</h3>
+    <p>A Gaussian Stack is a stack of images created by successively applying a Gaussian blur, which smooths the image at increasing levels of blurring. This stack reqpresents the low-frequency information at each level.</p>
+    <div class="image-container">
+        <h3>Gaussian Stack</h3>
+        <p>Each level in the stack applies a Gaussian filter with increasing sigma (blur strength), but unlike a pyramid, the image size remains constant without downsampling. This stack helps represent the low-frequency components at different scales.</p>
+        <img src="media/Ix (Derivative in x).png" alt="Ix Cameraman">
+    </div>
     
+    <h3>2. Laplacian Stack</h3>
+    <p>A Laplacian Stack is derived from the Gaussian stack by subtracting the next, more blurred image from the current one. It captures the high-frequency details between each level, which is crucial for multi-resolution blending.</p>
+    <div class="image-container">
+        <h3>Laplacian Stack</h3>
+        <p>Applying the finite difference operator [-1, 1] along the x axis allows us to compute the derivative in x to highlight vertical edges.</p>
+        <img src="media/Ix (Derivative in x).png" alt="Ix Cameraman">
+    </div>
 
         
 </body>
