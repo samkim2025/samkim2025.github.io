@@ -159,6 +159,28 @@
     </div>
 
     <h2>2.2 Fun with Frequencies</h2>
+    <p>In this section, I explored hybrid images, which involve combining two images in a way that allows different interpretations depending on the viewing distance.</p>
+    <p>Essentially, high-frequency details dominate perception when viewed up close, while low-frequency components are more prominent from a distance.</p>
+    <h3>1. Low/High Pass Filter</h3>
+    <p>To create a hybrid image, I first applied a low-pass filter (Gaussian filter) to one image to isolate the low-frequency content. Next, I applied a high-pass filter to the second image by subtracting a blurred version of the image from the original, leaving only the high-frequency details. The two filtered images were then combined to form the hybrid image.</p>
+    <div class="image-container">
+        <h3>Original Images</h3>
+        <p>These are the images I started with:</p>
+        <img src="media/DerekPicture.jpg" alt="Derek"> <img src="media/nutmeg.jpg" alt="Nutmeg">
+    </div>
+    <h3>2. Alignment and Scaling</h3>
+    <p>To align and scale the images, I manually selected points in both images to align key features and scaled them appropriately so that the high-frequency and low-frequency parts would blend smoothly.</p>
+    <div class="image-container">
+        <h3>3. Results</h3>
+        <p>This is the image I got:</p>
+        <img src="media/dereg.png" alt="Derek + Nutmeg">
+    </div>
+    <h3>4. Fourier Analysis:</h3>
+    <p>To visualize how the frequency components are distributed in the original and hybrid images, I computed the 2D Fourier transforms of the images. This analysis shows the distribution of high and low-frequency content.</p>
+    <div class="image-container">
+        <p>These are the Fourier Analysis</p>
+        <img src="media/fourier_derek.png" alt="Fourier Derek"> <img src="media/fourier_nutmeg.png" alt="Fourier Nutmeg"> <img src="media/fourier_hybrid.png" alt="Fourier Hybrid">
+    </div>
 
     <h2>2.3 Gaussian and Laplacian Stacks</h2>
     <p>In this part of the project, I explored multi-resolution blending to combine two images. The goal of this technique is to combine two images seamlessly by creating a spline between the two images at various frequency levels.</p>
