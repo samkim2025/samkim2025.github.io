@@ -191,9 +191,26 @@
 
     <h2>2.4 Fun with Frequencies</h2>
     <p>In this section, I focused on blending two images together using multiresolution blending. This technique allows us to seamlessly merge two images, such as the classic apple and orange images, to create what is famously known as the "Oraple".</p>
-    <h3>1. Image Mask</h3>
-    <p></p>
-    
+    <h3>The "Orapple"</h3>
+    <p>With the stacks I created in section 2.3, we blend the two images. First, I resized both images to match dimensions. Next, I generated the Gaussian stack for each image to capture their low frequency content. From there, I computed the Laplacian stack to isolate the high-frequency details at each level. These stacks allow me to blend the two images smoothly, creating the famous "Orapple".</p>
+    <img src="media/orapple.png" alt="Orapple">
+
+    <h3>Stankeley</h3>
+    <p>Using the same principle, I tried making my own set of blends -- the first being Stankeley.</p>
+    <img src="media/Original Stanford Image.png" alt="Stanford">
+    <img src="media/glade.jpg" alt="Glade">
+    <img src="media/mask.png" alt="Custom Mask">
+    <img src="media/stankeley.png" alt="Stankeley">
+
+    <h3>Magream</h3>
+    <p>Then, I sought to combine Magritte's "The Son of Man" and Munch's "The Scream".</p>
+    <img src="media/magritte.png" alt="The Son of Man">
+    <img src="media/scream.jpg" alt="The Scream">
+    <img src="media/magream.png" alt="Magream">
+
+    <h3>Failed Example</h3>
+    <p>This is a failed example that was a result of changing the threshold improperly. "The Scream" isn't as prominent as the successful example above.</p>
+    <img src="media/magream.jpg" alt="Magream Failed">
         
 </body>
 </html>
