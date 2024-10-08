@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CS180 Portfolio - Project 3</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        h1, h2 {
+            color: #333;
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+            margin-bottom: 10px;
+        }
+        .image-container {
+            margin-bottom: 30px;
+        }
+    </style>
+</head>
+<body>
+  <h1>Face Morphing</h1>
+  
+  <h2>Overview</h2>
+
+  <p>In this project, I tried to create a morph between two portraits -- mine and Bill's.</p>
+  <p>I also computed the mean face of a population dataset, and generate caricatures by extrapolating from the population mean.</p>
+  <p>I achieved this through image warping, cross-dissolving colors, and manipulating facial geometries using keypoints and Delauney triangulation.</p>
+
+  <h2>Part 1</h2>
+  <p>First, I manually selected keypoints on my image and another image to mark corresponding facial features.</p>
+  <p>I then computed a Delaunay triangulation based on the average positions of these keypoints to facilitate accurate mapping between the two faces.</p>
+  <div class="image-container">
+    <h3>Triangulated Sam and Bill</h3>
+    <img src="media/triangulation.png" alt="Triangulated Sam and Bill">
+  </div>
+    
+  
+</body>
+</html>
