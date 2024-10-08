@@ -27,22 +27,50 @@
     </style>
 </head>
 <body>
-  <h1>Face Morphing</h1>
+    <h1>Face Morphing</h1>
   
-  <h2>Overview</h2>
+    <h2>Overview</h2>
 
-  <p>In this project, I tried to create a morph between two portraits -- mine and Bill's.</p>
-  <p>I also computed the mean face of a population dataset, and generate caricatures by extrapolating from the population mean.</p>
-  <p>I achieved this through image warping, cross-dissolving colors, and manipulating facial geometries using keypoints and Delauney triangulation.</p>
+    <p>In this project, I tried to create a morph between two portraits -- mine and Bill's.</p>
+    <p>I also computed the mean face of a population dataset, and generate caricatures by extrapolating from the population mean.</p>
+    <p>I achieved this through image warping, cross-dissolving colors, and manipulating facial geometries using keypoints and Delauney triangulation.</p>
 
-  <h2>Part 1</h2>
-  <p>First, I manually selected keypoints on my image and another image to mark corresponding facial features.</p>
-  <p>I then computed a Delaunay triangulation based on the average positions of these keypoints to facilitate accurate mapping between the two faces.</p>
-  <div class="image-container">
-    <h3>Triangulated Sam and Bill</h3>
-    <img src="media/triangulation.png" alt="Triangulated Sam and Bill">
-  </div>
-    
+    <h2>Part 1</h2>
+    <p>First, I manually selected keypoints on my image and another image to mark corresponding facial features.</p>
+    <p>I then computed a Delaunay triangulation based on the average positions of these keypoints to facilitate accurate mapping between the two faces.</p>
+    <div class="image-container">
+        <h3>Triangulated Sam and Bill</h3>
+        <img src="media/triangulation.png" alt="Triangulated Sam and Bill">
+    </div>
+
+    <h2>Part 2</h2>
+    <p>Next, I calculated an intermediate shape using the average of the selected keypoints from both images. I warped both images to this shape and blended them to create a visually balanced mid-way face.</p>
+    <div class="image-container">
+        <h3>Triangulated Sam and Bill</h3>
+        <img src="media/triangulation.png" alt="Triangulated Sam and Bill">
+    </div>
+
+    <h2>Part 3</h2>
+    <p>I created a smooth animation by generating a series of frames. Each frame adjusted the shape and appearance slightly from one image to the other, resulting in a seamless morphing effect.</p>
+    <div class="image-container">
+        <h3>Triangulated Sam and Bill</h3>
+        <img src="media/triangulation.png" alt="Triangulated Sam and Bill">
+    </div>
+
+    <h2>Part 4</h2>
+    <p>I used a dataset of facial images to compute the mean face by averaging the positions of keypoints and pixel values. This provided insight into the average facial structure and appearance of the population.</p>
+    <div class="image-container">
+        <h3>Triangulated Sam and Bill</h3>
+        <img src="media/triangulation.png" alt="Triangulated Sam and Bill">
+    </div>
+
+    <h2>Part 5</h2>
+    <p>Finally, I exaggerated the differences between my face and the computed mean face to create a caricature. This was done by amplifying the deviations in keypoint positions, resulting in an enhanced representation of unique facial features.</p>
+    <div class="image-container">
+        <h3>Triangulated Sam and Bill</h3>
+        <img src="media/triangulation.png" alt="Triangulated Sam and Bill">
+    </div>
+
   
 </body>
 </html>
