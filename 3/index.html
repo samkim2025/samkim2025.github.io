@@ -35,7 +35,7 @@
     <p>I also computed the mean face of a population dataset, and generate caricatures by extrapolating from the population mean.</p>
     <p>I achieved this through image warping, cross-dissolving colors, and manipulating facial geometries using keypoints and Delauney triangulation.</p>
 
-    <h2>Part 1</h2>
+    <h2>Part 1: Defining Correspondences</h2>
     <p>First, I resized my portrait's dimensions to Bill's mugshot to ensure correspondence.</p>
     <p>Then, I manually selected 55 keypoints on my portrait and Bill's to mark corresponding facial features, 4 of them being the corners. I did this using the labeling tool created by last year's student.</p>
     <p>I then computed a Delaunay triangulation based on the average positions of these keypoints to map the two faces.</p>
@@ -44,7 +44,7 @@
         <img src="media/correspondence.png" alt="Triangulated Sam and Bill">
     </div>
 
-    <h2>Part 2</h2>
+    <h2>Part 2: Computing the Mid-Way Face</h2>
     <h3>To create the mid-way image between the two faces, I:</h3>
     <p>1. Calculated the average of the corresponding keypoints from both images to get the intermediate shape, using the formula below:</p>
     <div class="image-container">
@@ -60,14 +60,15 @@
         <img src="media/midwayformula.png" alt="Midway Formula">
     </div>
     
-    <h2>Part 3</h2>
-    <p>I created a smooth animation by generating a series of frames. Each frame adjusted the shape and appearance slightly from one image to the other, resulting in a seamless morphing effect.</p>
+    <h2>Part 3: The Morph Sequence</h2>
+    <p>I created a morph sequence, defining 45 frames to show the transition between two faces. I calculated the warp and dissolve fractions (ranged from 0 to 1) for each frame, blending them gradually.</p>
+    <p>Plugging these fractions into the morph function, I generated intermediate images and saved them to the output directory. Finally, I compiled these images into an animated GIF, with each frame being displayed for 30 ms.</p>
     <div class="image-container">
         <h3>Triangulated Sam and Bill</h3>
-        <img src="media/triangulation.png" alt="Triangulated Sam and Bill">
+        <img src="media/morph_sequence.gif" alt="Morph Sequence">
     </div>
 
-    <h2>Part 4</h2>
+    <h2>Part 4:</h2>
     <p>I used a dataset of facial images to compute the mean face by averaging the positions of keypoints and pixel values. This provided insight into the average facial structure and appearance of the population.</p>
     <div class="image-container">
         <h3>Triangulated Sam and Bill</h3>
