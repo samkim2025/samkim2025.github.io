@@ -36,11 +36,12 @@
     <p>I achieved this through image warping, cross-dissolving colors, and manipulating facial geometries using keypoints and Delauney triangulation.</p>
 
     <h2>Part 1</h2>
-    <p>First, I manually selected keypoints on my image and another image to mark corresponding facial features.</p>
-    <p>I then computed a Delaunay triangulation based on the average positions of these keypoints to facilitate accurate mapping between the two faces.</p>
+    <p>First, I resized my portrait's dimensions to Bill's to ensure correspondence.</p>
+    <p>Then, I manually selected 55 keypoints on my portrait and Bill's to mark corresponding facial features, 4 of them being the corners. I did this using the labeling tool created by last year's student.</p>
+    <p>I then computed a Delaunay triangulation based on the average positions of these keypoints to map the two faces.</p>
     <div class="image-container">
         <h3>Triangulated Sam and Bill</h3>
-        <img src="media/triangulation.png" alt="Triangulated Sam and Bill">
+        <img src="media/correspondence.png" alt="Triangulated Sam and Bill">
     </div>
 
     <h2>Part 2</h2>
