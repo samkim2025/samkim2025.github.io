@@ -31,12 +31,12 @@
   
     <h2>Overview</h2>
 
-    <p>In this project, I tried to create a morph between two portraits -- mine and Bill's.</p>
+    <p>In this project, I tried to create a morph between two images -- my portrait and Bill's mugshot.</p>
     <p>I also computed the mean face of a population dataset, and generate caricatures by extrapolating from the population mean.</p>
     <p>I achieved this through image warping, cross-dissolving colors, and manipulating facial geometries using keypoints and Delauney triangulation.</p>
 
     <h2>Part 1</h2>
-    <p>First, I resized my portrait's dimensions to Bill's to ensure correspondence.</p>
+    <p>First, I resized my portrait's dimensions to Bill's mugshot to ensure correspondence.</p>
     <p>Then, I manually selected 55 keypoints on my portrait and Bill's to mark corresponding facial features, 4 of them being the corners. I did this using the labeling tool created by last year's student.</p>
     <p>I then computed a Delaunay triangulation based on the average positions of these keypoints to map the two faces.</p>
     <div class="image-container">
@@ -45,12 +45,21 @@
     </div>
 
     <h2>Part 2</h2>
-    <p>Next, I calculated an intermediate shape using the average of the selected keypoints from both images. I warped both images to this shape and blended them to create a visually balanced mid-way face.</p>
+    <p>To create the mid-way image between the two faces, I:</p>
+    <p>1. Calculated the average of the corresponding keypoints from both images to get the intermediate shape, using the formula below:</p>
     <div class="image-container">
-        <h3>Triangulated Sam and Bill</h3>
-        <img src="media/triangulation.png" alt="Triangulated Sam and Bill">
+        <img src="media/mean_formula.png" alt="Mean Formula">
     </div>
-
+    <p>2. Created empty images im1_warped and im2_warped to store the warped versions of each input image.</p>
+    <p>3. Iterated over each triangle in the Delaunay triangulation computed on the average shape. For each triangle, I:</p>
+    <p>3a. Extracted the corresponding vertices from both images' keypoints and the average shape.</p>
+    <p>3b. Computed the affine transformation matrices to map the source triangles from each image to the destination triangle in the average shape.</p>
+    <p>3c. Used the warp_triangle function to perform the affine warping for each triangle, applying inverse warping and masking to ensure accurate pixel mapping.</p>
+    <p>4. Averaged the pixel values of the two warped images to blend them together, using the formula below:</p>
+    <div class="image-container">
+        <img src="media/midway_formula.png" alt="Midway Formula">
+    </div>
+    
     <h2>Part 3</h2>
     <p>I created a smooth animation by generating a series of frames. Each frame adjusted the shape and appearance slightly from one image to the other, resulting in a seamless morphing effect.</p>
     <div class="image-container">
