@@ -105,12 +105,28 @@
     
 
     <h2>Part 5</h2>
-    <p>I created caricatures of my face by extrapolating from the population mean computed earlier. Specifically, I used the average expression face derived from the dataset to exaggerate features of my own face.
-
-By setting the exaggeration factor α = 1.5, I amplified the differences between my facial features and the average expression face, effectively creating a caricature. I calculated the target keypoints using the formula:</p>
+    <p>I created caricatures of my face by extrapolating from the population mean computed earlier. Specifically, I used the average expression face derived from the dataset to exaggerate features of my own face.</p>
+    <p>By setting the exaggeration factor α = 1.5, I amplified the differences between my facial features and the average expression face and created a caricature. This was done by setting the alpha value outside [0, 1].</p>
+    <p>I calculated the target keypoints using the formula:</p>
     <div class="image-container">
-        <h3>Triangulated Sam and Bill</h3>
-        <img src="media/triangulation.png" alt="Triangulated Sam and Bill">
+        <img src="media/target_pts.png" alt="Target Points Formula">
+    </div>
+
+    <div class="image-container">
+        <h3>a = -0.5</h3>
+        <img src="media/-0.5.png" alt="Alpha = -0.5">
+    </div>
+    <div class="image-container">
+        <h3>a = 0.5</h3>
+        <img src="media/0.5.png" alt="Alpha = 0.5">
+    </div>
+    <div class="image-container">
+        <h3>a = 0.5</h3>
+        <img src="media/1.0.png" alt="Alpha = 1.0">
+    </div>
+    <div class="image-container">
+        <h3>a = 1.5</h3>
+        <img src="media/1.5.png" alt="Alpha = 1.5">
     </div>
 
   
