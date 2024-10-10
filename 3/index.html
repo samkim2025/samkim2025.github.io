@@ -63,7 +63,11 @@
     <h2>Part 3: The Morph Sequence</h2>
     <p>I created a morph sequence, defining 45 frames to show the transition between two faces. I calculated the warp and dissolve fractions (ranged from 0 to 1) for each frame, blending them gradually.</p>
     <p>Plugging these fractions into the morph function, I generated intermediate images and saved them to the output directory. Finally, I compiled these images into an animated GIF, with each frame being displayed for 30 ms.</p>
-    
+    <div class="image-container">
+        <h3>Morph Sequence GIF</h3>
+        <video autoplay loop muted playsinline>
+        <img src="media/morph_sequence.gif" alt="Morph Sequence">
+    </div>
 
     <h2>Part 4: The "Mean Face" Of A Population</h2>
     <p>In this part, I computed the mean face of a population using the Danes dataset, which includes facial images annotated with 46 keypoints each.</p> 
