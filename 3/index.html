@@ -44,7 +44,7 @@
         <img src="media/correspondence.png" alt="Triangulated Sam and Bill">
     </div>
 
-    <h2>Part 2: Computing the Mid-Way Face</h2>
+    <h2>Part 2: Computing The Mid-Way Face</h2>
     <h3>To create the mid-way image between the two faces, I:</h3>
     <p>1. Calculated the average of the corresponding keypoints from both images to get the intermediate shape, using the formula below:</p>
     <div class="image-container">
@@ -69,12 +69,40 @@
         <img src="media/morph_sequence.gif" alt="Morph Sequence">
     </div>
 
-    <h2>Part 4:</h2>
-    <p>I used a dataset of facial images to compute the mean face by averaging the positions of keypoints and pixel values. This provided insight into the average facial structure and appearance of the population.</p>
+    <h2>Part 4: The "Mean Face" Of A Population</h2>
+    <p>In this part, I computed the mean face of a population using the Danes dataset, which includes facial images annotated with 46 keypoints each.</p> 
+    <p>First, I collected all facial images (*a.jpg) and their corresponding keypoint files (*a.pts) from the dataset directories. Then, I used a numerical sort to pair images and keypoint files correctly.</p>
+    <p>After I loaded each image and keypoints (verifying that there were 46), I calculated the mean shape by averaging the keypoints across all images. This mean shape is the mean facial geometry of the population.</p>
+    <p>I then used Delaunay triangulation on the mean shape to warp each face to the average geometry with affine transformations, then averaged the pixel values of these warped images to create the population's mean face.</p>
+    <p>The output I got (shown below) is the average facial structure and appearance of the population.</p>
     <div class="image-container">
-        <h3>Triangulated Sam and Bill</h3>
-        <img src="media/triangulation.png" alt="Triangulated Sam and Bill">
+        <h3>Average Face</h3>
+        <img src="media/average_face.jpg" alt="Average Face">
     </div>
+    <p>To visualize how my own face compares to this average, I created a new image of myself called sam2.png</p>
+    <p>However, since I selected 55 points in the previous step, I reselected 46 points on my portrait to match the .pts file that was attached to each image in the dataset.</p>
+    <p>To make sure I had the order correct, I implemented a script that ovelays the points on the face, specifying the order of selection based on the line order of the .pts file.</p>
+    <p>This is what the result of that script looks like:</p>
+    <div class="image-container">
+        <h3>Points On Face</h3>
+        <img src="media/annotated.png" alt="Annotated Face">
+    </div>
+    <p>And with this ordering, I clicked on my face in approximately the same spots in the same order.</p>
+    <p>This is what the result of that script looks like:</p>
+    <div class="image-container">
+        <h3>Points On Face</h3>
+        <img src="media/annotated.png" alt="Annotated Face">
+    </div>
+    <p>Using the same triangulation technique, I warped my face into the average geometry, and the average face into the geometry of my face.</p>
+    <div class="image-container">
+        <h3>My face morphed into the average geometry</h3>
+        <img src="media/samtoavg.png" alt="Sam to Average">
+    </div>
+    <div class="image-container">
+        <h3>Average face morphed into my facial geometry</h3>
+        <img src="media/avgtosam.png" alt="Average to Sam">
+    </div>
+    
 
     <h2>Part 5</h2>
     <p>Finally, I exaggerated the differences between my face and the computed mean face to create a caricature. This was done by amplifying the deviations in keypoint positions, resulting in an enhanced representation of unique facial features.</p>
