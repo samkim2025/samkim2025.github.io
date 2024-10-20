@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CS180 Portfolio - Project 4</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        h1, h2 {
+            color: #333;
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+            margin-bottom: 10px;
+        }
+        .image-container {
+            margin-bottom: 30px;
+        }
+    </style>
+</head>
+<body>
+    <h1>CS180 IMAGE WARPING and MOSAICING </h1>
+
+    <h2>Overview</h2>
+
+    <h2>1.1 Image Rectification</h2>
+    
+    <p>To achieve image rectification, I selected four corner points of a planar object in the input image. These points correspond to the corners of the object that I wanted to rectify. I used the computeH function, which implements the normalized Direct Linear Transformation (DLT) algorithm. The DLT algorithm calculates the homography matrix H that maps the selected points in the input image to the corners of a rectangle in the desired output image.</p>
+    <p>Using the computed homography matrix H, I employed the warpImage function to warp the input image. The warping involves inverse mapping from the output image coordinates to the input image coordinates, followed by interpolation to obtain pixel values. The result is an image where the planar object appears fronto-parallel, effectively rectifying it.</p>
+    <div class="image-container">
+        <h3>Rectification Example</h3>
+        <img src="media/graffiti.jpg" alt="graffiti">
+        <img src="media/rectification.png" alt="rectification">
+    </div>
+
+    <h2>1.2 Image Mosaicing</h2>
+    <p>To create the image mosaic, I loaded two overlapping images (im2 and im3) that I wanted to stitch together to form a mosaic. I interactively selected 4 corresponding points in both images using the click_points function.</p>
+    <p>Using the selected correspondences, I computed the homography matrix H_32 that maps points from the right image (im3) to the left image's coordinate system (im2) using the computeH function.</p>
+    <p>I generated binary masks (mask2 and mask3) for the warped images to identify valid pixel regions. An overlap mask was created to identify overlapping regions between the two images.</p>
+    <p>A Gaussian blur was applied to the blending mask to ensure smooth transitions between the images. I applied the pyramid_blending function to blend the two images using Laplacian Pyramid blending.</p>
+    <div class="image-container">
+        <h3>Sam's room</h3>
+        <img src="media/lroom.jpg" alt="left room">
+        <img src="media/rroom.jpg" alt="right room">
+        <img src="media/mosaic.png" alt="mosaic">
+    </div>
+</body>
+</html>
