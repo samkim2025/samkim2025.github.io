@@ -36,9 +36,13 @@
     <p>To achieve image rectification, I selected four corner points of a planar object in the input image. These points correspond to the corners of the object that I wanted to rectify. I used the computeH function, which implements the normalized Direct Linear Transformation (DLT) algorithm. The DLT algorithm calculates the homography matrix H that maps the selected points in the input image to the corners of a rectangle in the desired output image.</p>
     <p>Using the computed homography matrix H, I employed the warpImage function to warp the input image. The warping involves inverse mapping from the output image coordinates to the input image coordinates, followed by interpolation to obtain pixel values. The result is an image where the planar object appears fronto-parallel, effectively rectifying it.</p>
     <div class="image-container">
-        <h3>Rectification Example</h3>
+        <h3>Graffiti Rectified</h3>
         <img src="media/graffiti.jpg" alt="graffiti">
-        <img src="media/rectification.png" alt="rectification">
+        <img src="media/rectification.png" alt="rectified graffiti">
+
+        <h3>Napkin Rectified</h3>
+        <img src="media/napkin.JPG" alt="napkin">
+        <img src="media/rectnapkin.png" alt="rectified napkin">
     </div>
 
     <h2>1.2 Image Mosaicing</h2>
@@ -48,21 +52,21 @@
     <p>A Gaussian blur was applied to the blending mask to ensure smooth transitions between the images. I applied the pyramid_blending function to blend the two images using Laplacian Pyramid blending.</p>
     <div class="image-container">
         <h3>Spieker Manual</h3>
-        <img src="media/lroom.jpg" alt="left room">
-        <img src="media/rroom.jpg" alt="right room">
-        <img src="media/mosaic.png" alt="mosaic">
+        <img src="media/spiekerm.jpg" alt="spieker left">
+        <img src="media/spiekerr.jpg" alt="spieker right">
+        <img src="media/spiekermanual.png" alt="spieker mosaic">
     </div>
     <div class="image-container">
         <h3>Oakland Airport Manual</h3>
-        <img src="media/lroom.jpg" alt="left room">
-        <img src="media/rroom.jpg" alt="right room">
-        <img src="media/mosaic.png" alt="mosaic">
+        <img src="media/oakl.JPG" alt="airport left">
+        <img src="media/oakr.JPG" alt="airport rightm">
+        <img src="media/oakmosaic.png" alt="airport mosaic">
     </div>
     <div class="image-container">
         <h3>Oakland Security Manual</h3>
-        <img src="media/lroom.jpg" alt="left room">
-        <img src="media/rroom.jpg" alt="right room">
-        <img src="media/mosaic.png" alt="mosaic">
+        <img src="media/securityl.JPG" alt="security left">
+        <img src="media/securityr.JPG" alt="security right">
+        <img src="media/securitymosaic.png" alt="security mosaic">
     </div>
 
     <h2>2 Feature Matching, Harris Corners, and Autostitching</h2>
@@ -73,21 +77,20 @@
     <p>I then used the same blending technique used from the manual approach and applied it to create the final mosaic.</p>
     <div class="image-container">
         <h3>Spieker Automatic</h3>
-        <img src="media/lroom.jpg" alt="left room">
-        <img src="media/rroom.jpg" alt="right room">
-        <img src="media/mosaic.png" alt="mosaic">
+        <img src="media/swimmosaic.png" alt="spieker automatic">
     </div>
     <div class="image-container">
         <h3>Oakland Airport Automatic</h3>
-        <img src="media/lroom.jpg" alt="left room">
-        <img src="media/rroom.jpg" alt="right room">
-        <img src="media/mosaic.png" alt="mosaic">
+        <img src="media/oakmosaic.png" alt="oakland mosaic">
     </div>
     <div class="image-container">
         <h3>Oakland Security Automatic</h3>
-        <img src="media/lroom.jpg" alt="left room">
-        <img src="media/rroom.jpg" alt="right room">
-        <img src="media/mosaic.png" alt="mosaic">
+        <img src="media/securitymosaic.png" alt="securitymosaic">
     </div>
+
+     <h2>Reflections</h2>
+    <p>Through this project, what I found most interesting was the inherently probabilistic nature of computer vision algorithms. Even with identical input images, the resulting mosaics varied significantl between runs due to several sources of variability.</p>
+    <p>When I selected points manually, the precise order and location of corresponding points influenced how the homography matrix was calculated, as each point pair contributes differently to our system of equations. This shows how small variations in point selection can lead to noticeably different transformation matrices.</p>
+    <p>The automatic feature matching algorithm further demonstrated the probabilistic elements of this project. The RANSAC algorithm's random sampling of point correspondences implies that each run will produce different homography estimates. Overall, this makes image mosaicing more of a "best estimate" process rather than a deterministic one. </p>
 </body>
 </html>
