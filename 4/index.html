@@ -42,12 +42,49 @@
     </div>
 
     <h2>1.2 Image Mosaicing</h2>
-    <p>To create the image mosaic, I loaded two overlapping images (im2 and im3) that I wanted to stitch together to form a mosaic. I interactively selected 4 corresponding points in both images using the click_points function.</p>
+    <p>To create the image mosaic, I loaded two overlapping images that I wanted to stitch together to form a mosaic. I interactively selected 4 corresponding points in both images using the click_points function.</p>
     <p>Using the selected correspondences, I computed the homography matrix H_32 that maps points from the right image (im3) to the left image's coordinate system (im2) using the computeH function.</p>
     <p>I generated binary masks (mask2 and mask3) for the warped images to identify valid pixel regions. An overlap mask was created to identify overlapping regions between the two images.</p>
     <p>A Gaussian blur was applied to the blending mask to ensure smooth transitions between the images. I applied the pyramid_blending function to blend the two images using Laplacian Pyramid blending.</p>
     <div class="image-container">
-        <h3>Sam's room</h3>
+        <h3>Spieker Manual</h3>
+        <img src="media/lroom.jpg" alt="left room">
+        <img src="media/rroom.jpg" alt="right room">
+        <img src="media/mosaic.png" alt="mosaic">
+    </div>
+    <div class="image-container">
+        <h3>Oakland Airport Manual</h3>
+        <img src="media/lroom.jpg" alt="left room">
+        <img src="media/rroom.jpg" alt="right room">
+        <img src="media/mosaic.png" alt="mosaic">
+    </div>
+    <div class="image-container">
+        <h3>Oakland Security Manual</h3>
+        <img src="media/lroom.jpg" alt="left room">
+        <img src="media/rroom.jpg" alt="right room">
+        <img src="media/mosaic.png" alt="mosaic">
+    </div>
+
+    <h2>2 Feature Matching, Harris Corners, and Autostitching</h2>
+    <p>For automatic image mosaicing, I implemented a Harris corner detector that computes corner responses using image gradients and Gaussian filtering. The detector identifies potential feature points by thresholding the corner response values.</p>
+    <p>I then applied Adaptive Non-Maximal Suppression (ANMS) to select 500 well-distributed corner points across each image based on both feature strength and spatial distribution.</p>
+    <p>For each selected corner point, I extracted feature descriptors by sampling 8x8 patches from 40x40 windows around each point. I normalized the patchs by subtracting the mean and dividing by the standard deviation to improve robustness. </p>
+    <p>I matched features between images using a nearest-neighbor approach with Lowe's ratio test (threshold of 0.7) to filter out ambiguous matches. The final homography was computed using RANSAC with a distance threshold of 5.0 pixels and up to 1000 iterations, ensuring that the transformation estimation is sufficiently robust despite potential mismatches.</p>
+    <p>I then used the same blending technique used from the manual approach and applied it to create the final mosaic.</p>
+    <div class="image-container">
+        <h3>Spieker Automatic</h3>
+        <img src="media/lroom.jpg" alt="left room">
+        <img src="media/rroom.jpg" alt="right room">
+        <img src="media/mosaic.png" alt="mosaic">
+    </div>
+    <div class="image-container">
+        <h3>Oakland Airport Automatic</h3>
+        <img src="media/lroom.jpg" alt="left room">
+        <img src="media/rroom.jpg" alt="right room">
+        <img src="media/mosaic.png" alt="mosaic">
+    </div>
+    <div class="image-container">
+        <h3>Oakland Security Automatic</h3>
         <img src="media/lroom.jpg" alt="left room">
         <img src="media/rroom.jpg" alt="right room">
         <img src="media/mosaic.png" alt="mosaic">
