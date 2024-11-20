@@ -69,6 +69,42 @@
         <img src="media/1.4.png" alt="Iterative Denoising">
         <p>The image shown here is the every 5th noisy image denoised (gradually becoming less noisy). The final predicted clean image was produced using iterative denoising.</p>
     </div>
-        
+
+    <h3>Part 1.5: Diffusion Model Sampling (DMS)</h3>
+    <div class="image-container">
+        <h3>Noisy!! Pixels are less cleaar</h3>
+        <img src="media/1.5.png" alt="DMS">
+    </div>
+
+    <h3>Part 1.6: Classifier-Free Guidance (CFG)</h3>
+    <div class="image-container">
+        <h3>Less noisy!! Pixels are quite cleaar</h3>
+        <img src="media/1.6.png" alt="CFG">
+    </div>
+
+    <h3>Part 1.7: Image-to-image Translation</h3>
+    <h3>Part 1.7.1: Editing Web Images/h3>
+    <div class="image-container">
+        <h3>The Dark Side of the Moon</h3>
+        <img src="media/1.7.1.1.png" alt="Pink Floyd">
+        <p>I picked Pink Floyd's album, The Dark Side of the Moon, as the image I will edit.</p>
+        <h3>The Dark Side of the Moon -- Edited</h3>
+        <img src="media/1.7.1.2.png" alt="Pink Floyd Edited">
+        <p>The image I got here was edited using CFG at noise levels [1, 3, 5, 7, 10, 20].</p>
+    </div>
+    <h3>Editing Hand-Drawn Images/h3>
+    <div class="image-container">
+        <h3>Sam Kim</h3>
+        <img src="media/1.7.1.3.png" alt="Sam Kim">
+        <p>Here's my autograph.</p>
+        <h3>Cat</h3>
+        <img src="media/1.7.1.4.png" alt="Cat">
+        <p>And here's a cat I drew.</p>
+        <h3>Edited Sam Kim and Cat</h3>
+        <img src="media/1.7.1.5.png" alt="Sam and Cat Edited">
+        <p>And here are both drawings similarly edited using CFG at noise levels [1, 3, 5, 7, 10, 20]. </p>
+    </div>
+    
+    
 </body>
 </html>
