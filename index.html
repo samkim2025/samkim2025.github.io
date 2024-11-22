@@ -7,14 +7,42 @@
             font-family: Arial, sans-serif;
             margin: 20px;
         }
+        .project-section {
+            margin: 20px 0;
+        }
+        .project-list {
+            margin-left: 20px;
+        }
+        a {
+            display: block;
+            margin: 10px 0;
+            color: #0066cc;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
-    <h1>Welcome to My CS180 Portfolio!</h1>
-    <a href="./1/index.html">Project 1</a>
-    <a href="./2/index.html">Project 2</a>
-    <a href="./3/index.html">Project 3</a>
-    <a href="./4/index.html">Project 4</a>
-    <a href="./5/index.html">Project 5</a>
+    <div class="project-section">
+        <h1>Featured Projects</h1>
+        <div class="project-list">
+            <a href="https://patientflow.streamlit.app" target="_blank">PatientFlow - Healthcare Analytics Platform</a>
+            <a href="https://factorflow.streamlit.app" target="_blank">FactorFlow - Market Prediction Platform</a>
+            <a href="https://aidbms.streamlit.app" target="_blank">AI-Powered Database Management System</a>
+        </div>
+    </div>
+
+    <div class="project-section">
+        <h1>My CS180 Portfolio</h1>
+        <div class="project-list">
+            <a href="./1/index.html">Project 1</a>
+            <a href="./2/index.html">Project 2</a>
+            <a href="./3/index.html">Project 3</a>
+            <a href="./4/index.html">Project 4</a>
+            <a href="./5/index.html">Project 5</a>
+        </div>
+    </div>
 </body>
 </html>
