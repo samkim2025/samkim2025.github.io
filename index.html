@@ -33,6 +33,41 @@
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
 
+        .bio-section {
+            background: white;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            margin: 2rem 0;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .bio-description {
+            color: #718096;
+            font-size: 0.95rem;
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+
+        .tech-stack {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+        }
+
+        .tech-tag {
+            background: #f3f4f6;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-size: 0.95rem;
+            color: #718096;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .tech-tag:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
         .project-section {
             margin: 2rem 0;
         }
@@ -105,6 +140,22 @@
             <h1>Sam's Portfolio</h1>
             <p>Virtual Reality, Machine Learning, Computer Vision...</p>
         </header>
+
+        <div class="bio-section">
+            <p class="bio-description">
+                Software engineer with a strong foundation in full-stack development and machine learning. Currently pursuing a degree in Applied Mathematics and Computer Science at UC Berkeley, with a focus on building scalable applications and ML-powered solutions.
+            </p>
+            <div class="tech-stack">
+                <span class="tech-tag">Python</span>
+                <span class="tech-tag">C++</span>
+                <span class="tech-tag">JavaScript</span>
+                <span class="tech-tag">React</span>
+                <span class="tech-tag">PyTorch</span>
+                <span class="tech-tag">SQL</span>
+                <span class="tech-tag">Docker</span>
+                <span class="tech-tag">OpenGL</span>
+            </div>
+        </div>
 
         <div class="project-section">
             <h2 class="section-title">Featured Projects</h2>
