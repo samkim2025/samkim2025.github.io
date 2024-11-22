@@ -1,29 +1,103 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CS180 Portfolio - Project 2</title>
+    <title>CS180 Portfolio - Project 1</title>
     <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #34495e;
+            --accent-color: #3498db;
+            --text-color: #2c3e50;
+            --bg-color: #f5f6fa;
+        }
+
         body {
-            font-family: Arial, sans-serif;
-            line-height: 1.6;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.8;
             margin: 0;
-            padding: 20px;
-            max-width: 800px;
+            padding: 40px;
+            max-width: 1200px;
             margin: 0 auto;
+            background-color: var(--bg-color);
+            color: var(--text-color);
         }
-        h1, h2 {
-            color: #333;
+
+        h1 {
+            color: var(--primary-color);
+            text-align: center;
+            font-size: 2.5em;
+            margin-bottom: 1.5em;
+            border-bottom: 3px solid var(--accent-color);
+            padding-bottom: 0.5em;
         }
+
+        h2 {
+            color: var(--secondary-color);
+            margin-top: 2em;
+            font-size: 1.8em;
+            border-left: 4px solid var(--accent-color);
+            padding-left: 15px;
+        }
+
+        .image-container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 40px;
+            transition: transform 0.3s ease;
+        }
+
+        .image-container:hover {
+            transform: translateY(-5px);
+        }
+
+        .image-container h3 {
+            color: var(--secondary-color);
+            margin-top: 0;
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 10px;
+        }
+
         img {
             max-width: 100%;
             height: auto;
-            margin-bottom: 10px;
+            border-radius: 5px;
+            display: block;
+            margin: 0 auto;
         }
-        .image-container {
-            margin-bottom: 30px;
+
+        p {
+            text-align: justify;
+            margin-bottom: 1.5em;
+        }
+
+        .channel-info {
+            background-color: #edf2f7;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 15px;
+            font-family: monospace;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 2em;
+            }
+
+            h2 {
+                font-size: 1.5em;
+            }
+
+            .image-container {
+                padding: 15px;
+            }
         }
     </style>
 </head>
