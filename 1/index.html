@@ -125,16 +125,20 @@
 <body>
     <h1>CS180 Images of the Russian Empire</h1>
 
-    <h2>Overview</h2>
-    
+    <div class="image-container">
+        <h2>Overview</h2>
+        <p>In this project, I automatically colorized historical photographs from Sergei Prokudin-Gorskii's collection. I processed glass plate negatives that contained three separate exposures of each scene, taken through different color filters. I separated each input image into three equal parts representing the blue, green, and red channels.</p>
+        <p>My main technical challenge was to precisely align the green and red channels to the blue channel reference using an x,y translation model. I achieved this alignment using image matching metrics such as L2 norm or Normalized Cross-Correlation, and recorded the displacement vectors for each alignment.</p>
+    </div>
+        
     <div class="image-container">
         <h3>Unaligned Cathedral</h3>
-        <img src="media/cathedral.jpg" alt="Unaligned Cathedral">
         <p>I initially divided the image into three, each representing the blue, green, and red channels respectively (from top to bottom).</p>
         <p>After dividing them, I sought to align them and produce a color photograph.</p>
+        <img src="media/cathedral.jpg" alt="Unaligned Cathedral">
     </div>
 
-    <h2>My Approach</h2>
+    <h2>My Initial Approach</h2>
     <p>First, I tried to see what would happen if I just divided the image in thirds, and stack them on top of each other.</p>
 
     <div class="image-container">
