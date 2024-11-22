@@ -41,12 +41,26 @@ h2 {
   padding-left: 15px;
 }
 
+.grid-container {
+  display: grid;
+  gap: 20px;
+  margin-bottom: 40px;
+  width: 100%;
+}
+
+.grid-4-cols { 
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.grid-2-cols {
+  grid-template-columns: repeat(2, 1fr);
+}
+  
 .image-container {
   background: white;
   padding: 20px;
   border-radius: 10px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  margin-bottom: 40px;
   transition: transform 0.3s ease;
 }
 
@@ -95,8 +109,18 @@ p {
     font-size: 1.5em;
   }
   
+  .grid-4-cols {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
   .image-container {
     padding: 15px;
+  }
+}
+
+@media (max-width: 480px) {
+  .grid-4-cols {
+    grid-template-columns: 1fr;
   }
 }
 </style>
@@ -143,6 +167,33 @@ p {
   <img src="media/Binarized Magnitude.png" alt="Binarized Magnitude">
 </div>
 
+<div class="grid-container grid-4-cols">
+  <div class="image-container">
+    <h3>Ix</h3>
+    <p>Applying the finite difference operator [-1, 1] along the x axis allows us to compute the derivative in x to highlight vertical edges.</p>
+    <img src="media/Ix (Derivative in x).png" alt="Ix Cameraman">
+  </div>
+
+  <div class="image-container">
+    <h3>Iy</h3>
+    <p>Similarly, I applied the finite difference operator along the y axis to compute the derivative in y to highlight horizontal edges.</p>
+    <img src="media/Iy (Derivative in y).png" alt="Iy Cameraman">
+  </div>
+
+  <div class="image-container"> 
+    <h3>Gradient Magnitude</h3>
+    <p>Next, I calculated the gradient magnitude, which combines the x and y derivatives to detect the overall strength of edges in the image.</p>
+    <p>More specifically, I used this line of code to calculate the gradient magnitude: """ gradient_magnitude = np.sqrt(Ix**2 + Iy**2) """</p>
+    <img src="media/Gradient Magnitude.png" alt="Gradient Magnitude">
+  </div>
+
+  <div class="image-container">
+    <h3>Binarized Magnitude</h3>
+    <p>Finally, I found an optimal threshold value based on trial and error to create a binary image that highlights the prominent edges in the image while suppressing noise.</p>
+    <img src="media/Binarized Magnitude.png" alt="Binarized Magnitude">
+  </div>
+</div>
+  
 <h2>1.2 Derivative of Gaussian (DoG) Filter</h2>
 
 <p>In this part of the project, I incorporated a Gaussian filter to improve upon the simple finite difference operator. While the finite difference method is effective at detecting edges, it also may produce a lot of noise. A Gaussian filter helps smooth the image before applying derivative operations.</p>
