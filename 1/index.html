@@ -111,19 +111,23 @@
     <div class="image-container">
         <h3>Unaligned Cathedral</h3>
         <img src="media/cathedral.jpg" alt="Unaligned Cathedral">
-        
-    <p>I initially divided the image into three, each representing the blue, green, and red channels respectively (from top to bottom).</p>
-    <p>After dividing them, I sought to align them and produce a color photograph.</p>
+        <p>I initially divided the image into three, each representing the blue, green, and red channels respectively (from top to bottom).</p>
+        <p>After dividing them, I sought to align them and produce a color photograph.</p>
     </div>
 
     <h2>My Approach</h2>
     <p>First, I tried to see what would happen if I just divided the image in thirds, and stack them on top of each other.</p>
-    <p>The result is depicted below, and it's not pretty.</p>
+
     
     <div class="image-container">
         <h3>Simple Stack Cathedral</h3>
+        <p>The result is shown below, and it's not pretty.</p>
         <img src="media/simple_stacked_cathedral.jpg" alt="Simple Stack Cathedral">
-        <p>Seeing that approach fail, I sought a different approach. </p>
+    </div>
+
+    <div class="image-container">
+        <h3>Alternative Approach</h3>
+        <p>Seeing this simple approach fail, I sought a different approach. </p>
         <p>First, I used the circular_shift function to align the channels. This method shifts an image by a given offset along the vertical and horizontal axes, and enables us to test different alignments.</p>
         <p>To measure the alignment quality quantitatively, I used the compute_ssd function to calculate sum of squared differences between the reference channel and the shifted target channel. Lower SSD values imply better alignment. </p>
         <p>Then, I use the align_channels method to carry out a brute-fore search over a given range of shifts performed on the target channel. For every shift in this range, I calculate the SSD, and eventually choose the shift with the lowest SSD value. </p>
