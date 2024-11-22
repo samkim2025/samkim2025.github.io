@@ -111,10 +111,10 @@
     <div class="image-container">
         <h3>Unaligned Cathedral</h3>
         <img src="media/cathedral.jpg" alt="Unaligned Cathedral">
-    </div>
-    
+        
     <p>I initially divided the image into three, each representing the blue, green, and red channels respectively (from top to bottom).</p>
     <p>After dividing them, I sought to align them and produce a color photograph.</p>
+    </div>
 
     <h2>My Approach</h2>
     <p>First, I tried to see what would happen if I just divided the image in thirds, and stack them on top of each other.</p>
@@ -123,16 +123,15 @@
     <div class="image-container">
         <h3>Simple Stack Cathedral</h3>
         <img src="media/simple_stacked_cathedral.jpg" alt="Simple Stack Cathedral">
+        <p>Seeing that approach fail, I sought a different approach. </p>
+        <p>First, I used the circular_shift function to align the channels. This method shifts an image by a given offset along the vertical and horizontal axes, and enables us to test different alignments.</p>
+        <p>To measure the alignment quality quantitatively, I used the compute_ssd function to calculate sum of squared differences between the reference channel and the shifted target channel. Lower SSD values imply better alignment. </p>
+        <p>Then, I use the align_channels method to carry out a brute-fore search over a given range of shifts performed on the target channel. For every shift in this range, I calculate the SSD, and eventually choose the shift with the lowest SSD value. </p>
+        <p>For large images (i.e. the .tif files), a brute force becomes super expensive and would take a long time to run. To address this, I implemented the pyramid_align method. In this method, we create an image pyramid that is made up of progressively smaller images, each downsampled from the previous one by a factor of 2. The pyramid method aligns the images at the smallest scale, where the search space is minimal. I then refine this shift at higher resolutions by upscaling the shift.</p>
+        <p>To build this image pyramid manually, I've written the manual_downsample and manual_upsample methods, which decreases/increases the image size. </p>
+        <p>Finally, the proess_image method carries out this entire process. It reads the image, divides it into three channels, and crops each channel to remove edges (default factor of 5%). The green and red channels are aligned to the blue channel using the pyramid alignment method. Finally, I stack these aligned channels to form the output image, which is saved and displayed.</p>
     </div>
 
-    <p>Seeing that approach fail, I sought a different approach. </p>
-    <p>First, I used the circular_shift function to align the channels. This method shifts an image by a given offset along the vertical and horizontal axes, and enables us to test different alignments.</p>
-    <p>To measure the alignment quality quantitatively, I used the compute_ssd function to calculate sum of squared differences between the reference channel and the shifted target channel. Lower SSD values imply better alignment. </p>
-    <p>Then, I use the align_channels method to carry out a brute-fore search over a given range of shifts performed on the target channel. For every shift in this range, I calculate the SSD, and eventually choose the shift with the lowest SSD value. </p>
-    <p>For large images (i.e. the .tif files), a brute force becomes super expensive and would take a long time to run. To address this, I implemented the pyramid_align method. In this method, we create an image pyramid that is made up of progressively smaller images, each downsampled from the previous one by a factor of 2. The pyramid method aligns the images at the smallest scale, where the search space is minimal. I then refine this shift at higher resolutions by upscaling the shift.</p>
-    <p>To build this image pyramid manually, I've written the manual_downsample and manual_upsample methods, which decreases/increases the image size. </p>
-    <p>Finally, the proess_image method carries out this entire process. It reads the image, divides it into three channels, and crops each channel to remove edges (default factor of 5%). The green and red channels are aligned to the blue channel using the pyramid alignment method. Finally, I stack these aligned channels to form the output image, which is saved and displayed.</p>
-    
     <h2>Results</h2>
     <p>Below are the results of my algorithm on the provided example images, along with the calculated offsets for each channel:</p>
 
