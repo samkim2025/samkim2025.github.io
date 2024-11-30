@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Tutoring Platform</title>
+    <title>7th Grade Math Tutoring</title>
     <style>
         .tutoring-platform {
             font-family: Arial, sans-serif;
@@ -71,6 +71,176 @@
             color: white;
             border: none;
         }
+
+        .grade-title {
+            color: #2d3748;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .topic-item {
+            margin-bottom: 1rem;
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            background-color: #fff;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .topic-title {
+            font-weight: bold;
+            color: #2d3748;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .subtopics {
+            margin-top: 0.5rem;
+            padding-left: 1rem;
+            display: none;
+        }
+
+        .subtopics.active {
+            display: block;
+        }
+
+        .subtopic-item {
+            padding: 0.3rem 0;
+            color: #4a5568;
+            cursor: pointer;
+        }
+
+        .subtopic-item:hover {
+            color: #2b6cb0;
+        }
+
+        /* Add new styles for grade sections */
+        .grade-section {
+            margin-bottom: 2rem;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 1rem;
+        }
+
+        .grade-header {
+            background: #001f3f;
+            color: white;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+            cursor: pointer;
+        }
+
+        .grade-content {
+            display: none;
+        }
+
+        .grade-content.active {
+            display: block;
+        }
+
+        /* Update existing styles for better hierarchy */
+        .semester-title {
+            color: #2d3748;
+            margin: 1rem 0;
+            padding: 0.5rem;
+            background: #f7fafc;
+            border-radius: 0.5rem;
+        }
+
+        .semester-title {
+            background: #001f3f;
+            color: white;
+            padding: 0.8rem;
+            border-radius: 0.5rem;
+            margin: 2rem 0 1rem 0;
+        }
+
+        .grade-section {
+            border: 1px solid #e2e8f0;
+            border-radius: 0.5rem;
+        }
+
+        .semester-title {
+            background: #001f3f;
+            color: white;
+            padding: 0.8rem;
+            border-radius: 0.5rem;
+            margin: 2rem 0 1rem 0;
+        }
+
+        .grade-section {
+            border: 1px solid #e2e8f0;
+            border-radius: 0.5rem;
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+        }
+
+        .grade-header {
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        /* Different colors for different grades */
+        .grade-section:nth-child(1) .grade-header {
+            background: #001f3f;  /* 7th grade */
+        }
+
+        .grade-section:nth-child(2) .grade-header {
+            background: #2c5282;  /* 8th grade */
+        }
+
+        /* Add to your existing styles */
+        .grade-section:nth-child(3) .grade-header {
+            background: #1a365d;  /* 9th grade - darker blue */
+        }
+
+        /* Add hover effects for better interactivity */
+        .topic-item:hover {
+            transform: translateX(5px);
+            transition: transform 0.2s ease;
+        }
+
+        /* Style for mathematical expressions */
+        .subtopic-item {
+            font-family: 'Times New Roman', serif;  /* Better for mathematical expressions */
+        }
+
+        /* Add to your existing styles */
+        /* Special styling for mathematical content */
+        .math-expression {
+            font-family: 'Times New Roman', serif;
+            font-style: italic;
+        }
+
+        /* Styling for semester sections */
+        .semester-title {
+            background: linear-gradient(135deg, #1a365d, #2c5282);
+            color: white;
+            padding: 0.8rem;
+            border-radius: 0.5rem;
+            margin: 2rem 0 1rem 0;
+            font-weight: bold;
+        }
+
+        /* Special styling for trigonometry section */
+        .topic-item[data-topic="trigonometry"] .subtopic-item {
+            padding-left: 1.5rem;
+            border-left: 3px solid #4299e1;
+        }
+
+        /* Special styling for geometry section */
+        .topic-item[data-topic="geometry"] .subtopic-item {
+            padding-left: 1.5rem;
+            border-left: 3px solid #48bb78;
+        }
+
+        /* Special styling for statistics section */
+        .topic-item[data-topic="statistics"] .subtopic-item {
+            padding-left: 1.5rem;
+            border-left: 3px solid #ed8936;
+        }
     </style>
 </head>
 <body>
@@ -80,25 +250,332 @@
         </div>
         <div class="main-container">
             <div class="sidebar">
-                <div class="grades-list">
-                    <div class="grade-item">
-                        <h3>Grade 5</h3>
+                <div class="grade-section">
+                    <div class="grade-header" onclick="toggleGrade(this)">
+                        7th Grade
+                        <span class="toggle-icon">▼</span>
+                    </div>
+                    <div class="grade-content">
+                        <h2 class="grade-title">7th Grade - First Semester</h2>
                         <div class="topics-list">
-                            <div class="topic-item" onclick="selectTopic('Fractions')">
-                                <span>Fractions</span>
+                            <div class="topic-item">
+                                <div class="topic-title" onclick="toggleSubtopics(this)">
+                                    <span>1. Prime Factorization</span>
+                                    <span class="toggle-icon">▼</span>
+                                </div>
                                 <div class="subtopics">
-                                    <div class="subtopic-item">Introduction to Fractions</div>
-                                    <div class="subtopic-item">Adding Fractions</div>
-                                    <div class="subtopic-item">Decimals</div>
+                                    <div class="subtopic-item" onclick="selectTopic('Prime Factorization')">Prime Factorization</div>
+                                    <div class="subtopic-item" onclick="selectTopic('Greatest Common Divisor and LCM')">Greatest Common Divisor and Least Common Multiple</div>
+                                    <div class="subtopic-item" onclick="selectTopic('Worksheet - Prime Factorization')">Single Task / Completing the Worksheet</div>
+                                    <div class="subtopic-item" onclick="selectTopic('Mind Map - Prime Factorization')">Concept Review / Mind Map</div>
                                 </div>
                             </div>
+
+                            <div class="topic-item">
+                                <div class="topic-title" onclick="toggleSubtopics(this)">
+                                    <span>2. Integers and Rational Numbers</span>
+                                    <span class="toggle-icon">▼</span>
+                                </div>
+                                <div class="subtopics">
+                                    <div class="subtopic-item" onclick="selectTopic('Integers and Rational Numbers')">Integers and Rational Numbers</div>
+                                    <div class="subtopic-item" onclick="selectTopic('Properties of Rational Numbers')">Properties of Rational Numbers and Mixed Operations</div>
+                                    <div class="subtopic-item" onclick="selectTopic('Properties and Division')">Properties and Division of Rational Numbers</div>
+                                    <div class="subtopic-item" onclick="selectTopic('Worksheet - Rational Numbers')">Single Task / Completing the Worksheet</div>
+                                    <div class="subtopic-item" onclick="selectTopic('Mind Map - Rational Numbers')">Concept Review / Mind Map</div>
+                                </div>
+                            </div>
+
+                            <div class="topic-item">
+                                <div class="topic-title" onclick="toggleSubtopics(this)">
+                                    <span>3. Usage of Letters and Expressions</span>
+                                    <span class="toggle-icon">▼</span>
+                                </div>
+                                <div class="subtopics">
+                                    <div class="subtopic-item" onclick="selectTopic('Usage of Letters')">Usage of Letters</div>
+                                    <div class="subtopic-item" onclick="selectTopic('Values of Expressions')">Values of Expressions</div>
+                                    <div class="subtopic-item" onclick="selectTopic('Simplification and Calculation')">Simplification and Calculation of Expressions</div>
+                                    <div class="subtopic-item" onclick="selectTopic('Worksheet - Expressions')">Single Task / Completing the Worksheet</div>
+                                    <div class="subtopic-item" onclick="selectTopic('Mind Map - Expressions')">Concept Review / Mind Map</div>
+                                </div>
+                            </div>
+
+                            <div class="topic-item">
+                                <div class="topic-title" onclick="toggleSubtopics(this)">
+                                    <span>4. Linear Equations</span>
+                                    <span class="toggle-icon">▼</span>
+                                </div>
+                                <div class="subtopics">
+                                    <div class="subtopic-item" onclick="selectTopic('Understanding Linear Equations')">Understanding Linear Equations</div>
+                                    <div class="subtopic-item" onclick="selectTopic('Solving Linear Equations')">Solving Linear Equations</div>
+                                    <div class="subtopic-item" onclick="selectTopic('Applications of Linear Equations')">Applications of Linear Equations</div>
+                                    <div class="subtopic-item" onclick="selectTopic('Worksheet - Linear Equations')">Single Task / Completing the Worksheet</div>
+                                    <div class="subtopic-item" onclick="selectTopic('Mind Map - Linear Equations')">Concept Review / Mind Map</div>
+                                </div>
+                            </div>
+
+                            <div class="topic-item">
+                                <div class="topic-title" onclick="toggleSubtopics(this)">
+                                    <span>5. Graphs and Coordinates</span>
+                                    <span class="toggle-icon">▼</span>
+                                </div>
+                                <div class="subtopics">
+                                    <div class="subtopic-item" onclick="selectTopic('Ordered Pairs and Coordinates')">Ordered Pairs and Coordinates</div>
+                                    <div class="subtopic-item" onclick="selectTopic('Interpretation of Graphs')">Interpretation of Graphs</div>
+                                    <div class="subtopic-item" onclick="selectTopic('Worksheet - Graphs')">Single Task / Completing the Worksheet</div>
+                                    <div class="subtopic-item" onclick="selectTopic('Mind Map - Graphs')">Concept Review / Mind Map</div>
+                                </div>
+                            </div>
+
+                            <div class="topic-item">
+                                <div class="topic-title" onclick="toggleSubtopics(this)">
+                                    <span>6. Proportions and Inverse Proportions</span>
+                                    <span class="toggle-icon">▼</span>
+                                </div>
+                                <div class="subtopics">
+                                    <div class="subtopic-item" onclick="selectTopic('Proportions')">Proportions</div>
+                                    <div class="subtopic-item" onclick="selectTopic('Inverse Proportions')">Inverse Proportions</div>
+                                    <div class="subtopic-item" onclick="selectTopic('Worksheet - Proportions')">Single Task / Completing the Worksheet</div>
+                                    <div class="subtopic-item" onclick="selectTopic('Mind Map - Proportions')">Concept Review / Mind Map</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grade-section">
+                    <div class="grade-header" onclick="toggleGrade(this)">
+                        8th Grade
+                        <span class="toggle-icon">▼</span>
+                    </div>
+                    <div class="grade-content">
+                        <h3 class="semester-title">First Semester</h3>
+                        <div class="topics-list">
+                            <div class="topic-item">
+                                <div class="topic-title" onclick="toggleSubtopics(this)">
+                                    <span>1. Rational and Circulating Decimals</span>
+                                    <span class="toggle-icon">▼</span>
+                                </div>
+                                <div class="subtopics">
+                                    <div class="subtopic-item" onclick="selectTopic('Rational Numbers and Circulating Decimals')">Rational Numbers and Circulating Decimals</div>
+                                    <div class="subtopic-item" onclick="selectTopic('Worksheet - Rational Numbers')">Single Task / Completing the Worksheet</div>
+                                    <div class="subtopic-item" onclick="selectTopic('Mind Map - Rational Numbers')">Math in Everyday Life / Mind Map</div>
+                                </div>
+                            </div>
+
+                            <div class="topic-item">
+                                <div class="topic-title" onclick="toggleSubtopics(this)">
+                                    <span>2. Calculation of Expressions</span>
+                                    <span class="toggle-icon">▼</span>
+                                </div>
+                                <div class="subtopics">
+                                    <div class="subtopic-item" onclick="selectTopic('Laws of Exponents')">Laws of Exponents</div>
+                                    <div class="subtopic-item" onclick="selectTopic('Single-Term Expressions')">Calculation of Single-Term Expressions</div>
+                                    <div class="subtopic-item" onclick="selectTopic('Multi-Term Expressions')">Calculation of Multi-Term Expressions</div>
+                                    <div class="subtopic-item" onclick="selectTopic('Worksheet - Expressions')">Single Task / Completing the Worksheet</div>
+                                    <div class="subtopic-item" onclick="selectTopic('Mind Map - Expressions')">Science in Everyday Life / Mind Map</div>
+                                </div>
+                            </div>
+
+                            <div class="topic-item">
+                                <div class="topic-title" onclick="toggleSubtopics(this)">
+                                    <span>3. Rational Numbers and Circulating Decimals</span>
+                                    <span class="toggle-icon">▼</span>
+                                </div>
+                                <div class="subtopics">
+                                    <div class="subtopic-item" onclick="selectTopic('Rational Numbers and Circulating Decimals')">Rational Numbers and Circulating Decimals</div>
+                                    <div class="subtopic-item" onclick="selectTopic('Worksheet - Rational Numbers')">Single Task / Completing the Worksheet</div>
+                                    <div class="subtopic-item" onclick="selectTopic('Mind Map - Rational Numbers')">Math in Everyday Life / Mind Map</div>
+                                </div>
+                            </div>
+
+                            <div class="topic-item">
+                                <div class="topic-title" onclick="toggleSubtopics(this)">
+                                    <span>4. Calculation of Expressions</span>
+                                    <span class="toggle-icon">▼</span>
+                                </div>
+                                <div class="subtopics">
+                                    <div class="subtopic-item" onclick="selectTopic('Laws of Exponents')">Laws of Exponents</div>
+                                    <div class="subtopic-item" onclick="selectTopic('Single-Term Expressions')">Calculation of Single-Term Expressions</div>
+                                    <div class="subtopic-item" onclick="selectTopic('Multi-Term Expressions')">Calculation of Multi-Term Expressions</div>
+                                    <div class="subtopic-item" onclick="selectTopic('Worksheet - Expressions')">Single Task / Completing the Worksheet</div>
+                                    <div class="subtopic-item" onclick="selectTopic('Mind Map - Expressions')">Science in Everyday Life / Mind Map</div>
+                                </div>
+                            </div>
+
+                            <div class="topic-item">
+                                <div class="topic-title" onclick="toggleSubtopics(this)">
+                                    <span>5. Rational Numbers and Circulating Decimals</span>
+                                    <span class="toggle-icon">▼</span>
+                                </div>
+                                <div class="subtopics">
+                                    <div class="subtopic-item" onclick="selectTopic('Rational Numbers and Circulating Decimals')">Rational Numbers and Circulating Decimals</div>
+                                    <div class="subtopic-item" onclick="selectTopic('Worksheet - Rational Numbers')">Single Task / Completing the Worksheet</div>
+                                    <div class="subtopic-item" onclick="selectTopic('Mind Map - Rational Numbers')">Math in Everyday Life / Mind Map</div>
+                                </div>
+                            </div>
+
+                            <div class="topic-item">
+                                <div class="topic-title" onclick="toggleSubtopics(this)">
+                                    <span>6. Calculation of Expressions</span>
+                                    <span class="toggle-icon">▼</span>
+                                </div>
+                                <div class="subtopics">
+                                    <div class="subtopic-item" onclick="selectTopic('Laws of Exponents')">Laws of Exponents</div>
+                                    <div class="subtopic-item" onclick="selectTopic('Single-Term Expressions')">Calculation of Single-Term Expressions</div>
+                                    <div class="subtopic-item" onclick="selectTopic('Multi-Term Expressions')">Calculation of Multi-Term Expressions</div>
+                                    <div class="subtopic-item" onclick="selectTopic('Worksheet - Expressions')">Single Task / Completing the Worksheet</div>
+                                    <div class="subtopic-item" onclick="selectTopic('Mind Map - Expressions')">Science in Everyday Life / Mind Map</div>
+                                </div>
+                            </div>
+
+                            <div class="topic-item">
+                                <div class="topic-title" onclick="toggleSubtopics(this)">
+                                    <span>6. Relationship Between Linear Functions and Linear Equations</span>
+                                    <span class="toggle-icon">▼</span>
+                                </div>
+                                <div class="subtopics">
+                                    <div class="subtopic-item" onclick="selectTopic('Linear Functions and Equations')">Relationship Between Linear Functions and Linear Equations</div>
+                                    <div class="subtopic-item" onclick="selectTopic('Graphical Representation')">Graphical Representation of Linear Functions and Simultaneous Equations</div>
+                                    <div class="subtopic-item" onclick="selectTopic('Worksheet - Linear Functions')">Single Task / Completing the Worksheet</div>
+                                    <div class="subtopic-item" onclick="selectTopic('Mind Map - Linear Functions')">Economics in Everyday Life / Mind Map</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grade-section">
+                    <div class="grade-header" onclick="toggleGrade(this)">
+                        9th Grade
+                        <span class="toggle-icon">▼</span>
+                    </div>
+                    <div class="grade-content">
+                        <h3 class="semester-title">First Semester</h3>
+                        <div class="topics-list">
+                            <div class="topic-item">
+                                <div class="topic-title" onclick="toggleSubtopics(this)">
+                                    <span>1. Proportional Relationships and Errors</span>
+                                    <span class="toggle-icon">▼</span>
+                                </div>
+                                <div class="subtopics">
+                                    <div class="subtopic-item" onclick="selectTopic('Properties of Proportional Relationships')">Properties of Proportional Relationships</div>
+                                    <div class="subtopic-item" onclick="selectTopic('Errors in Rational Numbers')">Errors in Rational Numbers</div>
+                                    <div class="subtopic-item" onclick="selectTopic('Worksheet - Proportional Relationships')">Single Task / Completing the Worksheet</div>
+                                    <div class="subtopic-item" onclick="selectTopic('Mind Map - Proportional Relationships')">History in Everyday Life / Mind Map</div>
+                                </div>
+                            </div>
+
+                            <div class="topic-item">
+                                <div class="topic-title" onclick="toggleSubtopics(this)">
+                                    <span>2. Calculations Involving Roots</span>
+                                    <span class="toggle-icon">▼</span>
+                                </div>
+                                <div class="subtopics">
+                                    <div class="subtopic-item" onclick="selectTopic('Root Expressions 1')">Calculations with Root Expressions (1)</div>
+                                    <div class="subtopic-item" onclick="selectTopic('Root Expressions 2')">Calculations with Root Expressions (2)</div>
+                                    <div class="subtopic-item" onclick="selectTopic('Worksheet - Root Calculations')">Single Task / Completing the Worksheet</div>
+                                    <div class="subtopic-item" onclick="selectTopic('Mind Map - Root Calculations')">Playful Math in Everyday Life / Mind Map</div>
+                                </div>
+                            </div>
+
+                            <div class="topic-item">
+                                <div class="topic-title" onclick="toggleSubtopics(this)">
+                                    <span>3. Polynomial Equations</span>
+                                    <span class="toggle-icon">▼</span>
+                                </div>
+                                <div class="subtopics">
+                                    <div class="subtopic-item" onclick="selectTopic('Polynomial Formulas')">Polynomial Formulas</div>
+                                    <div class="subtopic-item" onclick="selectTopic('Applications of Polynomials')">Applications of Polynomial Formulas</div>
+                                    <div class="subtopic-item" onclick="selectTopic('Worksheet - Polynomials')">Single Task / Completing the Worksheet</div>
+                                    <div class="subtopic-item" onclick="selectTopic('Mind Map - Polynomials')">History in Everyday Life / Mind Map</div>
+                                </div>
+                            </div>
+
+                            <div class="topic-item">
+                                <div class="topic-title" onclick="toggleSubtopics(this)">
+                                    <span>4. Factoring</span>
+                                    <span class="toggle-icon">▼</span>
+                                </div>
+                                <div class="subtopics">
+                                    <div class="subtopic-item" onclick="selectTopic('Factoring Polynomials')">Factoring of Polynomials</div>
+                                    <div class="subtopic-item" onclick="selectTopic('Special Factorization')">Special Factorization Formulas</div>
+                                    <div class="subtopic-item" onclick="selectTopic('Worksheet - Factoring')">Single Task / Completing the Worksheet</div>
+                                    <div class="subtopic-item" onclick="selectTopic('Mind Map - Factoring')">Science in Everyday Life / Mind Map</div>
+                                </div>
+                            </div>
+
+                            <div class="topic-item">
+                                <div class="topic-title" onclick="toggleSubtopics(this)">
+                                    <span>5. Quadratic Equations</span>
+                                    <span class="toggle-icon">▼</span>
+                                </div>
+                                <div class="subtopics">
+                                    <div class="subtopic-item" onclick="selectTopic('Understanding Quadratics')">Understanding Quadratic Equations</div>
+                                    <div class="subtopic-item" onclick="selectTopic('Solving Quadratics')">Solving Quadratic Equations</div>
+                                    <div class="subtopic-item" onclick="selectTopic('Applications of Quadratics')">Applications of Quadratic Equations</div>
+                                    <div class="subtopic-item" onclick="selectTopic('Worksheet - Quadratics')">Single Task / Completing the Worksheet</div>
+                                    <div class="subtopic-item" onclick="selectTopic('Mind Map - Quadratics')">Art in Everyday Life / Mind Map</div>
+                                </div>
+                            </div>
+
+                            <div class="topic-item">
+                                <div class="topic-title" onclick="toggleSubtopics(this)">
+                                    <span>6. Quadratic Functions and Their Graphs</span>
+                                    <span class="toggle-icon">▼</span>
+                                </div>
+                                <div class="subtopics">
+                                    <div class="subtopic-item" onclick="selectTopic('Properties of Quadratics')">Properties of Quadratic Functions</div>
+                                    <div class="subtopic-item" onclick="selectTopic('Basic Quadratic Graphs')">Graphs of y = ax²</div>
+                                    <div class="subtopic-item" onclick="selectTopic('Vertex Form Graphs')">Graphs of y=a(x−p)² + q</div>
+                                    <div class="subtopic-item" onclick="selectTopic('Standard Form Graphs')">Graphs of y= ax² +bx+c</div>
+                                    <div class="subtopic-item" onclick="selectTopic('Quadratic Properties')">Expressions and Properties of Quadratic Functions</div>
+                                    <div class="subtopic-item" onclick="selectTopic('Worksheet - Quadratic Functions')">Single Task / Completing the Worksheet</div>
+                                    <div class="subtopic-item" onclick="selectTopic('Mind Map - Quadratic Functions')">Science in Everyday Life / Mind Map</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <h3 class="semester-title">Second Semester</h3>
+                <div class="topics-list">
+                    <div class="topic-item">
+                        <div class="topic-title" onclick="toggleSubtopics(this)">
+                            <span>I. Trigonometric Ratios</span>
+                            <span class="toggle-icon">▼</span>
+                        </div>
+                        <div class="subtopics">
+                            <div class="subtopic-item" onclick="selectTopic('Trigonometric Ratios')">Trigonometric Ratios</div>
+                            <div class="subtopic-item" onclick="selectTopic('Applications of Trigonometry')">Applications of Trigonometric Ratios</div>
+                        </div>
+                    </div>
+
+                    <div class="topic-item">
+                        <div class="topic-title" onclick="toggleSubtopics(this)">
+                            <span>II. Properties of Circles</span>
+                            <span class="toggle-icon">▼</span>
+                        </div>
+                        <div class="subtopics">
+                            <div class="subtopic-item" onclick="selectTopic('Circles and Lines')">Circles and Lines</div>
+                            <div class="subtopic-item" onclick="selectTopic('Angles in Circles')">Central Angles and Inscribed Angles</div>
+                        </div>
+                    </div>
+
+                    <div class="topic-item">
+                        <div class="topic-title" onclick="toggleSubtopics(this)">
+                            <span>III. Statistics</span>
+                            <span class="toggle-icon">▼</span>
+                        </div>
+                        <div class="subtopics">
+                            <div class="subtopic-item" onclick="selectTopic('Representative Values')">Representative Values and Dispersion</div>
+                            <div class="subtopic-item" onclick="selectTopic('Correlation')">Correlation</div>
                         </div>
                     </div>
                 </div>
             </div>
             <div class="content-area" id="content">
                 <div class="placeholder-content">
-                    <h2>Welcome to Math Tutoring</h2>
+                    <h2>Welcome to 7th Grade Math</h2>
                     <p>Select a topic from the sidebar to begin learning</p>
                 </div>
             </div>
@@ -106,19 +583,65 @@
     </div>
 
     <script>
+        function toggleSubtopics(element) {
+            const subtopics = element.nextElementSibling;
+            subtopics.classList.toggle('active');
+            const icon = element.querySelector('.toggle-icon');
+            icon.textContent = subtopics.classList.contains('active') ? '▼' : '▶';
+        }
+
         function selectTopic(topicName) {
             const content = document.getElementById('content');
-            content.innerHTML = `
-                <h2>${topicName}</h2>
+            let topicContent = `<h2>${topicName}</h2>`;
+            
+            // Add special content for certain topics
+            if (topicName.includes('Quadratic')) {
+                topicContent += `
+                    <div class="math-expression">
+                        <p>y = ax² + bx + c</p>
+                        <p>y = a(x - h)² + k</p>
+                    </div>
+                `;
+            } else if (topicName.includes('Trigonometric')) {
+                topicContent += `
+                    <div class="math-expression">
+                        <p>sin θ = opposite / hypotenuse</p>
+                        <p>cos θ = adjacent / hypotenuse</p>
+                        <p>tan θ = opposite / adjacent</p>
+                    </div>
+                `;
+            }
+
+            topicContent += `
                 <div class="progress-bar">
-                    <div class="progress-fill" style="width: 25%"></div>
-                    <span>25% Complete</span>
+                    <div class="progress-fill" style="width: 0%"></div>
+                    <span>0% Complete</span>
                 </div>
                 <div class="action-buttons">
                     <button class="primary-button">Start Lesson</button>
                     <button class="secondary-button">Take Quiz</button>
                 </div>
             `;
+
+            content.innerHTML = topicContent;
+        }
+
+        function toggleGrade(element) {
+            const gradeContent = element.nextElementSibling;
+            const allGradeContents = document.querySelectorAll('.grade-content');
+            
+            // Close all other grade contents
+            allGradeContents.forEach(content => {
+                if (content !== gradeContent) {
+                    content.classList.remove('active');
+                    content.previousElementSibling.querySelector('.toggle-icon').textContent = '▼';
+                }
+            });
+            
+            // Toggle current grade content
+            gradeContent.classList.toggle('active');
+            const icon = element.querySelector('.toggle-icon');
+            icon.textContent = gradeContent.classList.contains('active') ? '▲' : '▼';
         }
     </script>
 </body>
