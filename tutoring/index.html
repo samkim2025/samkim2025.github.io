@@ -132,6 +132,8 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            color: white;
+            transition: background-color 0.3s ease;
         }
 
         .grade-content {
@@ -187,16 +189,16 @@
 
         /* Different colors for different grades */
         .grade-section:nth-child(1) .grade-header {
-            background: #001f3f;  /* 7th grade */
+            background: #2c5282;  /* Lighter blue for 7th grade */
         }
 
         .grade-section:nth-child(2) .grade-header {
-            background: #2c5282;  /* 8th grade */
+            background: #1a365d;  /* Medium blue for 8th grade */
         }
 
         /* Add to your existing styles */
         .grade-section:nth-child(3) .grade-header {
-            background: #1a365d;  /* 9th grade - darker blue */
+            background: #0f2942;  /* Darker blue for 9th grade */
         }
 
         /* Add hover effects for better interactivity */
@@ -265,6 +267,17 @@
             .main-container {
                 flex-direction: column;
             }
+        }
+
+        /* Hover effects */
+        .grade-header:hover {
+            filter: brightness(1.1);
+            cursor: pointer;
+        }
+
+        /* Make toggle icon white too */
+        .grade-header .toggle-icon {
+            color: white;
         }
     </style>
 </head>
@@ -663,7 +676,7 @@
             allGradeContents.forEach(content => {
                 if (content !== gradeContent) {
                     content.classList.remove('active');
-                    content.previousElementSibling.querySelector('.toggle-icon').textContent = '��';
+                    content.previousElementSibling.querySelector('.toggle-icon').textContent = '';
                 }
             });
             
