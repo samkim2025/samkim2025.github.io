@@ -482,6 +482,39 @@
             border: 1px solid #e2e8f0;
             border-radius: 3px;
         }
+
+        .input-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .template-buttons {
+            display: flex;
+            gap: 5px;
+        }
+
+        .answer-input {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            padding: 8px;
+            border: 1px solid #e2e8f0;
+            border-radius: 4px;
+            width: 120px;
+        }
+
+        .template-btn {
+            background: #edf2f7;
+            color: #2c5282;
+            border: 1px solid #cbd5e0;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .template-btn:hover {
+            background: #e2e8f0;
+        }
     </style>
 </head>
 <body>
@@ -1021,9 +1054,13 @@
                                 </div>
                                 <div class="question-item">
                                     <p>3) (2/5) × (2/5) × (2/5) × (2/5) = </p>
-                                    <input type="text" id="q9-input" class="answer-input" placeholder="e.g., (2/5)⁴">
-                                    <button onclick="insertTemplate('q9-input', 'fraction')" class="template-btn">a/b</button>
-                                    <button onclick="insertTemplate('q9-input', 'power')" class="template-btn">xⁿ</button>
+                                    <div class="input-group">
+                                        <input type="text" id="q9-input" class="answer-input" placeholder="Type or use buttons">
+                                        <div class="template-buttons">
+                                            <button onclick="insertTemplate('q9-input', 'fraction')" class="template-btn">a/b</button>
+                                            <button onclick="insertTemplate('q9-input', 'power')" class="template-btn">xⁿ</button>
+                                        </div>
+                                    </div>
                                     <button onclick="checkAnswer('q9')" class="check-btn">Check</button>
                                     <div class="feedback" id="q9-feedback"></div>
                                 </div>
@@ -1081,15 +1118,19 @@
             
             const answers = {
                 'q1': '2',
-                'q2': '3'
+                'q2': '3',
+                'q7': '19³',
+                'q8': '2⁴×7²',
+                'q9': '(2/5)⁴'
             };
 
-            if (input.value.trim() === answers[questionId]) {
+            let userAnswer = input.value.trim().replace(/\s+/g, '').toLowerCase();
+            let correctAnswer = answers[questionId].toLowerCase();
+            
+            if (userAnswer === correctAnswer) {
                 feedback.innerHTML = '<span class="correct">✓ Correct!</span>';
-                feedback.className = 'feedback correct';
             } else {
                 feedback.innerHTML = '<span class="incorrect">✗ Try again</span>';
-                feedback.className = 'feedback incorrect';
             }
         }
 
@@ -1117,24 +1158,36 @@
         function insertTemplate(inputId, type) {
             const input = document.getElementById(inputId);
             let template = '';
-
+            
             if (type === 'power') {
-                // Create a span with superscript styling
-                template = '<sup contenteditable="true">n</sup>';
+                // Use actual superscript numbers
+                template = 'x²'; // Default template with ² as example
             } else if (type === 'fraction') {
                 template = '(a/b)';
             }
-
-            // Insert at cursor position
-            const startPos = input.selectionStart;
-            input.value = input.value.substring(0, startPos) + template + input.value.substring(startPos);
             
-            // Focus and select the placeholder
+            const startPos = input.selectionStart;
+            const endPos = input.selectionEnd;
+            const currentValue = input.value;
+            
+            input.value = currentValue.substring(0, startPos) + template + currentValue.substring(endPos);
             input.focus();
+            
+            // Place cursor at the superscript position
             if (type === 'power') {
-                // Position cursor at 'n'
+                input.setSelectionRange(startPos + 1, startPos + 2);
+            } else {
                 input.setSelectionRange(startPos + 1, startPos + 2);
             }
+        }
+
+        // Add a helper function to convert numbers to superscript
+        function toSuperscript(num) {
+            const superscriptMap = {
+                '0': '⁰', '1': '¹', '2': '²', '3': '³', '4': '⁴',
+                '5': '⁵', '6': '⁶', '7': '⁷', '8': '⁸', '9': '⁹'
+            };
+            return num.toString().split('').map(char => superscriptMap[char] || char).join('');
         }
     </script>
 </body>
