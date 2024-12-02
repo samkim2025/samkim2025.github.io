@@ -1135,23 +1135,24 @@
         }
 
         function checkPowerAnswer(questionId) {
-            const baseInput = document.querySelector(`#${questionId} .base-input`);
-            const expInput = document.querySelector(`#${questionId} .exponent-input`);
+            const baseInput = document.getElementById(`${questionId}-base`);
+            const expInput = document.getElementById(`${questionId}-exp`);
             const feedback = document.getElementById(`${questionId}-feedback`);
             
-            // Get the values
-            const base = baseInput.value.trim();
-            const exponent = expInput.value.trim();
-            
-            // Check answer
             const answers = {
-                'q7': { base: '19', exp: '3' }
+                'q3': { base: '2', exp: '6' },
+                'q4': { base: '3', exp: '2' },
+                'q5': { base: '5', exp: '5' },
+                'q6': { base: '7', exp: '8' }
             };
-            
-            if (base === answers[questionId].base && exponent === answers[questionId].exp) {
+
+            if (baseInput.value.trim() === answers[questionId].base && 
+                expInput.value.trim() === answers[questionId].exp) {
                 feedback.innerHTML = '<span class="correct">✓ Correct!</span>';
+                feedback.className = 'feedback correct';
             } else {
                 feedback.innerHTML = '<span class="incorrect">✗ Try again</span>';
+                feedback.className = 'feedback incorrect';
             }
         }
 
