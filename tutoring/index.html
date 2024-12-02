@@ -362,6 +362,88 @@
             position: relative;
             top: -0.5em;
         }
+
+        .lesson-content {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .nav-btn {
+            background: #2c5282;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .nav-btn:hover {
+            background: #1a365d;
+        }
+
+        .page-indicator {
+            color: #4a5568;
+            font-size: 0.9rem;
+        }
+
+        .question-item {
+            margin: 20px 0;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 5px;
+        }
+
+        .answer-input {
+            padding: 8px;
+            margin: 0 10px;
+            border: 1px solid #e2e8f0;
+            border-radius: 4px;
+            width: 60px;
+        }
+
+        .check-btn {
+            background: #4299e1;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .check-btn:hover {
+            background: #3182ce;
+        }
+
+        .feedback {
+            margin-top: 10px;
+            padding: 5px;
+        }
+
+        .feedback.correct {
+            color: #48bb78;
+        }
+
+        .feedback.incorrect {
+            color: #e53e3e;
+        }
+
+        .input-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
     </style>
 </head>
 <body>
@@ -811,6 +893,168 @@
                         </div>
                     </div>
                 `;
+            }
+        }
+
+        const lessonContent = {
+            'powers-and-exponents': {
+                pages: [
+                    // Page 1: Introduction and Key Terms
+                    {
+                        content: `
+                            <h2>1.1.1 Powers and Exponents</h2>
+                            <div class="key-terms">
+                                <h3>Key Terms:</h3>
+                                <ul>
+                                    <li><strong>Powers:</strong> The product of a number multiplied by itself, multiple times</li>
+                                    <li><strong>Base (number):</strong> The number being multiplied multiple times</li>
+                                    <li><strong>Exponent:</strong> The amount of times the base is being multiplied</li>
+                                </ul>
+                            </div>
+                            <div class="example">
+                                <div class="math-expression">
+                                    2 × 2 × 2 = 2³
+                                </div>
+                            </div>
+                        `
+                    },
+                    // Page 2: Concept Check 1
+                    {
+                        content: `
+                            <h2>Concept Check 1</h2>
+                            <div class="concept-check">
+                                <div class="question">
+                                    <p>Looking at the expression: 2 × 2 × 2 = 2³</p>
+                                    <div class="question-item">
+                                        <p>1. What is the base in this expression?</p>
+                                        <input type="text" id="q1-input" class="answer-input">
+                                        <button onclick="checkAnswer('q1')" class="check-btn">Check</button>
+                                        <div class="feedback" id="q1-feedback"></div>
+                                    </div>
+                                    <div class="question-item">
+                                        <p>2. What is the exponent in this expression?</p>
+                                        <input type="text" id="q2-input" class="answer-input">
+                                        <button onclick="checkAnswer('q2')" class="check-btn">Check</button>
+                                        <div class="feedback" id="q2-feedback"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        `
+                    },
+                    // Page 3: Approaching the Concept
+                    {
+                        content: `
+                            <h2>Approaching the Concept</h2>
+                            <div class="concept-explanation">
+                                <p>When multiplying a number by itself, multiple times, you can express the expression as a power using 
+                                the base (the number being multiplied) and the exponent (the amount of times the base is being 
+                                multiplied). For example:</p>
+                                <div class="math-expression">
+                                    5 × 5 = 5² (Five squared)<br>
+                                    5 × 5 × 5 = 5³ (Five cubed)<br>
+                                    5 × 5 × 5 × 5 = 5⁴ (Five to the power of four)
+                                </div>
+                            </div>
+                        `
+                    },
+                    // Page 4: Concept Check 2
+                    {
+                        content: `
+                            <h2>Concept Check 2</h2>
+                            <div class="practice-problems">
+                                <p>Identify the base and exponent for each expression:</p>
+                                <div class="question-item">
+                                    <p>1) For 2⁶:</p>
+                                    <div class="input-group">
+                                        <label>Base: <input type="text" id="q3-base" class="answer-input"></label>
+                                        <label>Exponent: <input type="text" id="q3-exp" class="answer-input"></label>
+                                        <button onclick="checkPowerAnswer('q3')" class="check-btn">Check</button>
+                                        <div class="feedback" id="q3-feedback"></div>
+                                    </div>
+                                </div>
+                                <!-- Add more practice problems similarly -->
+                            </div>
+                        `
+                    }
+                ]
+            }
+        };
+
+        let currentPage = 0;
+        let currentLesson = null;
+
+        function selectLesson(lessonId) {
+            currentLesson = lessonId;
+            currentPage = 0;
+            displayCurrentPage();
+        }
+
+        function displayCurrentPage() {
+            const content = document.getElementById('content');
+            const lesson = lessonContent[currentLesson];
+            
+            if (!lesson) return;
+
+            content.innerHTML = `
+                <div class="lesson-content">
+                    ${lesson.pages[currentPage].content}
+                    <div class="navigation">
+                        ${currentPage > 0 ? '<button onclick="previousPage()" class="nav-btn">← Previous</button>' : ''}
+                        <span class="page-indicator">Page ${currentPage + 1} of ${lesson.pages.length}</span>
+                        ${currentPage < lesson.pages.length - 1 ? '<button onclick="nextPage()" class="nav-btn">Next →</button>' : ''}
+                    </div>
+                </div>
+            `;
+        }
+
+        function nextPage() {
+            if (currentPage < lessonContent[currentLesson].pages.length - 1) {
+                currentPage++;
+                displayCurrentPage();
+            }
+        }
+
+        function previousPage() {
+            if (currentPage > 0) {
+                currentPage--;
+                displayCurrentPage();
+            }
+        }
+
+        function checkAnswer(questionId) {
+            const input = document.getElementById(`${questionId}-input`);
+            const feedback = document.getElementById(`${questionId}-feedback`);
+            
+            const answers = {
+                'q1': '2',
+                'q2': '3'
+            };
+
+            if (input.value.trim() === answers[questionId]) {
+                feedback.innerHTML = '<span class="correct">✓ Correct!</span>';
+                feedback.className = 'feedback correct';
+            } else {
+                feedback.innerHTML = '<span class="incorrect">✗ Try again</span>';
+                feedback.className = 'feedback incorrect';
+            }
+        }
+
+        function checkPowerAnswer(questionId) {
+            const baseInput = document.getElementById(`${questionId}-base`);
+            const expInput = document.getElementById(`${questionId}-exp`);
+            const feedback = document.getElementById(`${questionId}-feedback`);
+            
+            const answers = {
+                'q3': { base: '2', exp: '6' }
+            };
+
+            if (baseInput.value.trim() === answers[questionId].base && 
+                expInput.value.trim() === answers[questionId].exp) {
+                feedback.innerHTML = '<span class="correct">✓ Correct!</span>';
+                feedback.className = 'feedback correct';
+            } else {
+                feedback.innerHTML = '<span class="incorrect">✗ Try again</span>';
+                feedback.className = 'feedback incorrect';
             }
         }
     </script>
