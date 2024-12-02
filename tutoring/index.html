@@ -459,6 +459,29 @@
         .template-btn:hover {
             background: #e2e8f0;
         }
+
+        .power-input-container {
+            display: inline-flex;
+            align-items: flex-start;
+            gap: 2px;
+        }
+
+        .base-input {
+            width: 40px;
+            padding: 4px;
+            border: 1px solid #e2e8f0;
+            border-radius: 4px;
+        }
+
+        .exponent-input {
+            width: 20px;
+            padding: 2px;
+            font-size: 0.8em;
+            position: relative;
+            top: -0.5em;
+            border: 1px solid #e2e8f0;
+            border-radius: 3px;
+        }
     </style>
 </head>
 <body>
@@ -989,9 +1012,11 @@
                                 </div>
                                 <div class="question-item">
                                     <p>2) 19 × 19 × 19 = </p>
-                                    <input type="text" id="q7-input" class="answer-input" placeholder="e.g., 2³">
-                                    <button onclick="insertTemplate('q7-input', 'power')" class="template-btn">xⁿ</button>
-                                    <button onclick="checkAnswer('q7')" class="check-btn">Check</button>
+                                    <div class="power-input-container">
+                                        <input type="text" class="base-input" placeholder="base">
+                                        <input type="text" class="exponent-input" placeholder="n">
+                                        <button onclick="checkPowerAnswer('q7')" class="check-btn">Check</button>
+                                    </div>
                                     <div class="feedback" id="q7-feedback"></div>
                                 </div>
                                 <div class="question-item">
@@ -1069,21 +1094,23 @@
         }
 
         function checkPowerAnswer(questionId) {
-            const baseInput = document.getElementById(`${questionId}-base`);
-            const expInput = document.getElementById(`${questionId}-exp`);
+            const baseInput = document.querySelector(`#${questionId} .base-input`);
+            const expInput = document.querySelector(`#${questionId} .exponent-input`);
             const feedback = document.getElementById(`${questionId}-feedback`);
             
+            // Get the values
+            const base = baseInput.value.trim();
+            const exponent = expInput.value.trim();
+            
+            // Check answer
             const answers = {
-                'q3': { base: '2', exp: '6' }
+                'q7': { base: '19', exp: '3' }
             };
-
-            if (baseInput.value.trim() === answers[questionId].base && 
-                expInput.value.trim() === answers[questionId].exp) {
+            
+            if (base === answers[questionId].base && exponent === answers[questionId].exp) {
                 feedback.innerHTML = '<span class="correct">✓ Correct!</span>';
-                feedback.className = 'feedback correct';
             } else {
                 feedback.innerHTML = '<span class="incorrect">✗ Try again</span>';
-                feedback.className = 'feedback incorrect';
             }
         }
 
@@ -1092,19 +1119,22 @@
             let template = '';
 
             if (type === 'power') {
-                template = 'xⁿ';
+                // Create a span with superscript styling
+                template = '<sup contenteditable="true">n</sup>';
             } else if (type === 'fraction') {
                 template = '(a/b)';
             }
 
-            // Insert template at the current cursor position
+            // Insert at cursor position
             const startPos = input.selectionStart;
-            const endPos = input.selectionEnd;
-            const currentValue = input.value;
-
-            input.value = currentValue.substring(0, startPos) + template + currentValue.substring(endPos);
+            input.value = input.value.substring(0, startPos) + template + input.value.substring(startPos);
+            
+            // Focus and select the placeholder
             input.focus();
-            input.setSelectionRange(startPos + 1, startPos + 1); // Place cursor inside the template
+            if (type === 'power') {
+                // Position cursor at 'n'
+                input.setSelectionRange(startPos + 1, startPos + 2);
+            }
         }
     </script>
 </body>
