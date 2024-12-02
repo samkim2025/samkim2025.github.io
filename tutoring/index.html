@@ -796,30 +796,18 @@
 
                         <div class="concept-check">
                             <h3>Concept Check 1:</h3>
-                            <ol>
-                                <li>What is the base in the expression above?</li>
-                                <li>What is the exponent in the expression above?</li>
-                            </ol>
-                        </div>
-
-                        <div class="concept-explanation">
-                            <h3>Approaching the Concept:</h3>
-                            <p>When multiplying a number by itself, multiple times, you can express the expression as a power using 
-                            the base (the number being multiplied) and the exponent (the amount of times the base is being 
-                            multiplied). For example:</p>
-                            <div class="math-expression">
-                                5 × 5 = 5² (Five squared)<br>
-                                5 × 5 × 5 = 5³ (Five cubed)<br>
-                                5 × 5 × 5 × 5 = 5⁴ (Five to the power of four)
+                            <div class="question">
+                                <p>1. What is the base in the expression 2 × 2 × 2 = 2³?</p>
+                                <input type="text" id="q1-input">
+                                <button onclick="checkAnswer('q1')">Check</button>
+                                <div class="feedback" id="q1-feedback"></div>
                             </div>
                         </div>
 
-                        <div class="practice-problems">
-                            <h3>Concept Check 2:</h3>
-                            <p>Identify the base and exponents of each power written below.</p>
-                            <div class="math-expression">
-                                1) 2⁶    2) 3²    3) 5⁵    4) 7⁸
-                            </div>
+                        <div class="navigation">
+                            <button class="prev-btn" onclick="previousPage()">Previous</button>
+                            <span class="page-indicator">Page 2 of 4</span>
+                            <button class="next-btn" onclick="nextPage()">Next</button>
                         </div>
                     </div>
                 `;
