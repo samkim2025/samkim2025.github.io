@@ -444,6 +444,21 @@
             align-items: center;
             gap: 10px;
         }
+
+        .template-btn {
+            background: #edf2f7;
+            color: #2c5282;
+            border: 1px solid #cbd5e0;
+            padding: 5px 10px;
+            margin-left: 5px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .template-btn:hover {
+            background: #e2e8f0;
+        }
     </style>
 </head>
 <body>
@@ -972,7 +987,21 @@
                                         <div class="feedback" id="q3-feedback"></div>
                                     </div>
                                 </div>
-                                <!-- Add more practice problems similarly -->
+                                <div class="question-item">
+                                    <p>2) 19 × 19 × 19 = </p>
+                                    <input type="text" id="q7-input" class="answer-input" placeholder="e.g., 2³">
+                                    <button onclick="insertTemplate('q7-input', 'power')" class="template-btn">xⁿ</button>
+                                    <button onclick="checkAnswer('q7')" class="check-btn">Check</button>
+                                    <div class="feedback" id="q7-feedback"></div>
+                                </div>
+                                <div class="question-item">
+                                    <p>3) (2/5) × (2/5) × (2/5) × (2/5) = </p>
+                                    <input type="text" id="q9-input" class="answer-input" placeholder="e.g., (2/5)⁴">
+                                    <button onclick="insertTemplate('q9-input', 'fraction')" class="template-btn">a/b</button>
+                                    <button onclick="insertTemplate('q9-input', 'power')" class="template-btn">xⁿ</button>
+                                    <button onclick="checkAnswer('q9')" class="check-btn">Check</button>
+                                    <div class="feedback" id="q9-feedback"></div>
+                                </div>
                             </div>
                         `
                     }
@@ -1056,6 +1085,26 @@
                 feedback.innerHTML = '<span class="incorrect">✗ Try again</span>';
                 feedback.className = 'feedback incorrect';
             }
+        }
+
+        function insertTemplate(inputId, type) {
+            const input = document.getElementById(inputId);
+            let template = '';
+
+            if (type === 'power') {
+                template = 'xⁿ';
+            } else if (type === 'fraction') {
+                template = '(a/b)';
+            }
+
+            // Insert template at the current cursor position
+            const startPos = input.selectionStart;
+            const endPos = input.selectionEnd;
+            const currentValue = input.value;
+
+            input.value = currentValue.substring(0, startPos) + template + currentValue.substring(endPos);
+            input.focus();
+            input.setSelectionRange(startPos + 1, startPos + 1); // Place cursor inside the template
         }
     </script>
 </body>
