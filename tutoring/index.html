@@ -313,6 +313,55 @@
         .math-expression {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
         }
+
+        /* Add these styles for lesson content */
+        .lesson-content {
+            max-width: 800px;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .key-terms {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+
+        .math-expression {
+            font-family: 'Times New Roman', serif;
+            font-size: 1.2em;
+            padding: 15px;
+            margin: 10px 0;
+            background: #f8f9fa;
+            border-left: 3px solid #2c5282;
+        }
+
+        .concept-check {
+            margin: 20px 0;
+            padding: 15px;
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 5px;
+        }
+
+        .concept-explanation {
+            margin: 20px 0;
+        }
+
+        .practice-problems {
+            margin: 20px 0;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 5px;
+        }
+
+        /* Style for superscript numbers */
+        .math-expression sup {
+            font-size: 0.7em;
+            position: relative;
+            top: -0.5em;
+        }
     </style>
 </head>
 <body>
@@ -336,10 +385,11 @@
                                     <span class="toggle-icon">▼</span>
                                 </div>
                                 <div class="subtopics">
-                                    <div class="subtopic-item" onclick="selectTopic('Prime Factorization')">Prime Factorization</div>
-                                    <div class="subtopic-item" onclick="selectTopic('Greatest Common Divisor and LCM')">Greatest Common Divisor and Least Common Multiple</div>
-                                    <div class="subtopic-item" onclick="selectTopic('Worksheet - Prime Factorization')">Single Task / Completing the Worksheet</div>
-                                    <div class="subtopic-item" onclick="selectTopic('Mind Map - Prime Factorization')">Concept Review / Mind Map</div>
+                                    <div class="subtopic-item" onclick="selectLesson('powers-and-exponents')">1.1.1 Powers and Exponents</div>
+                                    <div class="subtopic-item" onclick="selectLesson('prime-numbers')">1.1.2 Prime Numbers and Composite Numbers</div>
+                                    <div class="subtopic-item" onclick="selectLesson('prime-factorization')">1.1.3 Prime Factorization</div>
+                                    <div class="subtopic-item" onclick="selectLesson('perfect-squares')">1.1.4 Creating Perfect Squares</div>
+                                    <div class="subtopic-item" onclick="selectLesson('finding-divisors')">1.1.5 Finding Divisors Using Prime Factorization</div>
                                 </div>
                             </div>
 
@@ -718,6 +768,62 @@
             gradeContent.classList.toggle('active');
             const icon = element.querySelector('.toggle-icon');
             icon.textContent = gradeContent.classList.contains('active') ? '▲' : '▼';
+        }
+
+        // Add this JavaScript function to handle lesson content
+        function selectLesson(lessonId) {
+            const content = document.getElementById('content');
+            
+            if (lessonId === 'powers-and-exponents') {
+                content.innerHTML = `
+                    <div class="lesson-content">
+                        <h2>1.1.1 Powers and Exponents</h2>
+                        
+                        <div class="key-terms">
+                            <h3>Key Terms:</h3>
+                            <ul>
+                                <li><strong>Powers:</strong> The product of a number multiplied by itself, multiple times</li>
+                                <li><strong>Base (number):</strong> The number being multiplied multiple times</li>
+                                <li><strong>Exponent:</strong> The amount of times the base is being multiplied</li>
+                            </ul>
+                        </div>
+
+                        <div class="example">
+                            <div class="math-expression">
+                                2 × 2 × 2 = 2³
+                            </div>
+                        </div>
+
+                        <div class="concept-check">
+                            <h3>Concept Check 1:</h3>
+                            <ol>
+                                <li>What is the base in the expression above?</li>
+                                <li>What is the exponent in the expression above?</li>
+                            </ol>
+                        </div>
+
+                        <div class="concept-explanation">
+                            <h3>Approaching the Concept:</h3>
+                            <p>When multiplying a number by itself, multiple times, you can express the expression as a power using 
+                            the base (the number being multiplied) and the exponent (the amount of times the base is being 
+                            multiplied). For example:</p>
+                            <div class="math-expression">
+                                5 × 5 = 5² (Five squared)<br>
+                                5 × 5 × 5 = 5³ (Five cubed)<br>
+                                5 × 5 × 5 × 5 = 5⁴ (Five to the power of four)
+                            </div>
+                        </div>
+
+                        <div class="practice-problems">
+                            <h3>Concept Check 2:</h3>
+                            <p>Identify the base and exponents of each power written below.</p>
+                            <div class="math-expression">
+                                1) 2⁶    2) 3²    3) 5⁵    4) 7⁸
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
         }
     </script>
 </body>
