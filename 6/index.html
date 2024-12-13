@@ -73,11 +73,16 @@
             margin-bottom: 1rem;
         }
 
+        .media-container {
+            display: flex;
+            gap: 1rem;
+            justify-content: space-between;
+            align-items: center;
+        }
+
         .image, .video {
-            width: 100%;
-            max-width: 600px;
+            width: calc(50% - 0.5rem);
             border-radius: 0.5rem;
-            margin: 1rem 0;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
@@ -88,6 +93,15 @@
             
             h1 {
                 font-size: 2rem;
+            }
+
+            .media-container {
+                flex-direction: column;
+            }
+
+            .image, .video {
+                width: 100%;
+                margin-bottom: 1rem;
             }
         }
     </style>
@@ -117,26 +131,32 @@
         <h2>Examples</h2>
         <div class="example">
             <h3>Jerome of Stridon</h3>
-            <img src="media/sjerome.jpg" alt="Jerome of Stridon" class="image">
-            <video class="video" controls>
-                <source src="media/sjerome.mp4" type="video/mp4">
-            </video>
+            <div class="media-container">
+                <img src="media/sjerome.jpg" alt="Jerome of Stridon" class="image">
+                <video class="video" controls>
+                    <source src="media/sjerome.mp4" type="video/mp4">
+                </video>
+            </div>
         </div>
 
         <div class="example">
             <h3>Palace Skateboards, New York</h3>
-            <img src="media/palace.jpg" alt="Palace Skateboards" class="image">
-            <video class="video" controls>
-                <source src="media/palace.mp4" type="video/mp4">
-            </video>
+            <div class="media-container">
+                <img src="media/palace.jpg" alt="Palace Skateboards" class="image">
+                <video class="video" controls>
+                    <source src="media/palace.mp4" type="video/mp4">
+                </video>
+            </div>
         </div>
 
         <div class="example">
             <h3>Supreme, Chicago</h3>
-            <img src="media/supreme.jpg" alt="Supreme World Best" class="image">
-            <video class="video" controls>
-                <source src="media/supreme.mp4" type="video/mp4">
-            </video>
+            <div class="media-container">
+                <img src="media/supreme.jpg" alt="Supreme World Best" class="image">
+                <video class="video" controls>
+                    <source src="media/supreme.mp4" type="video/mp4">
+                </video>
+            </div>
         </div>
     </section>
 </body>
