@@ -5,18 +5,101 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>3D Visualization</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 0; padding: 0; }
-        section { padding: 20px; }
-        h1, h2 { color: #333; }
-        .example { margin-bottom: 40px; }
-        .image, .video { width: 100%; max-width: 600px; }
+        :root {
+            --primary-color: #2c3e50;
+            --accent-color: #e74c3c;
+            --gradient: linear-gradient(135deg, #2c3e50, #3498db);
+        }
+
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #f5f6fa;
+            color: #2d3436;
+            line-height: 1.6;
+        }
+
+        section { 
+            padding: 40px 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        #introduction {
+            background: var(--gradient);
+            color: white;
+            text-align: center;
+            padding: 80px 20px;
+        }
+
+        h1 {
+            font-size: 3em;
+            margin: 0;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        h2 {
+            color: var(--primary-color);
+            border-bottom: 3px solid var(--accent-color);
+            display: inline-block;
+            padding-bottom: 5px;
+            margin-bottom: 30px;
+        }
+
+        h3 {
+            color: var(--primary-color);
+        }
+
+        .example {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 40px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .example:hover {
+            transform: translateY(-5px);
+        }
+
+        .image, .video {
+            width: 100%;
+            max-width: 600px;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+
+        .video {
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2em;
+            }
+            
+            .example {
+                padding: 15px;
+            }
+        }
+
+        #implementation {
+            background: white;
+            margin: 40px auto;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
     </style>
 </head>
 <body>
 
     <section id="introduction">
-        <h1>Introduction</h1>
-        <p>This project demonstrates the transformation of 2D images into 3D visualizations using MATLAB and WebGL technologies.</p>
+        <h1>3D Visualization</h1>
+        <p>In this project, I implement an interactive MATLAB application that transforms single photographs into explorable 3D scenes, based on the ["Tour Into the Picture" (TIP)](http://graphics.cs.cmu.edu/courses/15-463/2011_fall/Papers/TIP.pdf) technique by Youichi Horry, Ken-ichi Anjyo, and Kiyoshi Arai from Hitachi, Ltd. Their innovative approach uses a "spidery mesh" interface to model scene geometry from a single image. Through user-defined vanishing points and perspective planes, the program computes homography transformations to extract and rectify textured surfaces, creating a virtual 3D environment that allows for dynamic camera movement and scene exploration.</p>
     </section>
 
     <section id="implementation">
@@ -28,7 +111,7 @@
         <h2>Examples</h2>
 
         <div class="example">
-            <h3>Example 1</h3>
+            <h3>Jerome of Stridon</h3>
             <img src="media/sjerome.jpg" alt="Jerome of Stridon" class="image">
             <video class="video" controls>
                 <source src="media/sjerome.mp4" type="video/mp4">
@@ -36,7 +119,7 @@
         </div>
 
         <div class="example">
-            <h3>Example 2</h3>
+            <h3>Palace Skateboards, New York</h3>
             <img src="media/palace.jpg" alt="Palace Skateboards" class="image">
             <video class="video" controls>
                 <source src="media/palace.mp4" type="video/mp4">
@@ -44,14 +127,12 @@
         </div>
 
         <div class="example">
-            <h3>Example 3</h3>
+            <h3>Supreme, Chicago</h3>
             <img src="media/supreme.jpg" alt="Supreme World Best" class="image">
             <video class="video" controls>
                 <source src="media/supreme.mp4" type="video/mp4">
             </video>
         </div>
-
-        <!-- Add more examples as needed -->
     </section>
 
 </body>
