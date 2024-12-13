@@ -81,6 +81,23 @@
             margin-bottom: 1rem;
         }
 
+        .image-grid {
+            display: flex;
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .image-item {
+            flex: 1;
+            text-align: center;
+        }
+
+        .image-item img {
+            max-width: 100%;
+            border-radius: 0.5rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
         @media (max-width: 768px) {
             body {
                 padding: 1rem;
@@ -92,6 +109,11 @@
 
             section {
                 padding: 1rem;
+            }
+
+            .image-grid {
+                flex-direction: column;
+                gap: 1rem;
             }
         }
     </style>
@@ -116,9 +138,15 @@
     <section class="content-section">
         <h2>Understanding Oriented Filters</h2>
         <p>I designed the oriented filters to detect features at different angles (0°, 45°, 90°, 135°). One interesting discovery I made was that when I sum all oriented filter responses, I get a result equivalent to a Laplacian bandpass filter. This confirmed that my oriented basis was complete.</p>
-        <div class="image-container">
-            <img src="media/orilter.png" alt="Oriented Filters Demonstration">
-            <p class="image-caption">Demonstration of oriented filters: original image (top-left), oriented filter responses, sum response (bottom-middle), and Laplacian bandpass (bottom-right)</p>
+        <div class="image-grid">
+            <div class="image-item">
+                <img src="results/tiger_oriented_filters_demo.png" alt="Tiger Oriented Filters">
+                <p class="image-caption">Tiger texture: original image and filter responses</p>
+            </div>
+            <div class="image-item">
+                <img src="results/peacock_oriented_filters_demo.png" alt="Peacock Oriented Filters">
+                <p class="image-caption">Peacock texture: original image and filter responses</p>
+            </div>
         </div>
     </section>
 
