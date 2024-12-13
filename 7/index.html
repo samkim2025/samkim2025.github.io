@@ -117,7 +117,7 @@
         <h2>Understanding Oriented Filters</h2>
         <p>I designed the oriented filters to detect features at different angles (0°, 45°, 90°, 135°). One interesting discovery I made was that when I sum all oriented filter responses, I get a result equivalent to a Laplacian bandpass filter. This confirmed that my oriented basis was complete.</p>
         <div class="image-container">
-            <img src="results/oriented_filters_demo.png" alt="Oriented Filters Demonstration">
+            <img src="results/orilter.png" alt="Oriented Filters Demonstration">
             <p class="image-caption">Demonstration of oriented filters: original image (top-left), oriented filter responses, sum response (bottom-middle), and Laplacian bandpass (bottom-right)</p>
         </div>
     </section>
@@ -126,7 +126,7 @@
         <h2>Steerable Pyramid Implementation</h2>
         <p>I broke down the image into different scales and orientations using my steerable pyramid implementation. This allowed me to analyze and modify texture features at multiple resolutions and directions.</p>
         <div class="image-container">
-            <img src="results/pyramid_visualization.png" alt="Steerable Pyramid Visualization">
+            <img src="rmedia/oriamid.png" alt="Steerable Pyramid Visualization">
             <p class="image-caption">Steerable pyramid decomposition showing multiple scales and orientations</p>
         </div>
     </section>
@@ -135,7 +135,7 @@
         <h2>Histogram Matching Results</h2>
         <p>Before diving into full texture synthesis, I wanted to ensure my histogram matching worked correctly. This was crucial for maintaining the overall tone and contrast of the source texture.</p>
         <div class="image-container">
-            <img src="results/histogram_matching.png" alt="Histogram Matching Results">
+            <img src="media/histmatch.png" alt="Histogram Matching Results">
             <p class="image-caption">Histogram matching between source image and noise</p>
         </div>
     </section>
@@ -144,7 +144,7 @@
         <h2>Synthesis Results</h2>
         <p>Here are the results of my full texture synthesis algorithm:</p>
         <div class="image-container">
-            <img src="results/synthesized_texture.png" alt="Texture Synthesis Results">
+            <img src="media/textsynth.png" alt="Texture Synthesis Results">
             <p class="image-caption">Source texture (left) and synthesized texture (right)</p>
         </div>
     </section>
