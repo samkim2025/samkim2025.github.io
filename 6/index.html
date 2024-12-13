@@ -124,7 +124,7 @@
 
     <section id="implementation">
         <h2>Implementation Details</h2>
-        <p>The implementation follows a systematic approach to convert 2D images into navigable 3D scenes. The core process begins with user interaction, where the interface allows for placement of a central vanishing point and definition of perspective planes through a spidery mesh interface similar to the original TIP paper. For each plane, the program computes homography matrices using the Direct Linear Transform (DLT) algorithm, mapping the user-defined quadrilaterals to rectangles in 3D space.</p>
+        <p>I developed a method that turns regular 2D photos into 3D scenes you can navigate through. Users first interact with the image by placing a vanishing point and drawing out perspective planes using a web-like interface, similar to what was described in the TIP paper. For each plane, the program computes homography matrices using the Direct Linear Transform (DLT) algorithm, mapping the user-defined quadrilaterals to rectangles in 3D space.</p>
 
         <p>The rectification process involves:</p>
         <ul style="margin-left: 2rem; margin-bottom: 1rem;">
@@ -134,7 +134,7 @@
             <li>Handling foreground objects through separate billboard-style projections</li>
         </ul>
 
-        <p>Camera control is implemented using standard computer graphics viewing transformations, with the scene geometry represented in a right-handed coordinate system. The virtual camera can be manipulated through translation and rotation operations, while maintaining proper perspective projection. The rendering pipeline uses MATLAB's built-in graphics capabilities for real-time visualization of the textured 3D geometry.</p>
+        <p>For navigation, I implemented standard 3D camera controls that let users move around the scene. Everything is set up in a right-handed coordinate system, allowing for smooth camera movement and rotation while maintaining proper perspective. The rendering pipeline uses MATLAB's built-in graphics tools for real-time visualization of the textured 3D geometry.</p>
     </section>
 
     <section id="examples">
