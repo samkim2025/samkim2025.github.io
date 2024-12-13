@@ -121,65 +121,94 @@
 <body>
     <section id="introduction">
         <h1>Texture Synthesis using Steerable Pyramids</h1>
-        <p>This project implements advanced texture synthesis utilizing steerable pyramid decomposition. The methodology enables precise texture analysis and reproduction by decomposing source images into multi-scale, oriented frequency bands. Through careful statistical matching and reconstruction, we can generate new textures that preserve both local and global characteristics of the original.</p>
+        <p>In this project, I implemented texture synthesis using steerable pyramids, a technique I chose for its ability to preserve both statistical and structural properties of source textures. My implementation uses oriented filters at multiple scales to decompose images into their frequency components, followed by histogram matching to generate new textures.</p>
     </section>
 
     <section class="content-section">
-        <h2>Implementation Overview</h2>
-        <p>The implementation follows a systematic approach with four key components:</p>
+        <h2>My Approach</h2>
+        <p>I structured my implementation around these key steps:</p>
         <ul>
-            <li>Oriented Filter Design: Implementation of directional filters for analyzing textural components across multiple orientations</li>
-            <li>Multi-scale Decomposition: Construction of a steerable pyramid framework to capture features across various spatial frequencies</li>
-            <li>Statistical Analysis: Application of histogram matching techniques to ensure statistical consistency between source and generated textures</li>
-            <li>Texture Reconstruction: Synthesis of new textures through pyramid reconstruction using matched coefficients</li>
+            <li>Oriented Filter Decomposition: I created a set of oriented filters (4 orientations) to analyze different directional components of the texture.</li>
+            <li>Multi-scale Analysis: I decomposed the image into a steerable pyramid with 4 scales to capture features at different resolutions.</li>
+            <li>Histogram Matching: I matched the statistical properties of noise to the source texture at each scale and orientation.</li>
+            <li>Texture Reconstruction: I synthesized the final texture by reconstructing the pyramid with matched coefficients.</li>
         </ul>
     </section>
 
     <section class="content-section">
-        <h2>Source Texture Analysis</h2>
-        <p>Two distinct texture types were selected for comprehensive analysis: tiger fur patterns, representing strong directional structures, and peacock feather patterns, exemplifying complex multi-scale characteristics. These selections provide robust test cases for evaluating the algorithm's effectiveness across different texture classes.</p>
-        <!-- Rest of the section remains the same -->
+        <h2>Source Textures</h2>
+        <p>For this project, I worked with two primary example textures: a tiger fur pattern that demonstrates structured, directional features, and a peacock feather pattern that exhibits complex, multi-scale characteristics.</p>
+        <div class="image-grid">
+            <div class="image-item">
+                <img src="data/tiger.jpg" alt="Tiger Texture Source">
+                <p class="image-caption">Tiger fur texture: Note the strong directional stripes and natural variation in the pattern</p>
+            </div>
+            <div class="image-item">
+                <img src="data/peacock.jpg" alt="Peacock Texture Source">
+                <p class="image-caption">Peacock feather texture: Observe the intricate patterns and iridescent color variations</p>
+            </div>
+        </div>
     </section>
 
     <section class="content-section">
-        <h2>Oriented Filter Implementation</h2>
-        <p>The oriented filter framework employs four primary directions (0°, 45°, 90°, 135°) to capture directional features. Notable validation of the implementation came through the observation that the sum of oriented filter responses approximates a Laplacian bandpass filter, confirming the completeness of the oriented basis.</p>
-        <!-- Rest of the section remains the same -->
+        <h2>Understanding Oriented Filters</h2>
+        <p>I designed the oriented filters to detect features at different angles (0°, 45°, 90°, 135°). One interesting discovery I made was that when I sum all oriented filter responses, I get a result equivalent to a Laplacian bandpass filter. This confirmed that my oriented basis was complete.</p>
+        <div class="image-grid">
+            <div class="image-item">
+                <img src="data/tigerfilter.png" alt="Tiger Oriented Filters">
+                <p class="image-caption">Tiger texture: Filter responses showing directional components and Laplacian equivalence</p>
+            </div>
+            <div class="image-item">
+                <img src="data/peacockfilter.png" alt="Peacock Oriented Filters">
+                <p class="image-caption">Peacock texture: Demonstrating how oriented filters capture different feature directions</p>
+            </div>
+        </div>
     </section>
 
     <section class="content-section">
-        <h2>Steerable Pyramid Architecture</h2>
-        <p>The steerable pyramid implementation facilitates multi-resolution analysis through recursive decomposition into scale and orientation bands. This architecture enables precise control over feature extraction and modification at multiple scales and orientations.</p>
-        <!-- Rest of the section remains the same -->
+        <h2>Steerable Pyramid Implementation</h2>
+        <p>I broke down the image into different scales and orientations using my steerable pyramid implementation. This allowed me to analyze and modify texture features at multiple resolutions and directions.</p>
+        <div class="image-grid">
+            <div class="image-item">
+                <img src="data/oriamid.png" alt="Tiger Steerable Pyramid">
+                <p class="image-caption">Tiger texture: Steerable pyramid decomposition showing scale and orientation bands</p>
+            </div>
+            <div class="image-item">
+                <img src="data/peacock_pyr.png" alt="Peacock Steerable Pyramid">
+                <p class="image-caption">Peacock texture: Multi-scale decomposition revealing intricate feather patterns</p>
+            </div>
+        </div>
     </section>
 
     <section class="content-section">
-        <h2>Histogram Matching Verification</h2>
-        <p>Prior to full texture synthesis, the histogram matching implementation was validated to ensure accurate preservation of tone and contrast characteristics. This step proves crucial for maintaining perceptual consistency between source and synthesized textures.</p>
-        <!-- Rest of the section remains the same -->
+        <h2>Histogram Matching Results</h2>
+        <p>Before diving into full texture synthesis, I wanted to ensure my histogram matching worked correctly. This was crucial for maintaining the overall tone and contrast of the source texture.</p>
+        <div class="image-grid">
+            <div class="image-item">
+                <img src="data/histmatch.png" alt="Tiger Histogram Matching">
+                <p class="image-caption">Tiger texture: Source histogram (left) matched to noise (right)</p>
+            </div>
+            <div class="image-item">
+                <img src="data/peacock_hist.png" alt="Peacock Histogram Matching">
+                <p class="image-caption">Peacock texture: Demonstrating histogram matching with complex color patterns</p>
+            </div>
+        </div>
     </section>
 
     <section class="content-section">
         <h2>Synthesis Results</h2>
-        <p>The following comparisons demonstrate the effectiveness of the implemented texture synthesis algorithm:</p>
-        <!-- Rest of the section remains the same -->
+        <p>Here are the results of my full texture synthesis algorithm:</p>
+        <div class="image-grid">
+            <div class="image-item">
+                <img src="data/textsynth.png" alt="Tiger Synthesis Results">
+                <p class="image-caption">Tiger texture: Source (left) and synthesized result (right)</p>
+            </div>
+            <div class="image-item">
+                <img src="data/peacock_text.png" alt="Peacock Synthesis Results">
+                <p class="image-caption">Peacock texture: Source (left) and synthesized result (right)</p>
+            </div>
+        </div>
     </section>
 
-    <section class="content-section">
-        <h2>Technical Considerations and Future Development</h2>
-        <p>Several technical challenges were addressed during implementation:</p>
-        <ul>
-            <li>Scale Parameter Optimization: Determination of optimal pyramid depth for various texture types</li>
-            <li>Boundary Condition Management: Implementation of appropriate padding strategies</li>
-            <li>Numerical Precision: Integration of stability measures in normalization procedures</li>
-        </ul>
-        <p>Proposed enhancements for future development include:</p>
-        <ul>
-            <li>Extension to full color texture synthesis capabilities</li>
-            <li>Implementation of additional orientation bands for enhanced detail preservation</li>
-            <li>Optimization of pyramid reconstruction algorithms</li>
-            <li>Integration of parallel processing for improved computational efficiency</li>
-        </ul>
-    </section>
 </body>
 </html>
