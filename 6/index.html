@@ -22,6 +22,7 @@
         section {
             max-width: 1200px;
             margin: 0 auto;
+            width: 100%;
         }
 
         #introduction {
@@ -34,17 +35,26 @@
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
 
-        h1 {
-            font-size: 2.5rem;
-            margin-bottom: 1.5rem;
-        }
-
         #implementation {
             background: white;
             border-radius: 1rem;
-            padding: 1.5rem;
-            margin: 2rem 0;
+            padding: 2rem;
+            margin: 2rem auto;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            width: 100%;
+        }
+
+        .example {
+            background: white;
+            border-radius: 1rem;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
         }
 
         h2 {
@@ -53,35 +63,31 @@
             color: #2d3748;
         }
 
-        .example {
-            background: white;
-            border-radius: 1rem;
-            padding: 1.5rem;
-            margin-bottom: 1.5rem;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-
-        .example:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-        }
-
         h3 {
             font-size: 1.25rem;
             color: #2d3748;
             margin-bottom: 1rem;
         }
 
+        ul {
+            margin-left: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        p {
+            margin-bottom: 1rem;
+        }
+
         .media-container {
             display: flex;
-            gap: 1rem;
+            gap: 2rem;
             justify-content: space-between;
-            align-items: center;
+            align-items: flex-start;
+            margin-top: 1rem;
         }
 
         .image, .video {
-            width: calc(50% - 0.5rem);
+            width: calc(50% - 1rem);
             border-radius: 0.5rem;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
@@ -97,11 +103,15 @@
 
             .media-container {
                 flex-direction: column;
+                gap: 1rem;
             }
 
             .image, .video {
                 width: 100%;
-                margin-bottom: 1rem;
+            }
+
+            section {
+                padding: 1rem;
             }
         }
     </style>
