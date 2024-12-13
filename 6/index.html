@@ -5,111 +5,116 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>3D Visualization</title>
     <style>
-        :root {
-            --primary-color: #2c3e50;
-            --accent-color: #e74c3c;
-            --gradient: linear-gradient(135deg, #2c3e50, #3498db);
-        }
-
-        body { 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        * {
             margin: 0;
             padding: 0;
-            background: #f5f6fa;
-            color: #2d3436;
-            line-height: 1.6;
+            box-sizing: border-box;
         }
 
-        section { 
-            padding: 40px 20px;
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+            padding: 2rem;
+        }
+
+        section {
             max-width: 1200px;
             margin: 0 auto;
         }
 
         #introduction {
-            background: var(--gradient);
-            color: white;
             text-align: center;
-            padding: 80px 20px;
+            margin-bottom: 3rem;
+            padding: 2rem;
+            background: linear-gradient(135deg, #001f3f, #003366);
+            color: white;
+            border-radius: 1rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
 
         h1 {
-            font-size: 3em;
-            margin: 0;
-            text-transform: uppercase;
-            letter-spacing: 2px;
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        #implementation {
+            background: white;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            margin: 2rem 0;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
         h2 {
-            color: var(--primary-color);
-            border-bottom: 3px solid var(--accent-color);
-            display: inline-block;
-            padding-bottom: 5px;
-            margin-bottom: 30px;
-        }
-
-        h3 {
-            color: var(--primary-color);
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            color: #2d3748;
         }
 
         .example {
             background: white;
-            border-radius: 10px;
-            padding: 20px;
-            margin-bottom: 40px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            transition: transform 0.3s ease;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s, box-shadow 0.2s;
         }
 
         .example:hover {
             transform: translateY(-5px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        h3 {
+            font-size: 1.25rem;
+            color: #2d3748;
+            margin-bottom: 1rem;
         }
 
         .image, .video {
             width: 100%;
             max-width: 600px;
-            border-radius: 8px;
-            margin: 10px 0;
-        }
-
-        .video {
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border-radius: 0.5rem;
+            margin: 1rem 0;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
         @media (max-width: 768px) {
-            h1 {
-                font-size: 2em;
+            body {
+                padding: 1rem;
             }
             
-            .example {
-                padding: 15px;
+            h1 {
+                font-size: 2rem;
             }
-        }
-
-        #implementation {
-            background: white;
-            margin: 40px auto;
-            padding: 40px;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
     </style>
 </head>
 <body>
-
     <section id="introduction">
         <h1>3D Visualization</h1>
-        <p>In this project, I implement an interactive MATLAB application that transforms single photographs into explorable 3D scenes, based on the ["Tour Into the Picture" (TIP)](http://graphics.cs.cmu.edu/courses/15-463/2011_fall/Papers/TIP.pdf) technique by Youichi Horry, Ken-ichi Anjyo, and Kiyoshi Arai from Hitachi, Ltd. Their innovative approach uses a "spidery mesh" interface to model scene geometry from a single image. Through user-defined vanishing points and perspective planes, the program computes homography transformations to extract and rectify textured surfaces, creating a virtual 3D environment that allows for dynamic camera movement and scene exploration.</p>
+        <p>In this project, I implement an interactive MATLAB application that transforms single photographs into explorable 3D scenes, based on the "Tour Into the Picture" (TIP) technique by Youichi Horry, Ken-ichi Anjyo, and Kiyoshi Arai from Hitachi, Ltd. Their innovative approach uses a "spidery mesh" interface to model scene geometry from a single image. Through user-defined vanishing points and perspective planes, the program computes homography transformations to extract and rectify textured surfaces, creating a virtual 3D environment that allows for dynamic camera movement and scene exploration.</p>
     </section>
 
     <section id="implementation">
         <h2>Implementation Details</h2>
-        <p>The process involves capturing 3D data from MATLAB, exporting it to a format compatible with WebGL, and rendering it using Three.js.</p>
+        <p>The implementation follows a systematic approach to convert 2D images into navigable 3D scenes. The core process begins with user interaction, where the interface allows for placement of a central vanishing point and definition of perspective planes through a spidery mesh interface similar to the original TIP paper. For each plane, the program computes homography matrices using the Direct Linear Transform (DLT) algorithm, mapping the user-defined quadrilaterals to rectangles in 3D space.</p>
+
+        <p>The rectification process involves:</p>
+        <ul style="margin-left: 2rem; margin-bottom: 1rem;">
+            <li>Computing the homography matrix H that maps source points to destination points using SVD-based DLT</li>
+            <li>Applying perspective warping to extract and rectify textures from the original image</li>
+            <li>Creating proper UV coordinates for texture mapping onto 3D geometry</li>
+            <li>Handling foreground objects through separate billboard-style projections</li>
+        </ul>
+
+        <p>Camera control is implemented using standard computer graphics viewing transformations, with the scene geometry represented in a right-handed coordinate system. The virtual camera can be manipulated through translation and rotation operations, while maintaining proper perspective projection. The rendering pipeline uses MATLAB's built-in graphics capabilities for real-time visualization of the textured 3D geometry.</p>
     </section>
 
     <section id="examples">
         <h2>Examples</h2>
-
         <div class="example">
             <h3>Jerome of Stridon</h3>
             <img src="media/sjerome.jpg" alt="Jerome of Stridon" class="image">
@@ -134,6 +139,5 @@
             </video>
         </div>
     </section>
-
 </body>
 </html>
