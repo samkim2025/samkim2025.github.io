@@ -136,16 +136,31 @@
     </section>
 
     <section class="content-section">
+        <h2>Source Textures</h2>
+        <p>For this project, I worked with two primary example textures: a tiger fur pattern that demonstrates structured, directional features, and a peacock feather pattern that exhibits complex, multi-scale characteristics.</p>
+        <div class="image-grid">
+            <div class="image-item">
+                <img src="media/tiger.jpg" alt="Tiger Texture Source">
+                <p class="image-caption">Tiger fur texture: Note the strong directional stripes and natural variation in the pattern</p>
+            </div>
+            <div class="image-item">
+                <img src="media/peacock.jpg" alt="Peacock Texture Source">
+                <p class="image-caption">Peacock feather texture: Observe the intricate patterns and iridescent color variations</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="content-section">
         <h2>Understanding Oriented Filters</h2>
         <p>I designed the oriented filters to detect features at different angles (0°, 45°, 90°, 135°). One interesting discovery I made was that when I sum all oriented filter responses, I get a result equivalent to a Laplacian bandpass filter. This confirmed that my oriented basis was complete.</p>
         <div class="image-grid">
             <div class="image-item">
-                <img src="results/tiger_oriented_filters_demo.png" alt="Tiger Oriented Filters">
-                <p class="image-caption">Tiger texture: original image and filter responses</p>
+                <img src="media/orilter.png" alt="Tiger Oriented Filters">
+                <p class="image-caption">Tiger texture: Filter responses showing directional components and Laplacian equivalence</p>
             </div>
             <div class="image-item">
-                <img src="results/peacock_oriented_filters_demo.png" alt="Peacock Oriented Filters">
-                <p class="image-caption">Peacock texture: original image and filter responses</p>
+                <img src="media/peacock_filt.png" alt="Peacock Oriented Filters">
+                <p class="image-caption">Peacock texture: Demonstrating how oriented filters capture different feature directions</p>
             </div>
         </div>
     </section>
@@ -153,27 +168,45 @@
     <section class="content-section">
         <h2>Steerable Pyramid Implementation</h2>
         <p>I broke down the image into different scales and orientations using my steerable pyramid implementation. This allowed me to analyze and modify texture features at multiple resolutions and directions.</p>
-        <div class="image-container">
-            <img src="media/steerable_tiger.png" alt="Steerable Pyramid Visualization">
-            <p class="image-caption">Steerable pyramid decomposition showing multiple scales and orientations</p>
+        <div class="image-grid">
+            <div class="image-item">
+                <img src="media/oriamid.png" alt="Tiger Steerable Pyramid">
+                <p class="image-caption">Tiger texture: Steerable pyramid decomposition showing scale and orientation bands</p>
+            </div>
+            <div class="image-item">
+                <img src="media/peacock_pyr.png" alt="Peacock Steerable Pyramid">
+                <p class="image-caption">Peacock texture: Multi-scale decomposition revealing intricate feather patterns</p>
+            </div>
         </div>
     </section>
 
     <section class="content-section">
         <h2>Histogram Matching Results</h2>
         <p>Before diving into full texture synthesis, I wanted to ensure my histogram matching worked correctly. This was crucial for maintaining the overall tone and contrast of the source texture.</p>
-        <div class="image-container">
-            <img src="media/histmatch.png" alt="Histogram Matching Results">
-            <p class="image-caption">Histogram matching between source image and noise</p>
+        <div class="image-grid">
+            <div class="image-item">
+                <img src="media/histmatch.png" alt="Tiger Histogram Matching">
+                <p class="image-caption">Tiger texture: Source histogram (left) matched to noise (right)</p>
+            </div>
+            <div class="image-item">
+                <img src="media/peacock_hist.png" alt="Peacock Histogram Matching">
+                <p class="image-caption">Peacock texture: Demonstrating histogram matching with complex color patterns</p>
+            </div>
         </div>
     </section>
 
     <section class="content-section">
         <h2>Synthesis Results</h2>
         <p>Here are the results of my full texture synthesis algorithm:</p>
-        <div class="image-container">
-            <img src="media/textsynth.png" alt="Texture Synthesis Results">
-            <p class="image-caption">Source texture (left) and synthesized texture (right)</p>
+        <div class="image-grid">
+            <div class="image-item">
+                <img src="media/textsynth.png" alt="Tiger Synthesis Results">
+                <p class="image-caption">Tiger texture: Source (left) and synthesized result (right)</p>
+            </div>
+            <div class="image-item">
+                <img src="media/peacock_text.png" alt="Peacock Synthesis Results">
+                <p class="image-caption">Peacock texture: Source (left) and synthesized result (right)</p>
+            </div>
         </div>
     </section>
 
