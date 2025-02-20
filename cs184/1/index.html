@@ -114,25 +114,15 @@
 
     <div class="algorithm-steps">
         <h3>Rasterization Process</h3>
-        <p><strong>1. Bounding Box Calculation:</strong><br>
-        Compute min/max X and Y values from triangle vertices to create sampling boundaries.</p>
+        <p><strong>1. Walk through how you rasterize triangles in your own words.</strong><br>
+        The original input parameters, (x0, y0), (x1, y1) and (x2, y2), represent coordinates that define a triangle. I first calculated the min and max values for X and Y to ensure that I only considered pixels that could possibly belong to this triangle. 
+        This prevents us from having to iterate over the whole screen. For each pixel within this sampling box, I checked whether the center point (x+0.5, y+0.5) lies inside the triangle. If it is, the pixel is covered by the triangle and I fill it. 
+        To check whether or not the point is in the triangle, I used the edge function that we learned in class. For each triangle edge, take the cross product of the edge vector AB = B - A and the vector from the same vertex to our sample point AP. 
+        If all cross products are non-negative, the sample point is inside the triangle (including the edge itself). If the sample point is inside, I set the pixel to the color of the triangle.</p>
         
-        <p><strong>2. Pixel Sampling:</strong><br>
-        For each pixel in the bounding box, test if its center (x+0.5, y+0.5) lies within the triangle using edge functions:</p>
-        
-        <p>For each edge AB:
-        <br>Calculate cross product of AB × AP
-        <br>If all cross products ≥ 0, pixel is inside</p>
-    </div>
-
-    <div class="image-container">
-        <h3>Bounding Box Efficiency</h3>
-        <p>Our algorithm checks every pixel in the triangle's bounding box exactly once. This is optimal because:</p>
-        <ul>
-            <li>We avoid checking pixels outside the triangle's area</li>
-            <li>Eliminates unnecessary computations from brute-force approaches</li>
-            <li>Maintains O(n) complexity where n is bounding box area</li>
-        </ul>
+        <p><strong>2. Explain how your algorithm is no worse than one that checks each sample within the bounding box of the triangle. The bounding box of the triangle is defined as the smallest rectangle that can be drawn whilst ensuring that the entire triangle is within it.</strong><br>
+        Each pixel in the bounding box is tested exactly once, at its center. This is a simple rule that determines whether a pixel should be drawn or not, and it’s efficient because we don’t waste resources by checking pixels outside the triangle’s bounding box (determined by taking the min/max values along both axes). 
+        We are avoiding a brute-force approach that would look at the entire image.</p>
     </div>
 
     <h2>Task 2: Supersampling Antialiasing</h2>
