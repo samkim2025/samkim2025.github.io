@@ -131,15 +131,17 @@
         Finally, I accumulated all subpixel colors and averaged them to form the final color of the pixel. This produces smoother, antialiased edges because pixels partially covered by the shape will be colored with a lighter shade of the shape color. </p>
 
     <div class="algorithm-steps">
-        <h3>Walk through your supersampling algorithm and data structures. Why is supersampling useful? What modifications did you make to the rasterization pipeline in the process? Explain how you used supersampling to antialias your triangles.</h3>
+        <p><strong>1. Walk through your supersampling algorithm and data structures. Why is supersampling useful?</strong><br>
+        <p>Supersampling is useful because it helps improve the quality of images by smoothing out “jaggies” that appear when we rasterize diagonals or curved shapes. 
+        It works by first dividing each pixel into multiple smaller subpixel samples. Then, I tested the coverage of each subpixel sample (i.e. does it lie inside or outside the shape?). 
+        Finally, I accumulated all subpixel colors and averaged them to form the final color of the pixel. This produces smoother, antialiased edges because pixels partially covered by the shape will be colored with a lighter shade of the shape color. </p>
         <p><strong>Key Data Structures:</strong></p>
         <ul>
             <li><span class="code">sample_rate</span>: An integer, specifies how many total subpixel samples each pixel contains. For example, sample_rate = 4 means we have a 2x2 grid of sub-pixels per pixel.</li>
             <li><span class="code">sample_buffer</span>: A 1D array of Color objects, each storing an (R, G, B) value in floating point. It’s size is width * height * sample_rate, and each pixel has sample_rate sub-sample slots.</li>
             <li><span class="code">rgb_framebuffer_target</span>: This is the final display buffer, storing one 8-bit (R, G, B) per pixel (so 3 * width * height bytes total). This buffer is what we see on display, and we write to it only once after rasterizing in resolve_to_framebuffer().</li>
         </ul>
-
-        <p><strong>Modifications made:</strong></p>
+        <p><strong>2. What modifications did you make to the rasterization pipeline in the process? Explain how you used supersampling to antialias your triangles.</strong><br>
         <ol>
             <li>I replaced the original, one color per pixel approach by storing multiple colors (one per subsample) in sample_buffer.</li>
             <li>Instead of testing only one center point per pixel, I looped over the sub-sample grid inside the pixel. For each sub-sample, I checked if that point is inside the triangle by computing the cross product. And if it was inside, I stored the triangle color into sample_buffer at the corresponding subsample index.</li>
@@ -152,71 +154,65 @@
         <div class="image-container">
             <h3>Sample Rate = 1 (1x1)</h3>
             <img src="media/2.2.1.png" alt="Sample Rate 1">
-            <p>At sample_rate = 1 (no supersampling), the edges appear extremely jagged and there are even gaps between the red pixels where the triangle should normally be. We can even notice jaggies in the original viewpoint, not just from the pixel inspector.</p>
+            <p>At sample_rate = 1 (no supersampling), the edges appear extremely jagged and there are even gaps between the red pixels where the triangle should normally be. We can even notice jaggies in the original viewpoint, not just from the pixel inspector. This is because each pixel is binary (fully covered or not).</p>
         </div>
 
         <div class="image-container">
             <h3>Sample Rate = 4 (2x2)</h3>
             <img src="media/2.2.2.png" alt="Sample Rate 4">
-            <p>At sample_rate = 4, we do not see any of the aforementioned gaps in the pixel inspector, and there is some blur/smoothness.</p>
+            <p>At sample_rate = 4, we do not see any of the gaps from sample rate 1 in the pixel inspector, and there is some blur/smoothness. This is because taking 4 samples allows us to have gradients/shades.</p>
         </div>
 
         <div class="image-container">
             <h3>Sample Rate = 16 (4x4)</h3>
             <img src="media/2.2.3.png" alt="Sample Rate 16">
-            <p>At sample_rate = 16, the blur is much more gradual/spread out. At sample_rate = 4, only one pixel was used to show the lightest, non-white pixel, but at sample_rate = 16, three pixels were used. In other words, pixels are more likely to take on intermediate values/shades.</p>
+            <p>At sample_rate = 16, the blur is much more gradual/spread out. At sample_rate = 4, only one pixel was used to show the lightest, non-white pixel, but at sample_rate = 16, three pixels were used. In other words, with 16 samples, pixels are more likely to take on intermediate values/shades. </p>
         </div>
     </div>
 
-    <div class="image-container">
-        <h3>Antialiasing Analysis</h3>
-        <p>The screenshots demonstrate how supersampling mitigates aliasing:</p>
-        <ul>
-            <li><strong>Sample Rate 1:</strong> Each pixel is binary (fully covered or not)</li>
-            <li><strong>Sample Rate 4:</strong> 4 samples provide limited gradient options</li>
-            <li><strong>Sample Rate 16:</strong> 16 samples allow smooth alpha blending</li>
-        </ul>
-        <p>Higher sample rates better approximate the ideal continuous signal but increase computational cost (O(n²) complexity).</p>
-    </div>
-
-    <div class="image-container">
-        <h3>Supersampling Comparison Details</h3>
-        <ul>
-            <li><strong>Sample Rate 1:</strong> Visible gaps between red pixels with severe jaggies</li>
-            <li><strong>Sample Rate 4:</strong> Eliminated gaps with initial blur effect</li>
-            <li><strong>Sample Rate 16:</strong> Gradual color transitions across 3+ pixels</li>
-        </ul>
-        <p>The higher sample rate provides more intermediate color values, creating smoother apparent edges through alpha blending.</p>
-    </div>
     
     <!-- Task 3 Section -->
-    <h2>Task 3: Animated Cubeman</h2>
-    <div class="image-container">
+    <h2>Task 3: Transforms</h2>
+    <div class="grid-container grid-2x2">
+        <div class="image-container">
+            <h3>Nearest 1x</h3>
+            <img src="media/3.2.png" alt="Original Robot">
+        </div>
+        <div class="image-container">
+            <h3>Nearest 16x</h3>
+            <img src="media/3.1.png" alt="Modified Robot">
+        </div>
+    </div>
+    <div class="algorithm-steps">
         <h3>Ride-Hailing Robot</h3>
-        <img src="media/3.1.png" alt="Modified Robot">
-        <p>Modifications include:
+        <p>To create this ride-hailing robot, I tried playing with four things:
             <ul>
-                <li>Black color scheme (#000000)</li>
-                <li>Head rotation to upright position</li>
-                <li>Left arm rotated 270° for waving motion</li>
-                <li>Right hand translated and rotated 90°</li>
+                <li>Color: I changed the color of the robot by transforming the polygon fill value for each box to “#000000” instead of the original “#EF161F”.</li>
+                <li>Rotation of the head: I rotated the head back to an upright position (angle = 0).</li>
+                <li>The left arm: I rotated the left arm by 270 degrees to give it the semblance that it’s calling for a cab.</li>
+                <li>The right arm: For the right arm, I wanted to experiment with the possibility of rotating each “segment” of the arm separately. I kept the upper part of the arm (i.e. the bicep equivalent), but only played with the “hand”. I translated the hand left and up after rotating it 90 degrees.</li>
             </ul>
         </p>
     </div>
     
+    
     <!-- Task 4 Section -->
     <h2>Task 4: Barycentric Coordinates</h2>
-    <div class="algorithm-steps">
-        <h3>Color Interpolation</h3>
-        <p>Any point <em>p</em> in triangle can be expressed as:</p>
-        <p><code>p = αv₀ + βv₁ + γv₂</code> where α + β + γ = 1</p>
-        <img src="4.1.png" alt="Barycentric Visualization">
-        <p>Colors blend smoothly using the same weights:<br>
-        <code>Color(p) = αColor(v₀) + βColor(v₁) + γColor(v₂)</code></p>
+    <div class="image-container">
+        <h3>Color Gradients</h3>
+        <img src="media/4.2.png" alt="Triangle Rasterization Result">
+    </div>
+    <div class="image-container">
+        <h3>Barycentric Interpolation</h3>
+        <img src="media/4.1.png" alt="Triangle Rasterization Result">
+        <p>In a triangle with vertices (v0, v1, and v2), we can express any point p inside the triangle as a weighted combination of the vertices. In other words, p = a*v0 + b*v1 + c*v2. 
+            The weights a, b, and c must add up to 1, and they must be greater than or equal to zero.  These weights are the barycentric coordinates of p relative to the triangle. 
+            To interpolate colors, we do the same idea but in color space. This actually makes a lot of sense given that we have three axes in color (RGB) and a triangle has three vertices. 
+            Color(p)=αColor(v0​)+βColor(v1​)+γColor(v2​). And Color(v_i) is the color value we assign to vertex i. As p moves around inside the triangle, the barycentric coordinates change, blending the colors.</p>
     </div>
     
     <!-- Task 5 Section -->
-    <h2>Task 5: Texture Sampling</h2>
+    <h2>Task 5: "Pixel Sampling" For Texture Mapping</h2>
     <div class="grid-container grid-2x2">
         <div class="image-container">
             <h3>Nearest 1x</h3>
@@ -248,7 +244,7 @@
     </div>
     
     <!-- Task 6 Section -->
-    <h2>Task 6: Level Sampling</h2>
+    <h2>Task 6: Level Sampling with Mipmaps for Texture Mapping</h2>
     <div class="algorithm-steps">
         <h3>Mipmap Implementation</h3>
         <p>Calculated texture coordinate derivatives to determine mipmap level:</p>
