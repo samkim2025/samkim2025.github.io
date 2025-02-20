@@ -105,7 +105,7 @@
 <body>
     <h1>CS184 Project 1: Rasterizer</h1>
 
-    <h2>Task 1: Triangle Rasterization</h2>
+    <h2>Task 1: Drawing Single-Color Triangles</h2>
     
     <div class="image-container">
         <h3>Basic Triangle Rasterization</h3>
@@ -125,44 +125,46 @@
         We are avoiding a brute-force approach that would look at the entire image.</p>
     </div>
 
-    <h2>Task 2: Supersampling Antialiasing</h2>
+    <h2>Task 2: Antialiasing by Supersampling</h2>
+    <p>Supersampling is useful because it helps improve the quality of images by smoothing out “jaggies” that appear when we rasterize diagonals or curved shapes. 
+        It works by first dividing each pixel into multiple smaller subpixel samples. Then, I tested the coverage of each subpixel sample (i.e. does it lie inside or outside the shape?). 
+        Finally, I accumulated all subpixel colors and averaged them to form the final color of the pixel. This produces smoother, antialiased edges because pixels partially covered by the shape will be colored with a lighter shade of the shape color. </p>
 
     <div class="algorithm-steps">
-        <h3>Supersampling Pipeline</h3>
+        <h3>Walk through your supersampling algorithm and data structures. Why is supersampling useful? What modifications did you make to the rasterization pipeline in the process? Explain how you used supersampling to antialias your triangles.</h3>
         <p><strong>Key Data Structures:</strong></p>
         <ul>
-            <li><span class="code">sample_rate</span>: Subpixels per pixel (e.g., 4 = 2×2 grid)</li>
-            <li><span class="code">sample_buffer</span>: 1D array storing colors for all subpixels</li>
-            <li><span class="code">rgb_framebuffer_target</span>: Final display buffer with averaged colors</li>
+            <li><span class="code">sample_rate</span>: An integer, specifies how many total subpixel samples each pixel contains. For example, sample_rate = 4 means we have a 2x2 grid of sub-pixels per pixel.</li>
+            <li><span class="code">sample_buffer</span>: A 1D array of Color objects, each storing an (R, G, B) value in floating point. It’s size is width * height * sample_rate, and each pixel has sample_rate sub-sample slots.</li>
+            <li><span class="code">rgb_framebuffer_target</span>: This is the final display buffer, storing one 8-bit (R, G, B) per pixel (so 3 * width * height bytes total). This buffer is what we see on display, and we write to it only once after rasterizing in resolve_to_framebuffer().</li>
         </ul>
 
-        <p><strong>Implementation Steps:</strong></p>
+        <p><strong>Modifications made:</strong></p>
         <ol>
-            <li>Divide each pixel into subpixel grid based on sample_rate</li>
-            <li>Test coverage for each subpixel using same edge function</li>
-            <li>Accumulate color values in sample_buffer</li>
-            <li>Average subpixel colors in resolve_to_framebuffer()</li>
-            <li>Convert to 8-bit color for final display</li>
+            <li>I replaced the original, one color per pixel approach by storing multiple colors (one per subsample) in sample_buffer.</li>
+            <li>Instead of testing only one center point per pixel, I looped over the sub-sample grid inside the pixel. For each sub-sample, I checked if that point is inside the triangle by computing the cross product. And if it was inside, I stored the triangle color into sample_buffer at the corresponding subsample index.</li>
+            <li>After rasterizing all triangles, I call resolve_to_framebuffer(). For each pixel, I sum the sample_rate subsample colors and average them. I then convert this average into an 8-bit color and write it to rgb_framebuffer_target.</li>
+            <li>I make sure to clear the sample_buffer to a default color (white) at the start of each frame clear_buffers() so that the old data doesn’t persist.</li>
         </ol>
     </div>
 
     <div class="grid-container">
         <div class="image-container">
-            <h3>Sample Rate 1 (No AA)</h3>
+            <h3>Sample Rate = 1 (1x1)</h3>
             <img src="media/2.2.1.png" alt="Sample Rate 1">
-            <p>Notice jagged edges ("jaggies") especially on diagonals</p>
+            <p>At sample_rate = 1 (no supersampling), the edges appear extremely jagged and there are even gaps between the red pixels where the triangle should normally be. We can even notice jaggies in the original viewpoint, not just from the pixel inspector.</p>
         </div>
 
         <div class="image-container">
-            <h3>Sample Rate 4 (2x2)</h3>
+            <h3>Sample Rate = 4 (2x2)</h3>
             <img src="media/2.2.2.png" alt="Sample Rate 4">
-            <p>Smoother edges but still visible stair-stepping</p>
+            <p>At sample_rate = 4, we do not see any of the aforementioned gaps in the pixel inspector, and there is some blur/smoothness.</p>
         </div>
 
         <div class="image-container">
-            <h3>Sample Rate 16 (4x4)</h3>
+            <h3>Sample Rate = 16 (4x4)</h3>
             <img src="media/2.2.3.png" alt="Sample Rate 16">
-            <p>Nearly smooth edges with gradual color transitions</p>
+            <p>At sample_rate = 16, the blur is much more gradual/spread out. At sample_rate = 4, only one pixel was used to show the lightest, non-white pixel, but at sample_rate = 16, three pixels were used. In other words, pixels are more likely to take on intermediate values/shades.</p>
         </div>
     </div>
 
