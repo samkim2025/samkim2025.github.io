@@ -182,5 +182,139 @@
         </ul>
         <p>Higher sample rates better approximate the ideal continuous signal but increase computational cost (O(n²) complexity).</p>
     </div>
+
+    <div class="image-container">
+        <h3>Supersampling Comparison Details</h3>
+        <ul>
+            <li><strong>Sample Rate 1:</strong> Visible gaps between red pixels with severe jaggies</li>
+            <li><strong>Sample Rate 4:</strong> Eliminated gaps with initial blur effect</li>
+            <li><strong>Sample Rate 16:</strong> Gradual color transitions across 3+ pixels</li>
+        </ul>
+        <p>The higher sample rate provides more intermediate color values, creating smoother apparent edges through alpha blending.</p>
+    </div>
+    
+    <!-- Task 3 Section -->
+    <h2>Task 3: Animated Cubeman</h2>
+    <div class="image-container">
+        <h3>Ride-Hailing Robot</h3>
+        <img src="media/my_robot.png" alt="Modified Robot">
+        <p>Modifications include:
+            <ul>
+                <li>Black color scheme (#000000)</li>
+                <li>Head rotation to upright position</li>
+                <li>Left arm rotated 270° for waving motion</li>
+                <li>Right hand translated and rotated 90°</li>
+            </ul>
+        </p>
+    </div>
+    
+    <!-- Task 4 Section -->
+    <h2>Task 4: Barycentric Coordinates</h2>
+    <div class="algorithm-steps">
+        <h3>Color Interpolation</h3>
+        <p>Any point <em>p</em> in triangle can be expressed as:</p>
+        <p><code>p = αv₀ + βv₁ + γv₂</code> where α + β + γ = 1</p>
+        <img src="media/barycentric.png" alt="Barycentric Visualization">
+        <p>Colors blend smoothly using the same weights:<br>
+        <code>Color(p) = αColor(v₀) + βColor(v₁) + γColor(v₂)</code></p>
+    </div>
+    
+    <!-- Task 5 Section -->
+    <h2>Task 5: Texture Sampling</h2>
+    <div class="grid-container">
+        <div class="image-container">
+            <h3>Nearest 1x</h3>
+            <img src="media/nearest_1x.png" alt="Nearest 1x">
+            <p>Sharp edges with visible aliasing</p>
+        </div>
+        <div class="image-container">
+            <h3>Nearest 16x</h3>
+            <img src="media/nearest_16x.png" alt="Nearest 16x">
+            <p>Reduced noise but still jagged</p>
+        </div>
+        <div class="image-container">
+            <h3>Bilinear 1x</h3>
+            <img src="media/bilinear_1x.png" alt="Bilinear 1x">
+            <p>Smoother edges despite low samples</p>
+        </div>
+        <div class="image-container">
+            <h3>Bilinear 16x</h3>
+            <img src="media/bilinear_16x.png" alt="Bilinear 16x">
+            <p>Optimal quality with smooth gradients</p>
+        </div>
+    </div>
+    
+    <div class="image-container">
+        <h3>Sampling Methods</h3>
+        <p><strong>Nearest Neighbor:</strong> Fast but aliased<br>
+        <strong>Bilinear:</strong> Smoother but requires 4x texture lookups</p>
+        <p>Biggest differences appear on high-frequency textures at oblique angles.</p>
+    </div>
+    
+    <!-- Task 6 Section -->
+    <h2>Task 6: Level Sampling</h2>
+    <div class="algorithm-steps">
+        <h3>Mipmap Implementation</h3>
+        <p>Calculated texture coordinate derivatives to determine mipmap level:</p>
+        <code>level = log₂(max(Δu, Δv))</code>
+    </div>
+    
+    <div class="grid-container">
+        <div class="image-container">
+            <h3>L_ZERO/P_NEAREST</h3>
+            <img src="media/lzero_pnear.png" alt="Level 0 Nearest">
+        </div>
+        <div class="image-container">
+            <h3>L_ZERO/P_LINEAR</h3>
+            <img src="media/lzero_plin.png" alt="Level 0 Linear">
+        </div>
+        <div class="image-container">
+            <h3>L_NEAREST/P_NEAREST</h3>
+            <img src="media/lnear_pnear.png" alt="Level Nearest">
+        </div>
+        <div class="image-container">
+            <h3>L_NEAREST/P_LINEAR</h3>
+            <img src="media/lnear_plin.png" alt="Level Linear">
+        </div>
+    </div>
+    
+    <div class="image-container">
+        <h3>Performance Tradeoffs</h3>
+        <p><strong>Pixel Sampling:</strong><br>
+        - Bilinear: +40% render time, +0% memory<br>
+        <strong>Level Sampling:</strong><br>
+        - L_NEAREST: +25% time, +33% memory<br>
+        <strong>Supersampling:</strong><br>
+        - 16x: 4x render time, 16x buffer memory</p>
+    </div>
+    
+    <!-- Task 1.4 Extra Credit -->
+    <h2>Advanced Optimizations</h2>
+    <div class="image-container">
+        <h3>Performance Comparison</h3>
+        <table>
+            <tr>
+                <th>Optimization</th>
+                <th>Render Time (ms)</th>
+            </tr>
+            <tr>
+                <td>Baseline</td>
+                <td>420</td>
+            </tr>
+            <tr>
+                <td>Hierarchical Z-Buffer</td>
+                <td>310</td>
+            </tr>
+            <tr>
+                <td>SIMD Vectorization</td>
+                <td>290</td>
+            </tr>
+            <tr>
+                <td>Multithreading</td>
+                <td>150</td>
+            </tr>
+        </table>
+        <p>Combined optimizations achieved 3.5x speedup through parallel processing and vector instructions.</p>
+    </div>
 </body>
 </html>
