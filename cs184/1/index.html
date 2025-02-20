@@ -80,6 +80,10 @@
             margin-top: 20px;
         }
 
+        .grid-2x2 {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
         .code {
             font-family: 'Courier New', Courier, monospace;
             background-color: #f8f9fa;
@@ -92,7 +96,7 @@
                 padding: 20px;
             }
             
-            .grid-container {
+            .grid-container, .grid-2x2 {
                 grid-template-columns: 1fr;
             }
         }
@@ -221,7 +225,7 @@
     
     <!-- Task 5 Section -->
     <h2>Task 5: Texture Sampling</h2>
-    <div class="grid-container">
+    <div class="grid-container grid-2x2">
         <div class="image-container">
             <h3>Nearest 1x</h3>
             <img src="media/5.1.png" alt="Nearest 1x">
@@ -259,7 +263,7 @@
         <code>level = log₂(max(Δu, Δv))</code>
     </div>
     
-    <div class="grid-container">
+    <div class="grid-container grid-2x2">
         <div class="image-container">
             <h3>L_ZERO/P_NEAREST</h3>
             <img src="media/6.1.png" alt="Level 0 Nearest">
