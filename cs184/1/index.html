@@ -105,7 +105,7 @@
     
     <div class="image-container">
         <h3>Basic Triangle Rasterization</h3>
-        <img src="media/task1.png" alt="Triangle Rasterization Result">
+        <img src="media/1.3.png" alt="Triangle Rasterization Result">
     </div>
 
     <div class="algorithm-steps">
@@ -155,19 +155,19 @@
     <div class="grid-container">
         <div class="image-container">
             <h3>Sample Rate 1 (No AA)</h3>
-            <img src="media/task2_1x.png" alt="Sample Rate 1">
+            <img src="media/2.2.1.png" alt="Sample Rate 1">
             <p>Notice jagged edges ("jaggies") especially on diagonals</p>
         </div>
 
         <div class="image-container">
             <h3>Sample Rate 4 (2x2)</h3>
-            <img src="media/task2_4x.png" alt="Sample Rate 4">
+            <img src="media/2.2.2.png" alt="Sample Rate 4">
             <p>Smoother edges but still visible stair-stepping</p>
         </div>
 
         <div class="image-container">
             <h3>Sample Rate 16 (4x4)</h3>
-            <img src="media/task2_16x.png" alt="Sample Rate 16">
+            <img src="media/2.2.3.png" alt="Sample Rate 16">
             <p>Nearly smooth edges with gradual color transitions</p>
         </div>
     </div>
@@ -197,7 +197,7 @@
     <h2>Task 3: Animated Cubeman</h2>
     <div class="image-container">
         <h3>Ride-Hailing Robot</h3>
-        <img src="media/my_robot.png" alt="Modified Robot">
+        <img src="media/3.1.png" alt="Modified Robot">
         <p>Modifications include:
             <ul>
                 <li>Black color scheme (#000000)</li>
@@ -214,7 +214,7 @@
         <h3>Color Interpolation</h3>
         <p>Any point <em>p</em> in triangle can be expressed as:</p>
         <p><code>p = αv₀ + βv₁ + γv₂</code> where α + β + γ = 1</p>
-        <img src="media/barycentric.png" alt="Barycentric Visualization">
+        <img src="4.1.png" alt="Barycentric Visualization">
         <p>Colors blend smoothly using the same weights:<br>
         <code>Color(p) = αColor(v₀) + βColor(v₁) + γColor(v₂)</code></p>
     </div>
@@ -224,22 +224,22 @@
     <div class="grid-container">
         <div class="image-container">
             <h3>Nearest 1x</h3>
-            <img src="media/nearest_1x.png" alt="Nearest 1x">
+            <img src="media/5.1.png" alt="Nearest 1x">
             <p>Sharp edges with visible aliasing</p>
         </div>
         <div class="image-container">
             <h3>Nearest 16x</h3>
-            <img src="media/nearest_16x.png" alt="Nearest 16x">
+            <img src="media/5.2.png" alt="Nearest 16x">
             <p>Reduced noise but still jagged</p>
         </div>
         <div class="image-container">
             <h3>Bilinear 1x</h3>
-            <img src="media/bilinear_1x.png" alt="Bilinear 1x">
+            <img src="media/5.3.png" alt="Bilinear 1x">
             <p>Smoother edges despite low samples</p>
         </div>
         <div class="image-container">
             <h3>Bilinear 16x</h3>
-            <img src="media/bilinear_16x.png" alt="Bilinear 16x">
+            <img src="media/5.4.png" alt="Bilinear 16x">
             <p>Optimal quality with smooth gradients</p>
         </div>
     </div>
@@ -262,19 +262,19 @@
     <div class="grid-container">
         <div class="image-container">
             <h3>L_ZERO/P_NEAREST</h3>
-            <img src="media/lzero_pnear.png" alt="Level 0 Nearest">
+            <img src="media/6.1.png" alt="Level 0 Nearest">
         </div>
         <div class="image-container">
             <h3>L_ZERO/P_LINEAR</h3>
-            <img src="media/lzero_plin.png" alt="Level 0 Linear">
+            <img src="media/6.2.png" alt="Level 0 Linear">
         </div>
         <div class="image-container">
             <h3>L_NEAREST/P_NEAREST</h3>
-            <img src="media/lnear_pnear.png" alt="Level Nearest">
+            <img src="media/6.3.png" alt="Level Nearest">
         </div>
         <div class="image-container">
             <h3>L_NEAREST/P_LINEAR</h3>
-            <img src="media/lnear_plin.png" alt="Level Linear">
+            <img src="media/6.4.png" alt="Level Linear">
         </div>
     </div>
     
