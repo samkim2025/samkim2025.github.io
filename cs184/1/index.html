@@ -126,10 +126,6 @@
     </div>
 
     <h2>Task 2: Antialiasing by Supersampling</h2>
-    <p>Supersampling is useful because it helps improve the quality of images by smoothing out “jaggies” that appear when we rasterize diagonals or curved shapes. 
-        It works by first dividing each pixel into multiple smaller subpixel samples. Then, I tested the coverage of each subpixel sample (i.e. does it lie inside or outside the shape?). 
-        Finally, I accumulated all subpixel colors and averaged them to form the final color of the pixel. This produces smoother, antialiased edges because pixels partially covered by the shape will be colored with a lighter shade of the shape color. </p>
-
     <div class="algorithm-steps">
         <p><strong>1. Walk through your supersampling algorithm and data structures. Why is supersampling useful?</strong><br>
         <p>Supersampling is useful because it helps improve the quality of images by smoothing out “jaggies” that appear when we rasterize diagonals or curved shapes. 
@@ -175,11 +171,11 @@
     <h2>Task 3: Transforms</h2>
     <div class="grid-container grid-2x2">
         <div class="image-container">
-            <h3>Nearest 1x</h3>
-            <img src="media/3.2.png" alt="Original Robot">
+            <h3>Original Robot</h3>
+            <img src="media/3.2.jpg" alt="Original Robot">
         </div>
         <div class="image-container">
-            <h3>Nearest 16x</h3>
+            <h3>Modified Robot</h3>
             <img src="media/3.1.png" alt="Modified Robot">
         </div>
     </div>
@@ -198,19 +194,26 @@
     
     <!-- Task 4 Section -->
     <h2>Task 4: Barycentric Coordinates</h2>
-    <div class="image-container">
-        <h3>Color Gradients</h3>
-        <img src="media/4.2.png" alt="Triangle Rasterization Result">
+    <div class="grid-container grid-2x2">
+        <div class="image-container">
+            <h3>Barycentric Triangle</h3>
+            <img src="media/4.1.png" alt="Barycentric Triangle">
+        </div>
+        <div class="image-container">
+            <h3>Barycentric Circle</h3>
+            <img src="media/4.2.png" alt="Barycentric Triangle">
+        </div>
     </div>
-    <div class="image-container">
-        <h3>Barycentric Interpolation</h3>
-        <img src="media/4.1.png" alt="Triangle Rasterization Result">
-        <p>In a triangle with vertices (v0, v1, and v2), we can express any point p inside the triangle as a weighted combination of the vertices. In other words, p = a*v0 + b*v1 + c*v2. 
-            The weights a, b, and c must add up to 1, and they must be greater than or equal to zero.  These weights are the barycentric coordinates of p relative to the triangle. 
-            To interpolate colors, we do the same idea but in color space. This actually makes a lot of sense given that we have three axes in color (RGB) and a triangle has three vertices. 
-            Color(p)=αColor(v0​)+βColor(v1​)+γColor(v2​). And Color(v_i) is the color value we assign to vertex i. As p moves around inside the triangle, the barycentric coordinates change, blending the colors.</p>
+    <div class="algorithm-steps">
+        <p><strong>Explain barycentric coordinates in your own words and use an image to aid you in your explanation.</strong><br>
+        <p>In a triangle with vertices (v0, v1, and v2), we can express any point p inside the triangle as a weighted combination of the vertices. 
+            In other words, p = a*v0 + b*v1 + c*v2. The weights a, b, and c must add up to 1, and they must be greater than or equal to zero.  
+            These weights are the barycentric coordinates of p relative to the triangle. To interpolate colors, we do the same idea but in color space. 
+            This actually makes a lot of sense given that we have three axes in color (RGB) and a triangle has three vertices. Color(p)=αColor(v0​)+βColor(v1​)+γColor(v2​). 
+            And Color(v_i) is the color value we assign to vertex i. As p moves around inside the triangle, the barycentric coordinates change, blending the colors. </p>
     </div>
     
+        
     <!-- Task 5 Section -->
     <h2>Task 5: "Pixel Sampling" For Texture Mapping</h2>
     <div class="grid-container grid-2x2">
@@ -235,6 +238,22 @@
             <p>Optimal quality with smooth gradients</p>
         </div>
     </div>
+    <div class="algorithm-steps">
+        <p><strong>1. Explain pixel sampling in your own words and describe how you implemented it to perform texture mapping. </strong><br>
+        <p>Pixel sampling determines how textures map onto surfaces during rendering. When a texture is applied to a 3D surface, each pixel on the screen corresponds to a portion of the texture image. 
+            Since the texture’s resolution usually does not match with the screen’s, we have to interpolate colors from nearby texels. </p>
+        <p><strong>2. Briefly discuss the two different pixel sampling methods, nearest and bilinear. </strong><br>
+        <p>There are two sampling methods, nearest neighbors and bilinear. Nearest neighbors selects the closest single texel to the sampled texture coordinate. 
+            First, I ensured that the UV coordinates stay within [0, 1] by setting up the min/max boundaries. Then, I scaled the UVs to texture dimensions and rounded it to the nearest integer values.
+            Finally, I checked the bounds to prevent accessing texture that is out of bounds. The bilinear approach, on the other hand, blends 4 nearest texels using distance-based weights. 
+            First, I found the fractional position between texels, and sampled the 4 nearest texel centers. Then I calculated the weighted average based on the positions of each sub-texel, interpolating the values.
+            Nearest neighbors preserved the sharp jaggies, but bilinear sampling showed blur.</p>
+        <p><strong>3. Explain pixel sampling in your own words and describe how you implemented it to perform texture mapping. </strong><br>
+        <p>Pixel sampling determines how textures map onto surfaces during rendering. When a texture is applied to a 3D surface, each pixel on the screen corresponds to a portion of the texture image. 
+            Since the texture’s resolution usually does not match with the screen’s, we have to interpolate colors from nearby texels. </p>
+        
+    </div>
+
     
     <div class="image-container">
         <h3>Sampling Methods</h3>
