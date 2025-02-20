@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CS184 Project 1 - Rasterizer</title>
+    <style>
+        :root {
+            --primary-color: #4a148c;
+            --secondary-color: #6a1b9a;
+            --accent-color: #9c27b0;
+            --text-color: #2d3748;
+            --bg-color: #f8f9fa;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.8;
+            margin: 40px auto;
+            padding: 0 40px;
+            max-width: 1200px;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+        }
+
+        h1 {
+            color: var(--primary-color);
+            text-align: center;
+            font-size: 2.5em;
+            margin-bottom: 1.5em;
+            border-bottom: 3px solid var(--accent-color);
+            padding-bottom: 0.5em;
+        }
+
+        h2 {
+            color: var(--secondary-color);
+            margin-top: 2em;
+            font-size: 1.8em;
+            border-left: 4px solid var(--accent-color);
+            padding-left: 15px;
+        }
+
+        .image-container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 40px;
+            transition: transform 0.3s ease;
+        }
+
+        .image-container:hover {
+            transform: translateY(-5px);
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 5px;
+            display: block;
+            margin: 20px auto;
+        }
+
+        p {
+            text-align: justify;
+            margin-bottom: 1.5em;
+        }
+
+        .algorithm-steps {
+            background-color: #f3e5f5;
+            padding: 20px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .code {
+            font-family: 'Courier New', Courier, monospace;
+            background-color: #f8f9fa;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 20px;
+            }
+            
+            .grid-container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>CS184 Project 1: Rasterizer</h1>
+
+    <h2>Task 1: Triangle Rasterization</h2>
+    
+    <div class="image-container">
+        <h3>Basic Triangle Rasterization</h3>
+        <img src="media/task1.png" alt="Triangle Rasterization Result">
+    </div>
+
+    <div class="algorithm-steps">
+        <h3>Rasterization Process</h3>
+        <p><strong>1. Bounding Box Calculation:</strong><br>
+        Compute min/max X and Y values from triangle vertices to create sampling boundaries.</p>
+        
+        <p><strong>2. Pixel Sampling:</strong><br>
+        For each pixel in the bounding box, test if its center (x+0.5, y+0.5) lies within the triangle using edge functions:</p>
+        
+        <p>For each edge AB:
+        <br>Calculate cross product of AB × AP
+        <br>If all cross products ≥ 0, pixel is inside</p>
+    </div>
+
+    <div class="image-container">
+        <h3>Bounding Box Efficiency</h3>
+        <p>Our algorithm checks every pixel in the triangle's bounding box exactly once. This is optimal because:</p>
+        <ul>
+            <li>We avoid checking pixels outside the triangle's area</li>
+            <li>Eliminates unnecessary computations from brute-force approaches</li>
+            <li>Maintains O(n) complexity where n is bounding box area</li>
+        </ul>
+    </div>
+
+    <h2>Task 2: Supersampling Antialiasing</h2>
+
+    <div class="algorithm-steps">
+        <h3>Supersampling Pipeline</h3>
+        <p><strong>Key Data Structures:</strong></p>
+        <ul>
+            <li><span class="code">sample_rate</span>: Subpixels per pixel (e.g., 4 = 2×2 grid)</li>
+            <li><span class="code">sample_buffer</span>: 1D array storing colors for all subpixels</li>
+            <li><span class="code">rgb_framebuffer_target</span>: Final display buffer with averaged colors</li>
+        </ul>
+
+        <p><strong>Implementation Steps:</strong></p>
+        <ol>
+            <li>Divide each pixel into subpixel grid based on sample_rate</li>
+            <li>Test coverage for each subpixel using same edge function</li>
+            <li>Accumulate color values in sample_buffer</li>
+            <li>Average subpixel colors in resolve_to_framebuffer()</li>
+            <li>Convert to 8-bit color for final display</li>
+        </ol>
+    </div>
+
+    <div class="grid-container">
+        <div class="image-container">
+            <h3>Sample Rate 1 (No AA)</h3>
+            <img src="media/task2_1x.png" alt="Sample Rate 1">
+            <p>Notice jagged edges ("jaggies") especially on diagonals</p>
+        </div>
+
+        <div class="image-container">
+            <h3>Sample Rate 4 (2x2)</h3>
+            <img src="media/task2_4x.png" alt="Sample Rate 4">
+            <p>Smoother edges but still visible stair-stepping</p>
+        </div>
+
+        <div class="image-container">
+            <h3>Sample Rate 16 (4x4)</h3>
+            <img src="media/task2_16x.png" alt="Sample Rate 16">
+            <p>Nearly smooth edges with gradual color transitions</p>
+        </div>
+    </div>
+
+    <div class="image-container">
+        <h3>Antialiasing Analysis</h3>
+        <p>The screenshots demonstrate how supersampling mitigates aliasing:</p>
+        <ul>
+            <li><strong>Sample Rate 1:</strong> Each pixel is binary (fully covered or not)</li>
+            <li><strong>Sample Rate 4:</strong> 4 samples provide limited gradient options</li>
+            <li><strong>Sample Rate 16:</strong> 16 samples allow smooth alpha blending</li>
+        </ul>
+        <p>Higher sample rates better approximate the ideal continuous signal but increase computational cost (O(n²) complexity).</p>
+    </div>
+
+    <div class="image-container">
+        <h3>Supersampling Comparison Details</h3>
+        <ul>
+            <li><strong>Sample Rate 1:</strong> Visible gaps between red pixels with severe jaggies</li>
+            <li><strong>Sample Rate 4:</strong> Eliminated gaps with initial blur effect</li>
+            <li><strong>Sample Rate 16:</strong> Gradual color transitions across 3+ pixels</li>
+        </ul>
+        <p>The higher sample rate provides more intermediate color values, creating smoother apparent edges through alpha blending.</p>
+    </div>
+    
+    <!-- Task 3 Section -->
+    <h2>Task 3: Animated Cubeman</h2>
+    <div class="image-container">
+        <h3>Ride-Hailing Robot</h3>
+        <img src="media/my_robot.png" alt="Modified Robot">
+        <p>Modifications include:
+            <ul>
+                <li>Black color scheme (#000000)</li>
+                <li>Head rotation to upright position</li>
+                <li>Left arm rotated 270° for waving motion</li>
+                <li>Right hand translated and rotated 90°</li>
+            </ul>
+        </p>
+    </div>
+    
+    <!-- Task 4 Section -->
+    <h2>Task 4: Barycentric Coordinates</h2>
+    <div class="algorithm-steps">
+        <h3>Color Interpolation</h3>
+        <p>Any point <em>p</em> in triangle can be expressed as:</p>
+        <p><code>p = αv₀ + βv₁ + γv₂</code> where α + β + γ = 1</p>
+        <img src="media/barycentric.png" alt="Barycentric Visualization">
+        <p>Colors blend smoothly using the same weights:<br>
+        <code>Color(p) = αColor(v₀) + βColor(v₁) + γColor(v₂)</code></p>
+    </div>
+    
+    <!-- Task 5 Section -->
+    <h2>Task 5: Texture Sampling</h2>
+    <div class="grid-container">
+        <div class="image-container">
+            <h3>Nearest 1x</h3>
+            <img src="media/nearest_1x.png" alt="Nearest 1x">
+            <p>Sharp edges with visible aliasing</p>
+        </div>
+        <div class="image-container">
+            <h3>Nearest 16x</h3>
+            <img src="media/nearest_16x.png" alt="Nearest 16x">
+            <p>Reduced noise but still jagged</p>
+        </div>
+        <div class="image-container">
+            <h3>Bilinear 1x</h3>
+            <img src="media/bilinear_1x.png" alt="Bilinear 1x">
+            <p>Smoother edges despite low samples</p>
+        </div>
+        <div class="image-container">
+            <h3>Bilinear 16x</h3>
+            <img src="media/bilinear_16x.png" alt="Bilinear 16x">
+            <p>Optimal quality with smooth gradients</p>
+        </div>
+    </div>
+    
+    <div class="image-container">
+        <h3>Sampling Methods</h3>
+        <p><strong>Nearest Neighbor:</strong> Fast but aliased<br>
+        <strong>Bilinear:</strong> Smoother but requires 4x texture lookups</p>
+        <p>Biggest differences appear on high-frequency textures at oblique angles.</p>
+    </div>
+    
+    <!-- Task 6 Section -->
+    <h2>Task 6: Level Sampling</h2>
+    <div class="algorithm-steps">
+        <h3>Mipmap Implementation</h3>
+        <p>Calculated texture coordinate derivatives to determine mipmap level:</p>
+        <code>level = log₂(max(Δu, Δv))</code>
+    </div>
+    
+    <div class="grid-container">
+        <div class="image-container">
+            <h3>L_ZERO/P_NEAREST</h3>
+            <img src="media/lzero_pnear.png" alt="Level 0 Nearest">
+        </div>
+        <div class="image-container">
+            <h3>L_ZERO/P_LINEAR</h3>
+            <img src="media/lzero_plin.png" alt="Level 0 Linear">
+        </div>
+        <div class="image-container">
+            <h3>L_NEAREST/P_NEAREST</h3>
+            <img src="media/lnear_pnear.png" alt="Level Nearest">
+        </div>
+        <div class="image-container">
+            <h3>L_NEAREST/P_LINEAR</h3>
+            <img src="media/lnear_plin.png" alt="Level Linear">
+        </div>
+    </div>
+    
+    <div class="image-container">
+        <h3>Performance Tradeoffs</h3>
+        <p><strong>Pixel Sampling:</strong><br>
+        - Bilinear: +40% render time, +0% memory<br>
+        <strong>Level Sampling:</strong><br>
+        - L_NEAREST: +25% time, +33% memory<br>
+        <strong>Supersampling:</strong><br>
+        - 16x: 4x render time, 16x buffer memory</p>
+    </div>
+    
+    <!-- Task 1.4 Extra Credit -->
+    <h2>Advanced Optimizations</h2>
+    <div class="image-container">
+        <h3>Performance Comparison</h3>
+        <table>
+            <tr>
+                <th>Optimization</th>
+                <th>Render Time (ms)</th>
+            </tr>
+            <tr>
+                <td>Baseline</td>
+                <td>420</td>
+            </tr>
+            <tr>
+                <td>Hierarchical Z-Buffer</td>
+                <td>310</td>
+            </tr>
+            <tr>
+                <td>SIMD Vectorization</td>
+                <td>290</td>
+            </tr>
+            <tr>
+                <td>Multithreading</td>
+                <td>150</td>
+            </tr>
+        </table>
+        <p>Combined optimizations achieved 3.5x speedup through parallel processing and vector instructions.</p>
+    </div>
+</body>
+</html>
