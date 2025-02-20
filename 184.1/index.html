@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CS184 Project 1 - Rasterizer</title>
+    <style>
+        :root {
+            --primary-color: #4a148c;
+            --secondary-color: #6a1b9a;
+            --accent-color: #9c27b0;
+            --text-color: #2d3748;
+            --bg-color: #f8f9fa;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.8;
+            margin: 40px auto;
+            padding: 0 40px;
+            max-width: 1200px;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+        }
+
+        h1 {
+            color: var(--primary-color);
+            text-align: center;
+            font-size: 2.5em;
+            margin-bottom: 1.5em;
+            border-bottom: 3px solid var(--accent-color);
+            padding-bottom: 0.5em;
+        }
+
+        h2 {
+            color: var(--secondary-color);
+            margin-top: 2em;
+            font-size: 1.8em;
+            border-left: 4px solid var(--accent-color);
+            padding-left: 15px;
+        }
+
+        .image-container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 40px;
+            transition: transform 0.3s ease;
+        }
+
+        .image-container:hover {
+            transform: translateY(-5px);
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 5px;
+            display: block;
+            margin: 20px auto;
+        }
+
+        p {
+            text-align: justify;
+            margin-bottom: 1.5em;
+        }
+
+        .algorithm-steps {
+            background-color: #f3e5f5;
+            padding: 20px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .code {
+            font-family: 'Courier New', Courier, monospace;
+            background-color: #f8f9fa;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 20px;
+            }
+            
+            .grid-container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>CS184 Project 1: Rasterizer</h1>
+
+    <h2>Task 1: Triangle Rasterization</h2>
+    
+    <div class="image-container">
+        <h3>Basic Triangle Rasterization</h3>
+        <img src="media/task1.png" alt="Triangle Rasterization Result">
+    </div>
+
+    <div class="algorithm-steps">
+        <h3>Rasterization Process</h3>
+        <p><strong>1. Bounding Box Calculation:</strong><br>
+        Compute min/max X and Y values from triangle vertices to create sampling boundaries.</p>
+        
+        <p><strong>2. Pixel Sampling:</strong><br>
+        For each pixel in the bounding box, test if its center (x+0.5, y+0.5) lies within the triangle using edge functions:</p>
+        
+        <p>For each edge AB:
+        <br>Calculate cross product of AB × AP
+        <br>If all cross products ≥ 0, pixel is inside</p>
+    </div>
+
+    <div class="image-container">
+        <h3>Bounding Box Efficiency</h3>
+        <p>Our algorithm checks every pixel in the triangle's bounding box exactly once. This is optimal because:</p>
+        <ul>
+            <li>We avoid checking pixels outside the triangle's area</li>
+            <li>Eliminates unnecessary computations from brute-force approaches</li>
+            <li>Maintains O(n) complexity where n is bounding box area</li>
+        </ul>
+    </div>
+
+    <h2>Task 2: Supersampling Antialiasing</h2>
+
+    <div class="algorithm-steps">
+        <h3>Supersampling Pipeline</h3>
+        <p><strong>Key Data Structures:</strong></p>
+        <ul>
+            <li><span class="code">sample_rate</span>: Subpixels per pixel (e.g., 4 = 2×2 grid)</li>
+            <li><span class="code">sample_buffer</span>: 1D array storing colors for all subpixels</li>
+            <li><span class="code">rgb_framebuffer_target</span>: Final display buffer with averaged colors</li>
+        </ul>
+
+        <p><strong>Implementation Steps:</strong></p>
+        <ol>
+            <li>Divide each pixel into subpixel grid based on sample_rate</li>
+            <li>Test coverage for each subpixel using same edge function</li>
+            <li>Accumulate color values in sample_buffer</li>
+            <li>Average subpixel colors in resolve_to_framebuffer()</li>
+            <li>Convert to 8-bit color for final display</li>
+        </ol>
+    </div>
+
+    <div class="grid-container">
+        <div class="image-container">
+            <h3>Sample Rate 1 (No AA)</h3>
+            <img src="media/task2_1x.png" alt="Sample Rate 1">
+            <p>Notice jagged edges ("jaggies") especially on diagonals</p>
+        </div>
+
+        <div class="image-container">
+            <h3>Sample Rate 4 (2x2)</h3>
+            <img src="media/task2_4x.png" alt="Sample Rate 4">
+            <p>Smoother edges but still visible stair-stepping</p>
+        </div>
+
+        <div class="image-container">
+            <h3>Sample Rate 16 (4x4)</h3>
+            <img src="media/task2_16x.png" alt="Sample Rate 16">
+            <p>Nearly smooth edges with gradual color transitions</p>
+        </div>
+    </div>
+
+    <div class="image-container">
+        <h3>Antialiasing Analysis</h3>
+        <p>The screenshots demonstrate how supersampling mitigates aliasing:</p>
+        <ul>
+            <li><strong>Sample Rate 1:</strong> Each pixel is binary (fully covered or not)</li>
+            <li><strong>Sample Rate 4:</strong> 4 samples provide limited gradient options</li>
+            <li><strong>Sample Rate 16:</strong> 16 samples allow smooth alpha blending</li>
+        </ul>
+        <p>Higher sample rates better approximate the ideal continuous signal but increase computational cost (O(n²) complexity).</p>
+    </div>
+</body>
+</html>
