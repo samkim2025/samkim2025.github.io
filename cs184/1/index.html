@@ -216,28 +216,6 @@
         
     <!-- Task 5 Section -->
     <h2>Task 5: "Pixel Sampling" For Texture Mapping</h2>
-    <div class="grid-container grid-2x2">
-        <div class="image-container">
-            <h3>Nearest 1x</h3>
-            <img src="media/5.1.png" alt="Nearest 1x">
-            <p>Sharp edges with visible aliasing</p>
-        </div>
-        <div class="image-container">
-            <h3>Nearest 16x</h3>
-            <img src="media/5.2.png" alt="Nearest 16x">
-            <p>Reduced noise but still jagged</p>
-        </div>
-        <div class="image-container">
-            <h3>Bilinear 1x</h3>
-            <img src="media/5.3.png" alt="Bilinear 1x">
-            <p>Smoother edges despite low samples</p>
-        </div>
-        <div class="image-container">
-            <h3>Bilinear 16x</h3>
-            <img src="media/5.4.png" alt="Bilinear 16x">
-            <p>Optimal quality with smooth gradients</p>
-        </div>
-    </div>
     <div class="algorithm-steps">
         <p><strong>1. Explain pixel sampling in your own words and describe how you implemented it to perform texture mapping. </strong><br>
         <p>Pixel sampling determines how textures map onto surfaces during rendering. When a texture is applied to a 3D surface, each pixel on the screen corresponds to a portion of the texture image. 
@@ -248,26 +226,51 @@
             Finally, I checked the bounds to prevent accessing texture that is out of bounds. The bilinear approach, on the other hand, blends 4 nearest texels using distance-based weights. 
             First, I found the fractional position between texels, and sampled the 4 nearest texel centers. Then I calculated the weighted average based on the positions of each sub-texel, interpolating the values.
             Nearest neighbors preserved the sharp jaggies, but bilinear sampling showed blur.</p>
-        <p><strong>3. Explain pixel sampling in your own words and describe how you implemented it to perform texture mapping. </strong><br>
-        <p>Pixel sampling determines how textures map onto surfaces during rendering. When a texture is applied to a 3D surface, each pixel on the screen corresponds to a portion of the texture image. 
-            Since the texture’s resolution usually does not match with the screen’s, we have to interpolate colors from nearby texels. </p>
-        
     </div>
-
+    <div class="grid-container grid-2x2">
+        <div class="image-container">
+            <h3>Nearest & 1 sample per pixel</h3>
+            <img src="media/5.1.png" alt="Nearest 1x">
+            <p>Sharp edges with visible aliasing</p>
+        </div>
+        <div class="image-container">
+            <h3>Nearest & 16 sample per pixel</h3>
+            <img src="media/5.2.png" alt="Nearest 16x">
+            <p>Reduced noise but still jagged</p>
+        </div>
+        <div class="image-container">
+            <h3>Bilinear & 1 sample per pixel</h3>
+            <img src="media/5.3.png" alt="Bilinear 1x">
+            <p>Smoother edges despite low samples</p>
+        </div>
+        <div class="image-container">
+            <h3>Bilinear & 16 sample per pixel</h3>
+            <img src="media/5.4.png" alt="Bilinear 16x">
+            <p>Optimal quality with smooth gradients</p>
+        </div>
+    </div>
     
     <div class="image-container">
-        <h3>Sampling Methods</h3>
-        <p><strong>Nearest Neighbor:</strong> Fast but aliased<br>
-        <strong>Bilinear:</strong> Smoother but requires 4x texture lookups</p>
-        <p>Biggest differences appear on high-frequency textures at oblique angles.</p>
+        <h3>Relative Differences Across Sampling Methods</h3>
+        <p>I noticed the biggest relative difference between nearest/bilinear at 1 sample per pixel. 
+        Sharp edges showed major aliasing with the nearest neighbors approach, but the bilinear approach hid the jaggies (texels had smoother transition). 
+        At 16 samples per pixel, the noise was too removed to notice any significant difference between nearest/bilinear. </p>
     </div>
     
     <!-- Task 6 Section -->
     <h2>Task 6: Level Sampling with Mipmaps for Texture Mapping</h2>
     <div class="algorithm-steps">
-        <h3>Mipmap Implementation</h3>
-        <p>Calculated texture coordinate derivatives to determine mipmap level:</p>
-        <code>level = log₂(max(Δu, Δv))</code>
+        <p><strong>1. Explain level sampling in your own words and describe how you implemented it for texture mapping. </strong><br>
+        <p>Level sampling selects the appropriate mipmap level for texture mapping based on the distance and angle of the surface relative to the viewer. 
+            When textures are viewed from afar, higher mipmap levels (i.e. smaller, pre-filtered versions) are used to reduce aliasing/jaggies and maintain visual consistency. 
+            I implemented this by first calculating derivatives of UV coordinates at screen-space pixel neighbors (x+1, y) and (x, y+1) using barycentric interpolation. 
+            Then I scaled these derivatives by texture dimensions to convert UVdeltas to texel-space rates of change. </p>
+        <p><strong>2. You can now adjust your sampling technique by selecting pixel sampling, level sampling, or the number of samples per pixel. Describe the tradeoffs between speed, memory usage, and antialiasing power between the three various techniques. </strong><br>
+        <p>There are two sampling methods, nearest neighbors and bilinear. Nearest neighbors selects the closest single texel to the sampled texture coordinate. 
+            First, I ensured that the UV coordinates stay within [0, 1] by setting up the min/max boundaries. Then, I scaled the UVs to texture dimensions and rounded it to the nearest integer values.
+            Finally, I checked the bounds to prevent accessing texture that is out of bounds. The bilinear approach, on the other hand, blends 4 nearest texels using distance-based weights. 
+            First, I found the fractional position between texels, and sampled the 4 nearest texel centers. Then I calculated the weighted average based on the positions of each sub-texel, interpolating the values.
+            Nearest neighbors preserved the sharp jaggies, but bilinear sampling showed blur.</p>
     </div>
     
     <div class="grid-container grid-2x2">
@@ -287,45 +290,6 @@
             <h3>L_NEAREST/P_LINEAR</h3>
             <img src="media/6.4.png" alt="Level Linear">
         </div>
-    </div>
-    
-    <div class="image-container">
-        <h3>Performance Tradeoffs</h3>
-        <p><strong>Pixel Sampling:</strong><br>
-        - Bilinear: +40% render time, +0% memory<br>
-        <strong>Level Sampling:</strong><br>
-        - L_NEAREST: +25% time, +33% memory<br>
-        <strong>Supersampling:</strong><br>
-        - 16x: 4x render time, 16x buffer memory</p>
-    </div>
-    
-    <!-- Task 1.4 Extra Credit -->
-    <h2>Advanced Optimizations</h2>
-    <div class="image-container">
-        <h3>Performance Comparison</h3>
-        <table>
-            <tr>
-                <th>Optimization</th>
-                <th>Render Time (ms)</th>
-            </tr>
-            <tr>
-                <td>Baseline</td>
-                <td>420</td>
-            </tr>
-            <tr>
-                <td>Hierarchical Z-Buffer</td>
-                <td>310</td>
-            </tr>
-            <tr>
-                <td>SIMD Vectorization</td>
-                <td>290</td>
-            </tr>
-            <tr>
-                <td>Multithreading</td>
-                <td>150</td>
-            </tr>
-        </table>
-        <p>Combined optimizations achieved 3.5x speedup through parallel processing and vector instructions.</p>
     </div>
 </body>
 </html>
