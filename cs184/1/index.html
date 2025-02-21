@@ -127,7 +127,7 @@
 
     <h2>Task 2: Antialiasing by Supersampling</h2>
     <div class="algorithm-steps">
-        <p><strong>1. Walk through your supersampling algorithm and data structures. Why is supersampling useful?</strong><br>
+        <p><strong>1. Walk through your supersampling algorithm and data structures. Why is supersampling useful? Explain how you used supersampling to antialias your triangles.</strong><br>
         <p>Supersampling is useful because it helps improve the quality of images by smoothing out “jaggies” that appear when we rasterize diagonals or curved shapes. 
         It works by first dividing each pixel into multiple smaller subpixel samples. Then, I tested the coverage of each subpixel sample (i.e. does it lie inside or outside the shape?). 
         Finally, I accumulated all subpixel colors and averaged them to form the final color of the pixel. This produces smoother, antialiased edges because pixels partially covered by the shape will be colored with a lighter shade of the shape color. </p>
@@ -137,7 +137,7 @@
             <li><span class="code">sample_buffer</span>: A 1D array of Color objects, each storing an (R, G, B) value in floating point. It’s size is width * height * sample_rate, and each pixel has sample_rate sub-sample slots.</li>
             <li><span class="code">rgb_framebuffer_target</span>: This is the final display buffer, storing one 8-bit (R, G, B) per pixel (so 3 * width * height bytes total). This buffer is what we see on display, and we write to it only once after rasterizing in resolve_to_framebuffer().</li>
         </ul>
-        <p><strong>2. What modifications did you make to the rasterization pipeline in the process? Explain how you used supersampling to antialias your triangles.</strong><br>
+        <p><strong>2. What modifications did you make to the rasterization pipeline in the process?</strong><br>
         <ol>
             <li>I replaced the original, one color per pixel approach by storing multiple colors (one per subsample) in sample_buffer.</li>
             <li>Instead of testing only one center point per pixel, I looped over the sub-sample grid inside the pixel. For each sub-sample, I checked if that point is inside the triangle by computing the cross product. And if it was inside, I stored the triangle color into sample_buffer at the corresponding subsample index.</li>
