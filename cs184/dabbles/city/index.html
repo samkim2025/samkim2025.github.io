@@ -1,37 +1,4153 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <meta charset="utf-8">
-    <title>Three.js Test</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>World Famous Landmarks 3D Scene</title>
     <style>
-        body { margin: 0; }
+        body {
+            margin: 0;
+            overflow: hidden;
+            font-family: Arial, sans-serif;
+        }
+        canvas {
+            display: block;
+        }
+        #info {
+            position: absolute;
+            top: 10px;
+            width: 100%;
+            text-align: center;
+            color: white;
+            background: rgba(0,0,0,0.5);
+            padding: 5px;
+            z-index: 100;
+        }
+        #controls {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            background: rgba(0,0,0,0.5);
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            z-index: 100;
+        }
+        #time-control {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background: rgba(0,0,0,0.5);
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            z-index: 100;
+        }
+        #building-info {
+            position: absolute;
+            top: 50px;
+            left: 10px;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            max-width: 300px;
+            z-index: 100;
+            display: none;
+        }
+        #loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            background: rgba(0,0,0,0.7);
+            padding: 20px;
+            border-radius: 10px;
+            z-index: 101;
+        }
     </style>
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+                "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+            }
+        }
+    </script>
 </head>
 <body>
+    <div id="info">World Famous Landmarks 3D Scene - Use mouse to orbit, zoom, and pan</div>
+    <div id="controls">
+        <div>Controls:</div>
+        <div>Mouse - Orbit</div>
+        <div>Scroll - Zoom in/out</div>
+        <div>Right click + drag - Pan</div>
+    </div>
+    <div id="time-control">
+        <label for="time-slider">Time of Day: </label>
+        <input type="range" id="time-slider" min="0" max="24" value="12" step="0.1">
+        <span id="time-display">12:00</span>
+    </div>
+    <div id="building-info">
+        <h3 id="building-name">Building Name</h3>
+        <p id="building-desc">Building description</p>
+    </div>
+    <div id="loading">Loading World Famous Landmarks Scene...</div>
     <script type="module">
-        import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.155.0/build/three.module.js';
-        
+        import * as THREE from 'three';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+        import { Sky } from 'three/addons/objects/Sky.js';
+
+        // Scene setup
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer();
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        renderer.outputColorSpace = THREE.SRGBColorSpace;
+        renderer.toneMapping = THREE.ACESFilmicToneMapping;
+        renderer.toneMappingExposure = 0.8;
         document.body.appendChild(renderer.domElement);
+
+        // Set camera initial position
+        camera.position.set(100, 80, 100);
+        camera.lookAt(0, 0, 0);
+
+        // Orbit controls
+        const controls = new OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.05;
+        controls.screenSpacePanning = false;
+        controls.minDistance = 20;
+        controls.maxDistance = 250;
+        controls.maxPolarAngle = Math.PI / 2 - 0.1; // Prevent camera from going below ground
+        controls.update();
+
+        // City configuration
+        const blockSize = 40;
+        const streetWidth = 15;
+        const gridSize = 5; // 5x5 grid of buildings
+
+        // Sky setup
+        const sky = new Sky();
+        sky.scale.setScalar(1000);
+        scene.add(sky);
+
+        const sun = new THREE.Vector3();
+
+        // Atmosphere parameters
+        const effectController = {
+            turbidity: 10,
+            rayleigh: 2,
+            mieCoefficient: 0.005,
+            mieDirectionalG: 0.8,
+            elevation: 45, // sun elevation
+            azimuth: 180,  // sun azimuth
+            exposure: renderer.toneMappingExposure
+        };
+
+        function updateSky() {
+            const uniforms = sky.material.uniforms;
+            uniforms['turbidity'].value = effectController.turbidity;
+            uniforms['rayleigh'].value = effectController.rayleigh;
+            uniforms['mieCoefficient'].value = effectController.mieCoefficient;
+            uniforms['mieDirectionalG'].value = effectController.mieDirectionalG;
+
+            const phi = THREE.MathUtils.degToRad(90 - effectController.elevation);
+            const theta = THREE.MathUtils.degToRad(effectController.azimuth);
+
+            sun.setFromSphericalCoords(1, phi, theta);
+            uniforms['sunPosition'].value.copy(sun);
+            renderer.toneMappingExposure = effectController.exposure;
+        }
+
+        updateSky();
+
+        // Lighting
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.3);
+        scene.add(ambientLight);
+
+        // Directional light (sun)
+        const sunLight = new THREE.DirectionalLight(0xffffff, 1.5);
+        sunLight.position.set(sun.x * 100, sun.y * 100, sun.z * 100);
+        sunLight.castShadow = true;
+        sunLight.shadow.mapSize.width = 2048;
+        sunLight.shadow.mapSize.height = 2048;
+        sunLight.shadow.camera.near = 0.5;
+        sunLight.shadow.camera.far = 500;
+        sunLight.shadow.camera.left = -200;
+        sunLight.shadow.camera.right = 200;
+        sunLight.shadow.camera.top = 200;
+        sunLight.shadow.camera.bottom = -200;
+        scene.add(sunLight);
+
+        // Hemisphere light for better ambient lighting
+        const hemiLight = new THREE.HemisphereLight(0xffffff, 0x444444, 0.6);
+        scene.add(hemiLight);
+
+        // Time control
+        const timeSlider = document.getElementById('time-slider');
+        const timeDisplay = document.getElementById('time-display');
+
+        timeSlider.addEventListener('input', function() {
+            const time = parseFloat(this.value);
+            updateTimeOfDay(time);
+            
+            // Update time display
+            const hours = Math.floor(time);
+            const minutes = Math.floor((time - hours) * 60);
+            timeDisplay.textContent = `${hours}:${minutes.toString().padStart(2, '0')}`;
+        });
+
+        // Track if it's night time
+        let isNightTime = false;
+
+        function updateTimeOfDay(time) {
+            // 0 = midnight, 12 = noon, 24 = midnight
+            const elevation = time <= 12 ? time * 7.5 - 90 : (24 - time) * 7.5 - 90;
+            effectController.elevation = elevation;
+            
+            // Check if it's night time (for street lights)
+            const newIsNightTime = time < 6 || time > 18;
+            
+            // Only update all lights if the night/day state changed
+            if (newIsNightTime !== isNightTime) {
+                isNightTime = newIsNightTime;
+                
+                // Update street lights - only update emissive materials
+                scene.traverse(object => {
+                    if (object.userData && object.userData.isLampLight) {
+                        if (object.material && object.material.emissive) {
+                            object.material.emissiveIntensity = isNightTime ? 1.0 : 0.0;
+                        }
+                    }
+                });
+            }
+            
+            // Adjust lighting based on time
+            if (time >= 5 && time <= 19) {
+                // Daytime
+                const intensity = time >= 10 && time <= 15 ? 1.5 : 1.0;
+                sunLight.intensity = intensity;
+                ambientLight.intensity = 0.3;
+                
+                // Color temperature changes throughout the day
+                if (time < 8) {
+                    // Morning - warmer light
+                    sunLight.color.setHex(0xffccaa);
+                } else if (time > 17) {
+                    // Evening - warmer light
+                    sunLight.color.setHex(0xffaa88);
+                } else {
+                    // Midday - white light
+                    sunLight.color.setHex(0xffffff);
+                }
+            } else {
+                // Night
+                sunLight.intensity = 0.1;
+                ambientLight.intensity = 0.1;
+                sunLight.color.setHex(0x8888ff); // Bluish night light
+            }
+            
+            updateSky();
+            
+            // Update sunlight position
+            sunLight.position.set(sun.x * 100, sun.y * 100, sun.z * 100);
+        }
+
+        // Ground
+        const groundGeometry = new THREE.PlaneGeometry(blockSize * gridSize + streetWidth * (gridSize + 1), blockSize * gridSize + streetWidth * (gridSize + 1));
+        const groundMaterial = new THREE.MeshStandardMaterial({
+            color: 0x333333, // Dark gray for asphalt
+            roughness: 0.8,
+            metalness: 0.2
+        });
+        const ground = new THREE.Mesh(groundGeometry, groundMaterial);
+        ground.rotation.x = -Math.PI / 2;
+        ground.receiveShadow = true;
+        scene.add(ground);
+
+        // Create city grid
+        function createCityGrid() {
+            const gridWidth = blockSize * gridSize + streetWidth * (gridSize + 1);
+            const halfGridWidth = gridWidth / 2;
+
+            // Create horizontal streets
+            for (let i = 0; i <= gridSize; i++) {
+                const posZ = -halfGridWidth + i * (blockSize + streetWidth) + streetWidth / 2;
+                
+                const roadGeometry = new THREE.PlaneGeometry(gridWidth, streetWidth);
+                const roadMaterial = new THREE.MeshStandardMaterial({
+                    color: 0x444444,
+                    roughness: 0.9,
+                    metalness: 0.0
+                });
+                const road = new THREE.Mesh(roadGeometry, roadMaterial);
+                road.rotation.x = -Math.PI / 2;
+                road.position.set(0, 0.01, posZ);
+                road.receiveShadow = true;
+                scene.add(road);
+                
+                // Street line
+                const lineGeometry = new THREE.PlaneGeometry(gridWidth, 0.5);
+                const lineMaterial = new THREE.MeshStandardMaterial({
+                    color: 0xFFFF00,
+                    roughness: 0.7,
+                    metalness: 0.0
+                });
+                const line = new THREE.Mesh(lineGeometry, lineMaterial);
+                line.rotation.x = -Math.PI / 2;
+                line.position.set(0, 0.02, posZ);
+                line.receiveShadow = true;
+                scene.add(line);
+            }
+            
+            // Create vertical streets
+            for (let i = 0; i <= gridSize; i++) {
+                const posX = -halfGridWidth + i * (blockSize + streetWidth) + streetWidth / 2;
+                
+                const roadGeometry = new THREE.PlaneGeometry(streetWidth, gridWidth);
+                const roadMaterial = new THREE.MeshStandardMaterial({
+                    color: 0x444444,
+                    roughness: 0.9,
+                    metalness: 0.0
+                });
+                const road = new THREE.Mesh(roadGeometry, roadMaterial);
+                road.rotation.x = -Math.PI / 2;
+                road.position.set(posX, 0.01, 0);
+                road.receiveShadow = true;
+                scene.add(road);
+                
+                // Street line
+                const lineGeometry = new THREE.PlaneGeometry(0.5, gridWidth);
+                const lineMaterial = new THREE.MeshStandardMaterial({
+                    color: 0xFFFF00,
+                    roughness: 0.7,
+                    metalness: 0.0
+                });
+                const line = new THREE.Mesh(lineGeometry, lineMaterial);
+                line.rotation.x = -Math.PI / 2;
+                line.position.set(posX, 0.02, 0);
+                line.receiveShadow = true;
+                scene.add(line);
+            }
+            
+            // Create blocks with basic plots
+            for (let x = 0; x < gridSize; x++) {
+                for (let z = 0; z < gridSize; z++) {
+                    const posX = -halfGridWidth + streetWidth + x * (blockSize + streetWidth) + blockSize / 2;
+                    const posZ = -halfGridWidth + streetWidth + z * (blockSize + streetWidth) + blockSize / 2;
+                    
+                    // Plot
+                    const plotGeometry = new THREE.PlaneGeometry(blockSize, blockSize);
+                    const plotMaterial = new THREE.MeshStandardMaterial({
+                        color: 0x7CFC00, // Light green for grass
+                        roughness: 0.9,
+                        metalness: 0.0
+                    });
+                    const plot = new THREE.Mesh(plotGeometry, plotMaterial);
+                    plot.rotation.x = -Math.PI / 2;
+                    plot.position.set(posX, 0.02, posZ);
+                    plot.receiveShadow = true;
+                    scene.add(plot);
+                }
+            }
+        }
+
+        createCityGrid();
+
+        // Create street lamps
+        function createStreetLamp(x, z) {
+            const group = new THREE.Group();
+            
+            // Lamp post
+            const postGeo = new THREE.CylinderGeometry(0.15, 0.15, 5, 8);
+            const postMat = new THREE.MeshStandardMaterial({ color: 0x333333 });
+            const post = new THREE.Mesh(postGeo, postMat);
+            post.position.y = 2.5;
+            post.castShadow = true;
+            post.receiveShadow = true;
+            group.add(post);
+            
+            // Lamp arm
+            const armGeo = new THREE.BoxGeometry(1.5, 0.1, 0.1);
+            const armMat = new THREE.MeshStandardMaterial({ color: 0x333333 });
+            const arm = new THREE.Mesh(armGeo, armMat);
+            arm.position.set(0.75, 4.5, 0);
+            arm.castShadow = true;
+            arm.receiveShadow = true;
+            group.add(arm);
+            
+            // Lamp head
+            const headGeo = new THREE.CylinderGeometry(0.3, 0.3, 0.4, 8);
+            const headMat = new THREE.MeshStandardMaterial({ color: 0x333333 });
+            const head = new THREE.Mesh(headGeo, headMat);
+            head.position.set(1.5, 4.5, 0);
+            head.rotation.z = Math.PI / 2;
+            head.castShadow = true;
+            head.receiveShadow = true;
+            group.add(head);
+            
+            // Light bulb
+            const bulbGeo = new THREE.SphereGeometry(0.1, 16, 16);
+            const bulbMat = new THREE.MeshStandardMaterial({
+                color: 0xffffcc,
+                emissive: 0xffffcc,
+                emissiveIntensity: 1.0
+            });
+            const bulb = new THREE.Mesh(bulbGeo, bulbMat);
+            bulb.position.set(1.5, 4.4, 0);
+            bulb.userData.isLampLight = true;
+            group.add(bulb);
+            
+            group.userData = {
+                isLampLight: true
+            };
+            
+            group.position.set(x, 0, z);
+            return group;
+        }
+
+        // Place street lamps at intersections
+        function placeStreetLamps() {
+            const gridWidth = blockSize * gridSize + streetWidth * (gridSize + 1);
+            const halfGridWidth = gridWidth / 2;
+            
+            // Place lamps at intersections
+            for (let x = 0; x <= gridSize; x++) {
+                for (let z = 0; z <= gridSize; z++) {
+                    const posX = -halfGridWidth + x * (blockSize + streetWidth) + streetWidth / 2;
+                    const posZ = -halfGridWidth + z * (blockSize + streetWidth) + streetWidth / 2;
+                    
+                    // Place four lamps at each intersection
+                    const lamp1 = createStreetLamp(posX + streetWidth / 4, posZ + streetWidth / 4);
+                    lamp1.rotation.y = -Math.PI / 4;
+                    scene.add(lamp1);
+                    
+                    const lamp2 = createStreetLamp(posX - streetWidth / 4, posZ + streetWidth / 4);
+                    lamp2.rotation.y = -3 * Math.PI / 4;
+                    scene.add(lamp2);
+                    
+                    const lamp3 = createStreetLamp(posX + streetWidth / 4, posZ - streetWidth / 4);
+                    lamp3.rotation.y = Math.PI / 4;
+                    scene.add(lamp3);
+                    
+                    const lamp4 = createStreetLamp(posX - streetWidth / 4, posZ - streetWidth / 4);
+                    lamp4.rotation.y = 3 * Math.PI / 4;
+                    scene.add(lamp4);
+                }
+            }
+        }
+
+        placeStreetLamps();
+
+        // Famous buildings data
+        const buildingsData = [
+            {
+                name: "Taj Mahal",
+                location: "Agra, India",
+                description: "Symmetrical white marble mausoleum with intricate pietra dura inlay, Persian-inspired arches, and a central dome flanked by four minarets. Gardens reflect Islamic paradise imagery.",
+                createFunction: createTajMahal
+            },
+            {
+                name: "Great Wall of China",
+                location: "China",
+                description: "Serpentine stone fortification winding through mountains, with watchtowers and crenellated walls blending defensive utility with harmonious landscape integration.",
+                createFunction: createGreatWall
+            },
+            {
+                name: "Angkor Wat",
+                location: "Siem Reap, Cambodia",
+                description: "Massive sandstone temple complex with lotus-shaped towers, bas-reliefs depicting Hindu mythology, and moats symbolizing cosmic oceans.",
+                createFunction: createAngkorWat
+            },
+            {
+                name: "Burj Khalifa",
+                location: "Dubai, UAE",
+                description: "Soaring glass-and-steel skyscraper with a tripartite Y-shaped floor plan, inspired by desert flowers. Its tapered silhouette shimmers with reflective glazing.",
+                createFunction: createBurjKhalifa
+            },
+            {
+                name: "Itsukushima Shrine",
+                location: "Hiroshima, Japan",
+                description: "Vermilion-lacquered Shinto shrine with a 'floating' torii gate. Post-and-lintel wooden architecture contrasts with the tidal landscapes of Miyajima.",
+                createFunction: createItsukushimaShrine
+            },
+            {
+                name: "Petronas Towers",
+                location: "Kuala Lumpur, Malaysia",
+                description: "Twin glass skyscrapers with Islamic geometric motifs, stainless steel façades, and a sky bridge symbolizing Malaysia's cultural unity.",
+                createFunction: createPetronasTowers
+            },
+            {
+                name: "Sydney Opera House",
+                location: "Australia",
+                description: "Expressionist design with sail-like ceramic-tiled shells. The white roof 'sails' create dynamic curves against the harbor backdrop.",
+                createFunction: createSydneyOperaHouse
+            },
+            {
+                name: "Eiffel Tower",
+                location: "Paris, France",
+                description: "Iconic iron lattice tower with arched legs and tapered design. Ornamental rivets and geometric precision epitomize Industrial Revolution engineering.",
+                createFunction: createEiffelTower
+            },
+            {
+                name: "Colosseum",
+                location: "Rome, Italy",
+                description: "Elliptical amphitheater with travertine limestone arches and Doric/Ionic/Corinthian columns. Ruined facade reveals Roman engineering grandeur.",
+                createFunction: createColosseum
+            },
+            {
+                name: "Sagrada Família",
+                location: "Barcelona, Spain",
+                description: "Gaudí's surreal basilica with organic, nature-inspired forms. Hyperboloid vaults, trencadís mosaics, and skeletal spires evoke a stone forest.",
+                createFunction: createSagradaFamilia
+            },
+            {
+                name: "St. Basil's Cathedral",
+                location: "Moscow, Russia",
+                description: "Colorful onion domes with candy-striped patterns and tented roofs. A whimsical Byzantine-inspired design symbolizing heavenly Jerusalem.",
+                createFunction: createStBasilsCathedral
+            },
+            {
+                name: "Parthenon",
+                location: "Athens, Greece",
+                description: "Doric temple with fluted marble columns, optical refinements (entasis), and pediment sculptures. Embodies Classical Greek harmony and proportion.",
+                createFunction: createParthenon
+            },
+            {
+                name: "Leaning Tower of Pisa",
+                location: "Pisa, Italy",
+                description: "Romanesque bell tower with white marble columns and arches. Its unintended tilt creates a striking, gravity-defying silhouette.",
+                createFunction: createLeaningTower
+            },
+            {
+                name: "Neuschwanstein Castle",
+                location: "Bavaria, Germany",
+                description: "Romanticist fairy-tale castle with turrets, frescoed interiors, and alpine setting. Blend of Gothic and Byzantine revival styles.",
+                createFunction: createNeuschwansteinCastle
+            },
+            {
+                name: "Statue of Liberty",
+                location: "New York, USA",
+                description: "Copper-clad neoclassical sculpture with a spiked crown and torch. Robe folds and tablet symbolize enlightenment and freedom.",
+                createFunction: createStatueOfLiberty
+            },
+            {
+                name: "Golden Gate Bridge",
+                location: "San Francisco, USA",
+                description: "Art Deco suspension bridge with International Orange steel towers. Streamlined cables and vertical ribbing emphasize industrial elegance.",
+                createFunction: createGoldenGateBridge
+            },
+            {
+                name: "Empire State Building",
+                location: "New York, USA",
+                description: "Art Deco skyscraper with limestone façade, tiered setbacks, and a stainless steel spire. Chrome-nickel accents evoke the Machine Age.",
+                createFunction: createEmpireStateBuilding
+            },
+            {
+                name: "Fallingwater",
+                location: "Pennsylvania, USA",
+                description: "Frank Lloyd Wright's organic masterpiece. Cantilevered concrete terraces blend with natural rock and waterfalls, using horizontal lines to merge with the forest.",
+                createFunction: createFallingwater
+            },
+            {
+                name: "The White House",
+                location: "Washington D.C., USA",
+                description: "Neoclassical mansion with white-painted sandstone, Ionic porticoes, and symmetrical Palladian windows. Embodies Federal-era austerity.",
+                createFunction: createWhiteHouse
+            },
+            {
+                name: "Machu Picchu",
+                location: "Peru",
+                description: "Inca citadel with dry-stone walls, trapezoidal doorways, and terraced slopes. Precision-cut stones align with celestial events.",
+                createFunction: createMachuPicchu
+            },
+            {
+                name: "Christ the Redeemer",
+                location: "Rio de Janeiro, Brazil",
+                description: "Art Deco statue with soapstone mosaic tiles. Open arms and streamlined robes create a cross-like silhouette atop Corcovado Mountain.",
+                createFunction: createChristTheRedeemer
+            },
+            {
+                name: "Great Pyramid of Giza",
+                location: "Egypt",
+                description: "Limestone megalith with precise geometric alignment. Smooth, now-eroded casing stones once created a gleaming triangular prism.",
+                createFunction: createGreatPyramid
+            },
+            {
+                name: "Great Sphinx",
+                location: "Giza, Egypt",
+                description: "Monolithic limestone statue with a lion's body and pharaoh's face. Eroded features retain an enigmatic, monumental presence.",
+                createFunction: createGreatSphinx
+            },
+            {
+                name: "Great Mosque of Djenné",
+                location: "Mali",
+                description: "Adobe mud-brick mosque with palm-wood beams and conical towers. Annual re-plastering maintains its sculptural, earth-toned façade.",
+                createFunction: createGreatMosqueOfDjenne
+            },
+            {
+                name: "Lotus Temple",
+                location: "Delhi, India",
+                description: "Baháʼí House of Worship with 27 marble 'petals' forming a lotus shape. Pure white surfaces and nine reflecting pools enhance its serenity.",
+                createFunction: createLotusTemple
+            }
+        ];
+
+        // Building creation functions
+        function createTajMahal(x, y, z) {
+            const group = new THREE.Group();
+            
+            // Base platform
+            const baseGeo = new THREE.BoxGeometry(30, 1, 30);
+            const baseMat = new THREE.MeshStandardMaterial({ color: 0xF5F5F5 });
+            const base = new THREE.Mesh(baseGeo, baseMat);
+            base.position.y = 0.5;
+            base.receiveShadow = true;
+            group.add(base);
+            
+            // Main building
+            const mainGeo = new THREE.BoxGeometry(20, 15, 20);
+            const mainMat = new THREE.MeshStandardMaterial({ color: 0xFFFAFA });
+            const main = new THREE.Mesh(mainGeo, mainMat);
+            main.position.y = 8;
+            main.castShadow = true;
+            main.receiveShadow = true;
+            group.add(main);
+            
+            // Central dome
+            const domeGeo = new THREE.SphereGeometry(7, 32, 32, 0, Math.PI * 2, 0, Math.PI / 2);
+            const domeMat = new THREE.MeshStandardMaterial({ color: 0xFFFAFA });
+            const dome = new THREE.Mesh(domeGeo, domeMat);
+            dome.position.y = 15.5;
+            dome.castShadow = true;
+            group.add(dome);
+            
+            // Dome spire
+            const spireGeo = new THREE.ConeGeometry(1, 4, 16);
+            const spireMat = new THREE.MeshStandardMaterial({ color: 0xFFD700 });
+            const spire = new THREE.Mesh(spireGeo, spireMat);
+            spire.position.y = 22;
+            spire.castShadow = true;
+            group.add(spire);
+            
+            // Four minarets at corners
+            for (let x = -1; x <= 1; x += 2) {
+                for (let z = -1; z <= 1; z += 2) {
+                    // Minaret tower
+                    const minaretGeo = new THREE.CylinderGeometry(1, 1.5, 18, 16);
+                    const minaretMat = new THREE.MeshStandardMaterial({ color: 0xFFFAFA });
+                    const minaret = new THREE.Mesh(minaretGeo, minaretMat);
+                    minaret.position.set(x * 13, 9, z * 13);
+                    minaret.castShadow = true;
+                    group.add(minaret);
+                    
+                    // Minaret top
+                    const topGeo = new THREE.SphereGeometry(1.2, 16, 16, 0, Math.PI * 2, 0, Math.PI / 2);
+                    const topMat = new THREE.MeshStandardMaterial({ color: 0xFFFAFA });
+                    const top = new THREE.Mesh(topGeo, topMat);
+                    top.position.set(x * 13, 18, z * 13);
+                    top.castShadow = true;
+                    group.add(top);
+                    
+                    // Minaret spire
+                    const mSpireGeo = new THREE.ConeGeometry(0.5, 2, 16);
+                    const mSpireMat = new THREE.MeshStandardMaterial({ color: 0xFFD700 });
+                    const mSpire = new THREE.Mesh(mSpireGeo, mSpireMat);
+                    mSpire.position.set(x * 13, 19.5, z * 13);
+                    mSpire.castShadow = true;
+                    group.add(mSpire);
+                }
+            }
+            
+            // Front arch
+            const archGeo = new THREE.CylinderGeometry(5, 5, 1, 32, 1, true, -Math.PI/4, Math.PI/2);
+            const archMat = new THREE.MeshStandardMaterial({ color: 0xFFFAFA, side: THREE.DoubleSide });
+            const arch = new THREE.Mesh(archGeo, archMat);
+            arch.rotation.x = Math.PI / 2;
+            arch.rotation.y = Math.PI / 2;
+            arch.position.set(0, 8, 10);
+            arch.castShadow = true;
+            group.add(arch);
+            
+            // Create a reflecting pool
+            const poolGeo = new THREE.PlaneGeometry(15, 6);
+            const poolMat = new THREE.MeshStandardMaterial({ 
+                color: 0x0077be,
+                transparent: true,
+                opacity: 0.6,
+                metalness: 1.0,
+                roughness: 0.0
+            });
+            const pool = new THREE.Mesh(poolGeo, poolMat);
+            pool.rotation.x = -Math.PI / 2;
+            pool.position.set(0, 0.03, 17);
+            group.add(pool);
+
+            group.position.set(x, y, z);
+            return group;
+        }
+
+        function createGreatWall(x, y, z) {
+            const group = new THREE.Group();
+            
+            const wallLength = 35;
+            const wallHeight = 8;
+            const wallWidth = 6;
+            
+            // Create a winding path for the wall
+            const points = [];
+            for (let i = 0; i < 6; i++) {
+                const xPos = (i - 2.5) * 7;
+                const zPos = Math.sin(i * 0.8) * 5;
+                points.push(new THREE.Vector3(xPos, 0, zPos));
+            }
+            
+            const wallPath = new THREE.CatmullRomCurve3(points);
+            const segments = 20;
+            
+            for (let i = 0; i < segments; i++) {
+                // Create a section of wall
+                const t1 = i / segments;
+                const t2 = (i + 1) / segments;
+                
+                const point1 = wallPath.getPoint(t1);
+                const point2 = wallPath.getPoint(t2);
+                
+                const direction = new THREE.Vector3().subVectors(point2, point1).normalize();
+                const length = point1.distanceTo(point2);
+                
+                // Wall base
+                const baseGeo = new THREE.BoxGeometry(length, wallHeight, wallWidth);
+                const baseMat = new THREE.MeshStandardMaterial({ color: 0x9b7653 });
+                const base = new THREE.Mesh(baseGeo, baseMat);
+                
+                base.position.set(
+                    (point1.x + point2.x) / 2,
+                    wallHeight / 2,
+                    (point1.z + point2.z) / 2
+                );
+                
+                // Rotate to align with direction
+                const angle = Math.atan2(direction.z, direction.x);
+                base.rotation.y = -angle + Math.PI / 2;
+                
+                base.castShadow = true;
+                base.receiveShadow = true;
+                group.add(base);
+                
+                // Add crenellations to the top
+                for (let j = 0; j < 5; j++) {
+                    const crenellationGeo = new THREE.BoxGeometry(length / 5 - 0.2, 1, wallWidth);
+                    const crenellationMat = new THREE.MeshStandardMaterial({ color: 0x9b7653 });
+                    const crenellation = new THREE.Mesh(crenellationGeo, crenellationMat);
+                    
+                    const offset = (j - 2) * (length / 5);
+                    
+                    crenellation.position.set(
+                        (point1.x + point2.x) / 2 + Math.cos(-angle + Math.PI / 2) * offset,
+                        wallHeight + 0.5,
+                        (point1.z + point2.z) / 2 + Math.sin(-angle + Math.PI / 2) * offset
+                    );
+                    
+                    crenellation.rotation.y = -angle + Math.PI / 2;
+                    crenellation.castShadow = true;
+                    group.add(crenellation);
+                }
+                
+                // Add a watchtower at intervals
+                if (i % 5 === 0) {
+                    const towerGeo = new THREE.BoxGeometry(wallWidth + 2, wallHeight + 4, wallWidth + 2);
+                    const towerMat = new THREE.MeshStandardMaterial({ color: 0x9b7653 });
+                    const tower = new THREE.Mesh(towerGeo, towerMat);
+                    
+                    tower.position.set(
+                        point1.x,
+                        (wallHeight + 4) / 2,
+                        point1.z
+                    );
+                    
+                    tower.castShadow = true;
+                    tower.receiveShadow = true;
+                    group.add(tower);
+                    
+                    // Tower roof
+                    const roofGeo = new THREE.ConeGeometry(wallWidth + 1, 3, 4);
+                    const roofMat = new THREE.MeshStandardMaterial({ color: 0x8b4513 });
+                    const roof = new THREE.Mesh(roofGeo, roofMat);
+                    
+                    roof.position.set(
+                        point1.x,
+                        wallHeight + 4 + 1.5,
+                        point1.z
+                    );
+                    
+                    roof.castShadow = true;
+                    group.add(roof);
+                }
+            }
+            
+            // Add terrain under the wall
+            const terrainGeo = new THREE.PlaneGeometry(wallLength, wallWidth * 3, segments, 1);
+            const terrainMat = new THREE.MeshStandardMaterial({ 
+                color: 0x4b5320,
+                roughness: 0.9
+            });
+            
+            // Apply displacement to terrain vertices to follow the wall path
+            const terrainPositions = terrainGeo.attributes.position.array;
+            for (let i = 0; i < terrainPositions.length; i += 3) {
+                const t = (terrainPositions[i] / wallLength) + 0.5;
+                if (t >= 0 && t <= 1) {
+                    const point = wallPath.getPoint(t);
+                    terrainPositions[i] = point.x;
+                    terrainPositions[i+2] = point.z + terrainPositions[i+2] - wallWidth;
+                }
+            }
+            
+            terrainGeo.computeVertexNormals();
+            const terrain = new THREE.Mesh(terrainGeo, terrainMat);
+            terrain.rotation.x = -Math.PI / 2;
+            terrain.position.y = 0.1;
+            terrain.receiveShadow = true;
+            group.add(terrain);
+
+            group.position.set(x, y, z);
+            return group;
+        }
+
+        function createAngkorWat(x, y, z) {
+            const group = new THREE.Group();
+            
+            // Outer wall
+            const outerWallGeo = new THREE.BoxGeometry(35, 5, 35);
+            const wallMat = new THREE.MeshStandardMaterial({ color: 0xA47E1B });
+            const outerWall = new THREE.Mesh(outerWallGeo, wallMat);
+            outerWall.position.y = 2.5;
+            outerWall.castShadow = true;
+            outerWall.receiveShadow = true;
+            group.add(outerWall);
+            
+            // Inner walls - concentric squares
+            const innerWallGeo = new THREE.BoxGeometry(25, 7, 25);
+            const innerWall = new THREE.Mesh(innerWallGeo, wallMat);
+            innerWall.position.y = 3.5;
+            innerWall.castShadow = true;
+            innerWall.receiveShadow = true;
+            group.add(innerWall);
+            
+            // Center temple structure
+            const templePlatformGeo = new THREE.BoxGeometry(15, 2, 15);
+            const templePlatform = new THREE.Mesh(templePlatformGeo, wallMat);
+            templePlatform.position.y = 8;
+            templePlatform.castShadow = true;
+            templePlatform.receiveShadow = true;
+            group.add(templePlatform);
+            
+            // Main towers - center and four corners
+            function createTower(xPos, yPos, zPos, scale = 1) {
+                // Base of tower
+                const towerBaseGeo = new THREE.BoxGeometry(5 * scale, 3 * scale, 5 * scale);
+                const towerBase = new THREE.Mesh(towerBaseGeo, wallMat);
+                towerBase.position.set(xPos, yPos, zPos);
+                towerBase.castShadow = true;
+                towerBase.receiveShadow = true;
+                group.add(towerBase);
+                
+                // Middle of tower
+                const towerMidGeo = new THREE.BoxGeometry(4 * scale, 4 * scale, 4 * scale);
+                const towerMid = new THREE.Mesh(towerMidGeo, wallMat);
+                towerMid.position.set(xPos, yPos + 3.5 * scale, zPos);
+                towerMid.castShadow = true;
+                towerMid.receiveShadow = true;
+                group.add(towerMid);
+                
+                // Lotus tower top
+                const towerTopGeo = new THREE.ConeGeometry(3 * scale, 6 * scale, 4);
+                const towerTop = new THREE.Mesh(towerTopGeo, wallMat);
+                towerTop.position.set(xPos, yPos + 8.5 * scale, zPos);
+                towerTop.castShadow = true;
+                group.add(towerTop);
+            }
+            
+            // Center tower
+            createTower(0, 9, 0, 1.5);
+            
+            // Corner towers
+            createTower(-5, 9, -5, 0.8);
+            createTower(5, 9, -5, 0.8);
+            createTower(-5, 9, 5, 0.8);
+            createTower(5, 9, 5, 0.8);
+            
+            // Create moat
+            const moatGeo = new THREE.RingGeometry(18, 25, 32);
+            const waterMat = new THREE.MeshStandardMaterial({ 
+                color: 0x0077be,
+                transparent: true,
+                opacity: 0.6,
+                metalness: 0.3,
+                roughness: 0.2
+            });
+            const moat = new THREE.Mesh(moatGeo, waterMat);
+            moat.rotation.x = -Math.PI / 2;
+            moat.position.y = 0.1;
+            group.add(moat);
+            
+            // Create causeways
+            const causewayGeo = new THREE.BoxGeometry(7, 0.5, 7);
+            const causewayStoneMat = new THREE.MeshStandardMaterial({ color: 0xa59179 });
+            
+            // North causeway
+            const northCauseway = new THREE.Mesh(causewayGeo, causewayStoneMat);
+            northCauseway.position.set(0, 0.3, 21.5);
+            northCauseway.scale.set(1, 1, 1.5);
+            northCauseway.receiveShadow = true;
+            group.add(northCauseway);
+
+            group.position.set(x, y, z);
+            return group;
+        }
+
+        function createBurjKhalifa(x, y, z) {
+            const group = new THREE.Group();
+            
+            // Create the Y-shaped floor plan
+            const height = 60;
+            const segmentHeight = 5;
+            const numSegments = Math.floor(height / segmentHeight);
+            
+            for (let i = 0; i < numSegments; i++) {
+                // Scale down as we go up
+                const scale = 1 - (i / numSegments) * 0.7;
+                const yPos = i * segmentHeight + segmentHeight / 2;
+                
+                // Create the three wings for Y-shape
+                for (let j = 0; j < 3; j++) {
+                    const angle = (j * 2 * Math.PI / 3);
+                    const wingLength = 5 * scale;
+                    const wingWidth = 3 * scale;
+                    const wingHeight = segmentHeight;
+                    
+                    const wingGeo = new THREE.BoxGeometry(wingWidth, wingHeight, wingLength);
+                    const wingMat = new THREE.MeshStandardMaterial({ 
+                        color: 0xadd8e6,
+                        transparent: true,
+                        opacity: 0.6,
+                        metalness: 0.9,
+                        roughness: 0.1
+                    });
+                    
+                    const wing = new THREE.Mesh(wingGeo, wingMat);
+                    
+                    // Position and rotate the wing
+                    wing.position.y = yPos;
+                    
+                    // Create the Y-shape by positioning at angle from center
+                    const offset = (wingLength / 2) * 0.7;
+                    wing.position.x = Math.sin(angle) * offset;
+                    wing.position.z = Math.cos(angle) * offset;
+                    
+                    // Rotate to point outward
+                    wing.rotation.y = angle;
+                    
+                    wing.castShadow = true;
+                    wing.receiveShadow = true;
+                    group.add(wing);
+                }
+                
+                // Add a central connecting piece
+                const centerGeo = new THREE.CylinderGeometry(2 * scale, 2 * scale, segmentHeight, 6);
+                const centerMat = new THREE.MeshStandardMaterial({ 
+                    color: 0xadd8e6,
+                    transparent: true,
+                    opacity: 0.6,
+                    metalness: 0.9,
+                    roughness: 0.1
+                });
+                
+                const center = new THREE.Mesh(centerGeo, centerMat);
+                center.position.y = yPos;
+                center.castShadow = true;
+                center.receiveShadow = true;
+                group.add(center);
+            }
+            
+            // Add spire at the top
+            const spireGeo = new THREE.CylinderGeometry(0.5, 0.1, 15, 8);
+            const spireMat = new THREE.MeshStandardMaterial({ 
+                color: 0xC0C0C0,
+                metalness: 0.8,
+                roughness: 0.2
+            });
+            
+            const spire = new THREE.Mesh(spireGeo, spireMat);
+            spire.position.y = height + 7.5;
+            spire.castShadow = true;
+            group.add(spire);
+            
+            // Base platform
+            const baseGeo = new THREE.BoxGeometry(20, 1, 20);
+            const baseMat = new THREE.MeshStandardMaterial({ color: 0x808080 });
+            const base = new THREE.Mesh(baseGeo, baseMat);
+            base.position.y = 0.5;
+            base.receiveShadow = true;
+            group.add(base);
+
+            group.position.set(x, y, z);
+            return group;
+        }
+
+        function createItsukushimaShrine(x, y, z) {
+            const group = new THREE.Group();
+            
+            // Create water for the "floating" effect
+            const waterGeo = new THREE.PlaneGeometry(35, 35);
+            const waterMat = new THREE.MeshStandardMaterial({ 
+                color: 0x1E90FF,
+                transparent: true,
+                opacity: 0.7,
+                metalness: 0.3,
+                roughness: 0.2
+            });
+            const water = new THREE.Mesh(waterGeo, waterMat);
+            water.rotation.x = -Math.PI / 2;
+            water.position.y = 0.05;
+            group.add(water);
+            
+            // Create the vermilion torii gate
+            const toriiColor = 0xFF3800; // Vermilion red
+            
+            // Base columns
+            const columnGeo = new THREE.CylinderGeometry(1, 1, 12, 8);
+            const columnMat = new THREE.MeshStandardMaterial({ color: toriiColor });
+            
+            const leftColumn = new THREE.Mesh(columnGeo, columnMat);
+            leftColumn.position.set(-5, 6, 10);
+            leftColumn.castShadow = true;
+            group.add(leftColumn);
+            
+            const rightColumn = new THREE.Mesh(columnGeo, columnMat);
+            rightColumn.position.set(5, 6, 10);
+            rightColumn.castShadow = true;
+            group.add(rightColumn);
+            
+            // Horizontal bars
+            const lowerBarGeo = new THREE.BoxGeometry(14, 1, 1);
+            const lowerBarMat = new THREE.MeshStandardMaterial({ color: toriiColor });
+            const lowerBar = new THREE.Mesh(lowerBarGeo, lowerBarMat);
+            lowerBar.position.set(0, 10, 10);
+            lowerBar.castShadow = true;
+            group.add(lowerBar);
+            
+            const upperBarGeo = new THREE.BoxGeometry(16, 1, 1);
+            const upperBarMat = new THREE.MeshStandardMaterial({ color: toriiColor });
+            const upperBar = new THREE.Mesh(upperBarGeo, upperBarMat);
+            upperBar.position.set(0, 11.5, 10);
+            upperBar.castShadow = true;
+            group.add(upperBar);
+            
+            // Main shrine structure
+            const mainShrineGeo = new THREE.BoxGeometry(20, 8, 15);
+            const mainShrineMat = new THREE.MeshStandardMaterial({ color: toriiColor });
+            const mainShrine = new THREE.Mesh(mainShrineGeo, mainShrineMat);
+            mainShrine.position.set(0, 4, -5);
+            mainShrine.castShadow = true;
+            mainShrine.receiveShadow = true;
+            group.add(mainShrine);
+            
+            // Shrine roof
+            const roofGeo = new THREE.BoxGeometry(24, 1, 18);
+            const roofMat = new THREE.MeshStandardMaterial({ color: 0x111111 });
+            const roof = new THREE.Mesh(roofGeo, roofMat);
+            roof.position.set(0, 8.5, -5);
+            roof.castShadow = true;
+            group.add(roof);
+            
+            // Corridor connecting to shore
+            const corridorGeo = new THREE.BoxGeometry(5, 1, 20);
+            const corridorMat = new THREE.MeshStandardMaterial({ color: 0x8B4513 });
+            const corridor = new THREE.Mesh(corridorGeo, corridorMat);
+            corridor.position.set(-10, 0.6, -5);
+            corridor.receiveShadow = true;
+            group.add(corridor);
+            
+            // Wooden pillars supporting the shrine
+            for (let x = -8; x <= 8; x += 4) {
+                for (let z = -11; z <= 1; z += 4) {
+                    const pillarGeo = new THREE.CylinderGeometry(0.4, 0.4, 4, 6);
+                    const pillarMat = new THREE.MeshStandardMaterial({ color: 0x8B4513 });
+                    const pillar = new THREE.Mesh(pillarGeo, pillarMat);
+                    pillar.position.set(x, 2, z);
+                    pillar.castShadow = true;
+                    group.add(pillar);
+                }
+            }
+
+            group.position.set(x, y, z);
+            return group;
+        }
+
+        function createPetronasTowers(x, y, z) {
+            const group = new THREE.Group();
+            
+            // Create two identical towers
+            function createTower(xOffset) {
+                const segments = 8;
+                const height = 50;
+                const segmentHeight = height / segments;
+                
+                for (let i = 0; i < segments; i++) {
+                    // Scale down as we go up
+                    const scale = 1 - (i / segments) * 0.4;
+                    const radius = 4 * scale;
+                    const yPos = i * segmentHeight + segmentHeight / 2;
+                    
+                    // Tower segment
+                    const segmentGeo = new THREE.CylinderGeometry(radius, radius, segmentHeight, 8);
+                    const segmentMat = new THREE.MeshStandardMaterial({ 
+                        color: 0xC0C0C0,
+                        metalness: 0.8,
+                        roughness: 0.2
+                    });
+                    
+                    const segment = new THREE.Mesh(segmentGeo, segmentMat);
+                    segment.position.set(xOffset, yPos, 0);
+                    segment.castShadow = true;
+                    segment.receiveShadow = true;
+                    group.add(segment);
+                    
+                    // Windows (as darker bands)
+                    const windowHeight = segmentHeight * 0.6;
+                    const windowGeo = new THREE.CylinderGeometry(radius + 0.01, radius + 0.01, windowHeight, 8);
+                    const windowMat = new THREE.MeshStandardMaterial({ 
+                        color: 0x1E90FF,
+                        transparent: true,
+                        opacity: 0.6,
+                        metalness: 0.9,
+                        roughness: 0.1
+                    });
+                    
+                    const window = new THREE.Mesh(windowGeo, windowMat);
+                    window.position.set(xOffset, yPos, 0);
+                    group.add(window);
+                }
+                
+                // Tower spire
+                const spireGeo = new THREE.ConeGeometry(1.5, 10, 8);
+                const spireMat = new THREE.MeshStandardMaterial({ 
+                    color: 0xC0C0C0,
+                    metalness: 0.8,
+                    roughness: 0.2
+                });
+                
+                const spire = new THREE.Mesh(spireGeo, spireMat);
+                spire.position.set(xOffset, height + 5, 0);
+                spire.castShadow = true;
+                group.add(spire);
+            }
+            
+            // Create left and right towers
+            createTower(-7);
+            createTower(7);
+            
+            // Sky bridge connecting towers
+            const bridgeGeo = new THREE.BoxGeometry(14, 2, 4);
+            const bridgeMat = new THREE.MeshStandardMaterial({ 
+                color: 0xC0C0C0,
+                metalness: 0.7,
+                roughness: 0.3
+            });
+            
+            const bridge = new THREE.Mesh(bridgeGeo, bridgeMat);
+            bridge.position.set(0, 25, 0);
+            bridge.castShadow = true;
+            group.add(bridge);
+            
+            // Base platform
+            const baseGeo = new THREE.BoxGeometry(30, 1, 20);
+            const baseMat = new THREE.MeshStandardMaterial({ color: 0x808080 });
+            const base = new THREE.Mesh(baseGeo, baseMat);
+            base.position.y = 0.5;
+            base.receiveShadow = true;
+            group.add(base);
+
+            group.position.set(x, y, z);
+            return group;
+        }
+
+        function createSydneyOperaHouse(x, y, z) {
+            const group = new THREE.Group();
+            
+            // Base platform
+            const baseGeo = new THREE.BoxGeometry(35, 1, 25);
+            const baseMat = new THREE.MeshStandardMaterial({ color: 0xE0E0E0 });
+            const base = new THREE.Mesh(baseGeo, baseMat);
+            base.position.y = 0.5;
+            base.receiveShadow = true;
+            group.add(base);
+            
+            // Create the iconic "sails"
+            function createSail(xPos, zPos, scale, rotation) {
+                // Bottom shape - create a tapered half circle
+                const curvePoints = [];
+                const segments = 10;
+                
+                for (let i = 0; i <= segments; i++) {
+                    const t = i / segments;
+                    const angle = t * Math.PI;
+                    curvePoints.push(new THREE.Vector2(
+                        Math.cos(angle) * 5 * scale,
+                        Math.sin(angle) * 10 * scale
+                    ));
+                }
+                
+                const sailShape = new THREE.Shape();
+                sailShape.moveTo(curvePoints[0].x, curvePoints[0].y);
+                
+                for (let i = 1; i <= segments; i++) {
+                    sailShape.lineTo(curvePoints[i].x, curvePoints[i].y);
+                }
+                
+                // Create extruded geometry for the sail
+                const extrudeSettings = {
+                    steps: 1,
+                    depth: 10 * scale,
+                    bevelEnabled: false
+                };
+                
+                const sailGeo = new THREE.ExtrudeGeometry(sailShape, extrudeSettings);
+                const sailMat = new THREE.MeshStandardMaterial({ color: 0xFFFFFF });
+                const sail = new THREE.Mesh(sailGeo, sailMat);
+                
+                sail.rotation.x = -Math.PI / 2;
+                sail.rotation.z = rotation;
+                sail.position.set(xPos, 1, zPos);
+                sail.castShadow = true;
+                sail.receiveShadow = true;
+                
+                group.add(sail);
+            }
+            
+            // Create multiple sails
+            createSail(-10, 5, 1, 0);
+            createSail(-2, 5, 1.2, 0);
+            createSail(7, 5, 1, 0);
+            createSail(14, 5, 0.8, 0);
+            
+            createSail(-8, -5, 0.9, Math.PI);
+            createSail(0, -5, 1.1, Math.PI);
+            createSail(9, -5, 0.9, Math.PI);
+            
+            // Create water around the opera house
+            const waterGeo = new THREE.PlaneGeometry(100, 50);
+            const waterMat = new THREE.MeshStandardMaterial({ 
+                color: 0x1E90FF,
+                transparent: true,
+                opacity: 0.7,
+                metalness: 0.3,
+                roughness: 0.2
+            });
+            
+            const water = new THREE.Mesh(waterGeo, waterMat);
+            water.rotation.x = -Math.PI / 2;
+            water.position.y = -0.1;
+            water.position.z = -15;
+            group.add(water);
+
+            group.position.set(x, y, z);
+            return group;
+        }
+
+        function createEiffelTower(x, y, z) {
+            const group = new THREE.Group();
+            
+            // Tower color
+            const towerColor = 0x8B4513;
+            
+            // Base legs
+            for (let i = 0; i < 4; i++) {
+                const angle = (i * Math.PI / 2) + Math.PI / 4;
+                const legGeo = new THREE.BoxGeometry(1, 10, 1);
+                const legMat = new THREE.MeshStandardMaterial({ color: towerColor });
+                const leg = new THREE.Mesh(legGeo, legMat);
+                
+                leg.position.set(
+                    Math.cos(angle) * 8,
+                    5,
+                    Math.sin(angle) * 8
+                );
+                
+                // Slant the legs inward
+                leg.rotation.z = -Math.cos(angle) * 0.3;
+                leg.rotation.x = Math.sin(angle) * 0.3;
+                
+                leg.castShadow = true;
+                leg.receiveShadow = true;
+                group.add(leg);
+            }
+            
+            // First level platform
+            const platform1Geo = new THREE.BoxGeometry(16, 1, 16);
+            const platformMat = new THREE.MeshStandardMaterial({ color: towerColor });
+            const platform1 = new THREE.Mesh(platform1Geo, platformMat);
+            platform1.position.y = 10;
+            platform1.castShadow = true;
+            platform1.receiveShadow = true;
+            group.add(platform1);
+            
+            // Second level legs
+            for (let i = 0; i < 4; i++) {
+                const angle = (i * Math.PI / 2) + Math.PI / 4;
+                const legGeo = new THREE.BoxGeometry(0.8, 15, 0.8);
+                const legMat = new THREE.MeshStandardMaterial({ color: towerColor });
+                const leg = new THREE.Mesh(legGeo, legMat);
+                
+                leg.position.set(
+                    Math.cos(angle) * 4,
+                    18,
+                    Math.sin(angle) * 4
+                );
+                
+                // Slant the legs inward
+                leg.rotation.z = -Math.cos(angle) * 0.2;
+                leg.rotation.x = Math.sin(angle) * 0.2;
+                
+                leg.castShadow = true;
+                leg.receiveShadow = true;
+                group.add(leg);
+            }
+            
+            // Second level platform
+            const platform2Geo = new THREE.BoxGeometry(8, 1, 8);
+            const platform2 = new THREE.Mesh(platform2Geo, platformMat);
+            platform2.position.y = 25.5;
+            platform2.castShadow = true;
+            platform2.receiveShadow = true;
+            group.add(platform2);
+            
+            // Final spire
+            const spireGeo = new THREE.CylinderGeometry(0.5, 2, 30, 8);
+            const spireMat = new THREE.MeshStandardMaterial({ color: towerColor });
+            const spire = new THREE.Mesh(spireGeo, spireMat);
+            spire.position.y = 41;
+            spire.castShadow = true;
+            group.add(spire);
+            
+            // Add lattice pattern
+            function createLattice(size, height, yPos) {
+                const halfSize = size / 2;
+                
+                // Horizontal lattice
+                for (let y = 0; y < 4; y++) {
+                    const horizLatticeGeo = new THREE.BoxGeometry(size, 0.3, 0.3);
+                    const horizLatticeMat = new THREE.MeshStandardMaterial({ color: towerColor });
+                    const horizLattice1 = new THREE.Mesh(horizLatticeGeo, horizLatticeMat);
+                    horizLattice1.position.set(0, yPos + (y * height / 4), halfSize - 0.5);
+                    horizLattice1.castShadow = true;
+                    group.add(horizLattice1);
+                    
+                    const horizLattice2 = new THREE.Mesh(horizLatticeGeo, horizLatticeMat);
+                    horizLattice2.position.set(0, yPos + (y * height / 4), -halfSize + 0.5);
+                    horizLattice2.castShadow = true;
+                    group.add(horizLattice2);
+                    
+                    const vertLatticeGeo = new THREE.BoxGeometry(0.3, 0.3, size);
+                    const vertLattice1 = new THREE.Mesh(vertLatticeGeo, horizLatticeMat);
+                    vertLattice1.position.set(halfSize - 0.5, yPos + (y * height / 4), 0);
+                    vertLattice1.castShadow = true;
+                    group.add(vertLattice1);
+                    
+                    const vertLattice2 = new THREE.Mesh(vertLatticeGeo, horizLatticeMat);
+                    vertLattice2.position.set(-halfSize + 0.5, yPos + (y * height / 4), 0);
+                    vertLattice2.castShadow = true;
+                    group.add(vertLattice2);
+                }
+                
+                // Diagonal lattice
+                for (let i = 0; i < 2; i++) {
+                    const diagGeo = new THREE.BoxGeometry(0.3, Math.sqrt(2) * halfSize, 0.3);
+                    const diagMat = new THREE.MeshStandardMaterial({ color: towerColor });
+                    
+                    const diag1 = new THREE.Mesh(diagGeo, diagMat);
+                    diag1.position.set(i === 0 ? halfSize / 2 : -halfSize / 2, yPos + height / 2, i === 0 ? halfSize / 2 : -halfSize / 2);
+                    diag1.rotation.z = Math.PI / 4;
+                    diag1.rotation.y = i === 0 ? Math.PI / 4 : -Math.PI / 4;
+                    diag1.castShadow = true;
+                    group.add(diag1);
+                    
+                    const diag2 = new THREE.Mesh(diagGeo, diagMat);
+                    diag2.position.set(i === 0 ? -halfSize / 2 : halfSize / 2, yPos + height / 2, i === 0 ? halfSize / 2 : -halfSize / 2);
+                    diag2.rotation.z = Math.PI / 4;
+                    diag2.rotation.y = i === 0 ? -Math.PI / 4 : Math.PI / 4;
+                    diag2.castShadow = true;
+                    group.add(diag2);
+                }
+            }
+            
+            createLattice(16, 10, 5);
+            createLattice(8, 15, 18);
+            
+            // Ground base
+            const groundGeo = new THREE.BoxGeometry(20, 0.5, 20);
+            const groundMat = new THREE.MeshStandardMaterial({ color: 0x606060 });
+            const ground = new THREE.Mesh(groundGeo, groundMat);
+            ground.position.y = 0.25;
+            ground.receiveShadow = true;
+            group.add(ground);
+
+            group.position.set(x, y, z);
+            return group;
+        }
+
+        function createColosseum(x, y, z) {
+            const group = new THREE.Group();
+            
+            // Colosseum dimensions
+            const radius = 16;
+            const height = 15;
+            const segments = 36;
+            const wallThickness = 4;
+            
+            // Base platform
+            const baseGeo = new THREE.CylinderGeometry(radius + 2, radius + 2, 1, segments);
+            const baseMat = new THREE.MeshStandardMaterial({ color: 0xBDB76B });
+            const base = new THREE.Mesh(baseGeo, baseMat);
+            base.position.y = 0.5;
+            base.receiveShadow = true;
+            group.add(base);
+            
+            // Outer wall with arches
+            const wallColor = 0xD2B48C; // Tan/beige for limestone look
+            
+            // Main structure - cylindrical shape
+            const outerWallGeo = new THREE.CylinderGeometry(radius, radius, height, segments);
+            const innerWallGeo = new THREE.CylinderGeometry(radius - wallThickness, radius - wallThickness, height, segments);
+            
+            // Create a hollow cylinder by subtracting inner from outer
+            const wallBSP = CSG.subtract([
+                { geometry: outerWallGeo },
+                { geometry: innerWallGeo }
+            ]);
+            
+            const wallMat = new THREE.MeshStandardMaterial({ color: wallColor });
+            const wall = new THREE.Mesh(wallBSP, wallMat);
+            wall.position.y = height / 2 + 1;
+            wall.castShadow = true;
+            wall.receiveShadow = true;
+            group.add(wall);
+            
+            // Create the arches in the wall
+            const numTiers = 3;
+            const archesPerTier = 16;
+            const archHeight = 3;
+            const archWidth = 2;
+            
+            for (let tier = 0; tier < numTiers; tier++) {
+                const tierHeight = 3 + tier * 4;
+                
+                for (let i = 0; i < archesPerTier; i++) {
+                    const angle = (i / archesPerTier) * Math.PI * 2;
+                    
+                    // Calculate arch position
+                    const archX = Math.cos(angle) * radius;
+                    const archZ = Math.sin(angle) * radius;
+                    
+                    // Create arch shape (approximated with a stretched cylinder)
+                    const archGeo = new THREE.BoxGeometry(archWidth, archHeight, wallThickness + 0.5);
+                    const archMat = new THREE.MeshStandardMaterial({ color: 0x000000 });
+                    
+                    const arch = new THREE.Mesh(archGeo, archMat);
+                    arch.position.set(archX, tierHeight + 1, archZ);
+                    
+                    // Rotate to face outward
+                    arch.rotation.y = angle;
+                    
+                    group.add(arch);
+                    
+                    // Add decorative column between arches
+                    if (tier === 0) {
+                        const columnGeo = new THREE.CylinderGeometry(0.3, 0.3, archHeight, 8);
+                        const columnMat = new THREE.MeshStandardMaterial({ color: 0xA9A9A9 });
+                        
+                        const column = new THREE.Mesh(columnGeo, columnMat);
+                        
+                        // Position columns between arches
+                        const columnAngle = ((i + 0.5) / archesPerTier) * Math.PI * 2;
+                        column.position.set(
+                            Math.cos(columnAngle) * radius,
+                            tierHeight + 1,
+                            Math.sin(columnAngle) * radius
+                        );
+                        
+                        group.add(column);
+                    }
+                }
+            }
+            
+            // Add interior details - central arena
+            const arenaGeo = new THREE.CylinderGeometry(radius - wallThickness - 1, radius - wallThickness - 1, 0.5, segments);
+            const arenaMat = new THREE.MeshStandardMaterial({ color: 0xC2B280 }); // Sand color
+            const arena = new THREE.Mesh(arenaGeo, arenaMat);
+            arena.position.y = 1.1;
+            arena.receiveShadow = true;
+            group.add(arena);
+            
+            // Add some seating areas as rings inside
+            for (let i = 0; i < 3; i++) {
+                const seatRadius = radius - wallThickness - 1 - (i * 2);
+                if (seatRadius < 2) break; // Don't create if too small
+                
+                const seatGeo = new THREE.CylinderGeometry(seatRadius + 2, seatRadius, 1 + i, segments);
+                const seatMat = new THREE.MeshStandardMaterial({ color: 0xD3D3D3 });
+                const seat = new THREE.Mesh(seatGeo, seatMat);
+                seat.position.y = 1.5 + i;
+                seat.receiveShadow = true;
+                group.add(seat);
+            }
+
+            // Helper function to simulate CSG operations
+            function CSG {
+                static subtract(meshDefinitions) {
+                    // Just create a shell/hollow cylinder directly
+                    const outerGeo = meshDefinitions[0].geometry;
+                    return outerGeo; // In a real implementation, this would do proper CSG
+                }
+            }
+
+            group.position.set(x, y, z);
+            return group;
+        }
+
+        function createSagradaFamilia(x, y, z) {
+            const group = new THREE.Group();
+            
+            // Base platform
+            const baseGeo = new THREE.BoxGeometry(30, 1, 30);
+            const baseMat = new THREE.MeshStandardMaterial({ color: 0xBCAAA4 });
+            const base = new THREE.Mesh(baseGeo, baseMat);
+            base.position.y = 0.5;
+            base.receiveShadow = true;
+            group.add(base);
+            
+            // Main body of the church
+            const bodyGeo = new THREE.BoxGeometry(20, 20, 30);
+            const bodyMat = new THREE.MeshStandardMaterial({ color: 0xD2B48C });
+            const body = new THREE.Mesh(bodyGeo, bodyMat);
+            body.position.y = 11;
+            body.castShadow = true;
+            body.receiveShadow = true;
+            group.add(body);
+            
+            // Create the central tower - tallest
+            function createTower(xPos, zPos, height, width, color) {
+                // Tower base
+                const towerBaseGeo = new THREE.CylinderGeometry(width, width, height * 0.6, 8);
+                const towerBaseMat = new THREE.MeshStandardMaterial({ color: color });
+                const towerBase = new THREE.Mesh(towerBaseGeo, towerBaseMat);
+                towerBase.position.set(xPos, height * 0.3 + 11, zPos);
+                towerBase.castShadow = true;
+                towerBase.receiveShadow = true;
+                group.add(towerBase);
+                
+                // Tower middle
+                const towerMidGeo = new THREE.CylinderGeometry(width * 0.8, width, height * 0.3, 8);
+                const towerMidMat = new THREE.MeshStandardMaterial({ color: color });
+                const towerMid = new THREE.Mesh(towerMidGeo, towerMidMat);
+                towerMid.position.set(xPos, height * 0.75 + 11, zPos);
+                towerMid.castShadow = true;
+                group.add(towerMid);
+                
+                // Tower spire
+                const towerSpireGeo = new THREE.ConeGeometry(width * 0.5, height * 0.2, 8);
+                const towerSpireMat = new THREE.MeshStandardMaterial({ color: color });
+                const towerSpire = new THREE.Mesh(towerSpireGeo, towerSpireMat);
+                towerSpire.position.set(xPos, height * 0.95 + 11, zPos);
+                towerSpire.castShadow = true;
+                group.add(towerSpire);
+                
+                // Decorative elements - Gaudi-like organic shapes
+                for (let i = 0; i < 3; i++) {
+                    const yOffset = height * (0.3 + i * 0.2);
+                    
+                    for (let j = 0; j < 8; j++) {
+                        const angle = (j / 8) * Math.PI * 2;
+                        const radius = width * (1 - i * 0.1);
+                        
+                        const decorGeo = new THREE.SphereGeometry(0.4, 8, 8);
+                        const decorMat = new THREE.MeshStandardMaterial({ color: 0xF5DEB3 });
+                        const decor = new THREE.Mesh(decorGeo, decorMat);
+                        
+                        decor.position.set(
+                            xPos + Math.cos(angle) * radius,
+                            yOffset + 11,
+                            zPos + Math.sin(angle) * radius
+                        );
+                        
+                        decor.castShadow = true;
+                        group.add(decor);
+                    }
+                }
+            }
+            
+            // Create the main towers
+            createTower(0, 0, 35, 2.5, 0xD2B48C); // Central tallest tower
+            
+            // Front facade towers
+            createTower(-7, 12, 30, 2, 0xE6C9A8);
+            createTower(7, 12, 30, 2, 0xE6C9A8);
+            
+            // Rear towers
+            createTower(-7, -12, 25, 2, 0xDEB887);
+            createTower(7, -12, 25, 2, 0xDEB887);
+            
+            // Create smaller decorative spires
+            for (let x = -5; x <= 5; x += 5) {
+                for (let z = -10; z <= 10; z += 10) {
+                    if (Math.abs(x) !== 0 || Math.abs(z) !== 0) { // Skip center
+                        const height = 10 + Math.random() * 5;
+                        
+                        const spireGeo = new THREE.ConeGeometry(0.8, height, 5);
+                        const spireMat = new THREE.MeshStandardMaterial({ color: 0xE6C9A8 });
+                        const spire = new THREE.Mesh(spireGeo, spireMat);
+                        
+                        spire.position.set(x, 21 + height/2, z);
+                        spire.castShadow = true;
+                        group.add(spire);
+                    }
+                }
+            }
+            
+            // Add some front facade details
+            const facadeGeo = new THREE.BoxGeometry(20, 10, 1);
+            const facadeMat = new THREE.MeshStandardMaterial({ color: 0xF5DEB3 });
+            const facade = new THREE.Mesh(facadeGeo, facadeMat);
+            facade.position.set(0, 6, 15);
+            facade.castShadow = true;
+            facade.receiveShadow = true;
+            group.add(facade);
+            
+            // Front door
+            const doorGeo = new THREE.BoxGeometry(4, 7, 0.5);
+            const doorMat = new THREE.MeshStandardMaterial({ color: 0x8B4513 });
+            const door = new THREE.Mesh(doorGeo, doorMat);
+            door.position.set(0, 3.5, 15.3);
+            group.add(door);
+
+            group.position.set(x, y, z);
+            return group;
+        }
+
+        function createStBasilsCathedral(x, y, z) {
+            const group = new THREE.Group();
+            
+            // Base platform
+            const baseGeo = new THREE.BoxGeometry(30, 1, 30);
+            const baseMat = new THREE.MeshStandardMaterial({ color: 0xA52A2A });
+            const base = new THREE.Mesh(baseGeo, baseMat);
+            base.position.y = 0.5;
+            base.receiveShadow = true;
+            group.add(base);
+            
+            // Main church body
+            const bodyGeo = new THREE.BoxGeometry(25, 15, 25);
+            const bodyMat = new THREE.MeshStandardMaterial({ color: 0xCD5C5C });
+            const body = new THREE.Mesh(bodyGeo, bodyMat);
+            body.position.y = 8;
+            body.castShadow = true;
+            body.receiveShadow = true;
+            group.add(body);
+            
+            // Create colorful onion domes
+            const domeColors = [
+                0xFF0000, // Red
+                0x00FF00, // Green
+                0x0000FF, // Blue
+                0xFFFF00, // Yellow
+                0xFF00FF, // Magenta
+                0x00FFFF, // Cyan
+                0xFFA500, // Orange
+                0x800080  // Purple
+            ];
+            
+            // Central dome - largest
+            createDome(0, 0, 5, 12, domeColors[0]);
+            
+            // Corner domes
+            createDome(-8, -8, 3.5, 10, domeColors[1]);
+            createDome(8, -8, 3.5, 10, domeColors[2]);
+            createDome(-8, 8, 3.5, 10, domeColors[3]);
+            createDome(8, 8, 3.5, 10, domeColors[4]);
+            
+            // Additional domes
+            createDome(-10, 0, 3, 8, domeColors[5]);
+            createDome(10, 0, 3, 8, domeColors[6]);
+            createDome(0, -10, 3, 8, domeColors[7]);
+            createDome(0, 10, 3, 8, domeColors[0]);
+            
+            function createDome(xPos, zPos, radius, height, color) {
+                // Drum base
+                const drumGeo = new THREE.CylinderGeometry(radius, radius, height * 0.3, 16);
+                const drumMat = new THREE.MeshStandardMaterial({ color: 0xF5F5DC });
+                const drum = new THREE.Mesh(drumGeo, drumMat);
+                drum.position.set(xPos, 15 + height * 0.15, zPos);
+                drum.castShadow = true;
+                group.add(drum);
+                
+                // Onion dome
+                // Create using a custom shape with bezier curves
+                const points = [];
+                const segments = 20;
+                
+                for (let i = 0; i <= segments; i++) {
+                    const t = i / segments;
+                    let x, y;
+                    
+                    if (t < 0.5) {
+                        // Bottom half - flare outward
+                        x = radius * (1 + t * 0.5);
+                        y = height * 0.3 * t;
+                    } else {
+                        // Top half - curve inward to point
+                        x = radius * (1.25 - (t - 0.5) * 1.5);
+                        y = height * 0.3 + (t - 0.5) * height * 0.7;
+                    }
+                    
+                    points.push(new THREE.Vector2(x, y));
+                }
+                
+                const domeShape = new THREE.LatheGeometry(points, 16);
+                const domeMat = new THREE.MeshStandardMaterial({ color: color });
+                const dome = new THREE.Mesh(domeShape, domeMat);
+                dome.position.set(xPos, 15 + height * 0.3, zPos);
+                dome.castShadow = true;
+                group.add(dome);
+                
+                // Spire on top
+                const spireGeo = new THREE.CylinderGeometry(0.2, 0.1, height * 0.2, 8);
+                const spireMat = new THREE.MeshStandardMaterial({ color: 0xFFD700 });
+                const spire = new THREE.Mesh(spireGeo, spireMat);
+                spire.position.set(xPos, 15 + height * 1.2, zPos);
+                spire.castShadow = true;
+                group.add(spire);
+                
+                // Cross on top
+                const crossGroup = new THREE.Group();
+                
+                const verticalGeo = new THREE.BoxGeometry(0.1, 1, 0.1);
+                const horizontalGeo = new THREE.BoxGeometry(0.6, 0.1, 0.1);
+                const crossMat = new THREE.MeshStandardMaterial({ color: 0xFFD700 });
+                
+                const vertical = new THREE.Mesh(verticalGeo, crossMat);
+                const horizontal = new THREE.Mesh(horizontalGeo, crossMat);
+                horizontal.position.y = 0.2;
+                
+                crossGroup.add(vertical);
+                crossGroup.add(horizontal);
+                crossGroup.position.set(xPos, 15 + height * 1.3, zPos);
+                crossGroup.castShadow = true;
+                
+                group.add(crossGroup);
+                
+                // Add decorative patterns on the dome
+                const numPatterns = 8;
+                for (let i = 0; i < numPatterns; i++) {
+                    const angle = (i / numPatterns) * Math.PI * 2;
+                    
+                    // Stripes or patterns
+                    const patternGeo = new THREE.BoxGeometry(0.2, height * 0.8, 0.2);
+                    const patternMat = new THREE.MeshStandardMaterial({ color: 0xFFFFFF });
+                    const pattern = new THREE.Mesh(patternGeo, patternMat);
+                    
+                    pattern.position.set(
+                        xPos + Math.cos(angle) * radius * 0.8,
+                        15 + height * 0.6,
+                        zPos + Math.sin(angle) * radius * 0.8
+                    );
+                    
+                    // Orient the pattern to follow the dome curve
+                    pattern.lookAt(new THREE.Vector3(xPos, 15 + height * 0.2, zPos));
+                    pattern.rotation.x += Math.PI / 2;
+                    
+                    group.add(pattern);
+                }
+            }
+
+            group.position.set(x, y, z);
+            return group;
+        }
+
+        function createParthenon(x, y, z) {
+            const group = new THREE.Group();
+            
+            // Platform (stylobate)
+            const platformGeo = new THREE.BoxGeometry(30, 2, 15);
+            const marbleMat = new THREE.MeshStandardMaterial({ color: 0xF5F5F5 });
+            const platform = new THREE.Mesh(platformGeo, marbleMat);
+            platform.position.y = 1;
+            platform.receiveShadow = true;
+            group.add(platform);
+            
+            // Steps
+            for (let i = 1; i <= 3; i++) {
+                const stepGeo = new THREE.BoxGeometry(32 - i * 0.5, 0.5, 17 - i * 0.5);
+                const step = new THREE.Mesh(stepGeo, marbleMat);
+                step.position.y = i * 0.5;
+                step.receiveShadow = true;
+                group.add(step);
+            }
+            
+            // Create columns
+            const columnRadius = 0.75;
+            const columnHeight = 8;
+            
+            // Create front and back columns
+            for (let side = -1; side <= 1; side += 2) {
+                for (let i = -6; i <= 6; i += 2) {
+                    createDoricalColumn(i * 2, side * 6);
+                }
+            }
+            
+            // Create side columns (fewer)
+            for (let side = -1; side <= 1; side += 2) {
+                for (let i = -1; i <= 1; i += 2) {
+                    // Skip corners as they are already placed
+                    if (!(Math.abs(i) === 1 && Math.abs(side) === 1)) {
+                        createDoricalColumn(side * 13, i * 2);
+                    }
+                }
+            }
+            
+            function createDoricalColumn(xPos, zPos) {
+                // Column shaft
+                const shaftGeo = new THREE.CylinderGeometry(columnRadius, columnRadius * 1.1, columnHeight, 16);
+                const column = new THREE.Mesh(shaftGeo, marbleMat);
+                column.position.set(xPos, columnHeight / 2 + 2, zPos);
+                column.castShadow = true;
+                column.receiveShadow = true;
+                group.add(column);
+                
+                // Column capital
+                const capitalGeo = new THREE.BoxGeometry(columnRadius * 3, columnRadius, columnRadius * 3);
+                const capital = new THREE.Mesh(capitalGeo, marbleMat);
+                capital.position.set(xPos, columnHeight + 2 + columnRadius / 2, zPos);
+                capital.castShadow = true;
+                group.add(capital);
+                
+                // Create fluted details on column
+                const flutesCount = 16;
+                for (let i = 0; i < flutesCount; i++) {
+                    const angle = (i / flutesCount) * Math.PI * 2;
+                    
+                    const fluteDepth = 0.05;
+                    const fluteWidth = 0.1;
+                    const flutedGeo = new THREE.BoxGeometry(fluteWidth, columnHeight, fluteDepth);
+                    const flutedMat = new THREE.MeshStandardMaterial({ color: 0xE0E0E0 });
+                    const flute = new THREE.Mesh(flutedGeo, flutedMat);
+                    
+                    flute.position.set(
+                        xPos + Math.cos(angle) * (columnRadius - fluteDepth / 2),
+                        columnHeight / 2 + 2,
+                        zPos + Math.sin(angle) * (columnRadius - fluteDepth / 2)
+                    );
+                    
+                    flute.rotation.y = angle;
+                    
+                    group.add(flute);
+                }
+            }
+            
+            // Create the entablature (the part above the columns)
+            const entablatureGeo = new THREE.BoxGeometry(30, 2, 15);
+            const entablature = new THREE.Mesh(entablatureGeo, marbleMat);
+            entablature.position.y = columnHeight + 3;
+            entablature.castShadow = true;
+            entablature.receiveShadow = true;
+            group.add(entablature);
+            
+            // Create the pediment (triangular part at the top)
+            const pedimentHeight = 4;
+            
+            // Create triangular shape with geometry
+            const pedimentShape = new THREE.Shape();
+            pedimentShape.moveTo(-15, 0);
+            pedimentShape.lineTo(15, 0);
+            pedimentShape.lineTo(0, pedimentHeight);
+            pedimentShape.lineTo(-15, 0);
+            
+            const pedimentGeo = new THREE.ExtrudeGeometry(pedimentShape, {
+                depth: 1,
+                bevelEnabled: false
+            });
+            
+            // Front pediment
+            const frontPediment = new THREE.Mesh(pedimentGeo, marbleMat);
+            frontPediment.position.set(0, columnHeight + 4, 7);
+            frontPediment.rotation.x = Math.PI / 2;
+            frontPediment.castShadow = true;
+            group.add(frontPediment);
+            
+            // Back pediment
+            const backPediment = new THREE.Mesh(pedimentGeo, marbleMat);
+            backPediment.position.set(0, columnHeight + 4, -7);
+            backPediment.rotation.x = -Math.PI / 2;
+            backPediment.castShadow = true;
+            group.add(backPediment);
+            
+            // Central building (naos)
+            const naosGeo = new THREE.BoxGeometry(25, 8, 10);
+            const naosMat = new THREE.MeshStandardMaterial({ color: 0xF0F0F0 });
+            const naos = new THREE.Mesh(naosGeo, naosMat);
+            naos.position.y = 6;
+            naos.castShadow = true;
+            naos.receiveShadow = true;
+            group.add(naos);
+
+            group.position.set(x, y, z);
+            return group;
+        }
+
+        function createLeaningTower(x, y, z) {
+            const group = new THREE.Group();
+            
+            // Tower dimensions
+            const radius = 6;
+            const height = 25;
+            const numLevels = 8;
+            const levelHeight = height / numLevels;
+            
+            // The lean angle (in radians)
+            const leanAngle = Math.PI / 16; // About 11 degrees
+            
+            // Base platform
+            const basePlatformGeo = new THREE.CylinderGeometry(radius + 1, radius + 1, 1, 32);
+            const whiteStoneMat = new THREE.MeshStandardMaterial({ color: 0xF5F5F5 });
+            const basePlatform = new THREE.Mesh(basePlatformGeo, whiteStoneMat);
+            basePlatform.position.y = 0.5;
+            basePlatform.receiveShadow = true;
+            group.add(basePlatform);
+            
+            // Create each level of the tower as a cylinder
+            for (let i = 0; i < numLevels; i++) {
+                const levelRadius = radius * (1 - i * 0.03); // Slightly tapered
+                const levelGeo = new THREE.CylinderGeometry(levelRadius, levelRadius, levelHeight, 32);
+                const level = new THREE.Mesh(levelGeo, whiteStoneMat);
+                
+                // Position adjusted for the lean
+                const baseHeight = 1 + i * levelHeight + levelHeight / 2;
+                const offsetX = Math.sin(leanAngle) * baseHeight;
+                
+                level.position.set(
+                    offsetX,
+                    baseHeight * Math.cos(leanAngle),
+                    0
+                );
+                
+                level.rotation.z = -leanAngle;
+                level.castShadow = true;
+                level.receiveShadow = true;
+                group.add(level);
+                
+                // Add colonnades at each level (except top level)
+                if (i < numLevels - 1) {
+                    createColonnade(
+                        levelRadius,
+                        i * levelHeight + levelHeight, 
+                        offsetX,
+                        baseHeight * Math.cos(leanAngle)
+                    );
+                }
+            }
+            
+            function createColonnade(radius, baseHeight, offsetX, offsetY) {
+                const numColumns = 16;
+                const columnRadius = 0.3;
+                const columnHeight = 2;
+                
+                for (let i = 0; i < numColumns; i++) {
+                    const angle = (i / numColumns) * Math.PI * 2;
+                    
+                    // Adjust column position for lean
+                    const columnX = Math.cos(angle) * radius;
+                    const columnZ = Math.sin(angle) * radius;
+                    
+                    // Position relative to level, accounting for the lean
+                    const rotatedX = columnX * Math.cos(-leanAngle) - baseHeight * Math.sin(-leanAngle);
+                    const rotatedY = columnX * Math.sin(-leanAngle) + baseHeight * Math.cos(-leanAngle);
+                    
+                    const columnGeo = new THREE.CylinderGeometry(columnRadius, columnRadius, columnHeight, 8);
+                    const column = new THREE.Mesh(columnGeo, whiteStoneMat);
+                    
+                    column.position.set(
+                        offsetX + rotatedX,
+                        offsetY + rotatedY,
+                        columnZ
+                    );
+                    
+                    // Keep columns vertical despite tower's lean
+                    column.rotation.z = -leanAngle;
+                    
+                    column.castShadow = true;
+                    group.add(column);
+                    
+                    // Connect columns with arches
+                    const archWidth = 2 * Math.sin(Math.PI / numColumns) * radius;
+                    const archHeight = 0.5;
+                    const archGeo = new THREE.BoxGeometry(archWidth, archHeight, 0.3);
+                    const arch = new THREE.Mesh(archGeo, whiteStoneMat);
+                    
+                    // Position arch between columns
+                    const nextAngle = ((i + 0.5) / numColumns) * Math.PI * 2;
+                    const archX = Math.cos(nextAngle) * radius;
+                    const archZ = Math.sin(nextAngle) * radius;
+                    
+                    // Adjust for lean
+                    const rotatedArchX = archX * Math.cos(-leanAngle) - (baseHeight + columnHeight/2) * Math.sin(-leanAngle);
+                    const rotatedArchY = archX * Math.sin(-leanAngle) + (baseHeight + columnHeight/2) * Math.cos(-leanAngle);
+                    
+                    arch.position.set(
+                        offsetX + rotatedArchX,
+                        offsetY + rotatedArchY,
+                        archZ
+                    );
+                    
+                    // Rotate arch to align with curve and lean
+                    arch.rotation.y = nextAngle;
+                    arch.rotation.z = -leanAngle;
+                    
+                    arch.castShadow = true;
+                    group.add(arch);
+                }
+            }
+            
+            // Top bell chamber
+            const bellChamberGeo = new THREE.CylinderGeometry(radius * 0.6, radius * 0.6, levelHeight * 1.2, 32);
+            const bellChamber = new THREE.Mesh(bellChamberGeo, whiteStoneMat);
+            
+            // Position adjusted for the lean
+            const topHeight = 1 + numLevels * levelHeight;
+            bellChamber.position.set(
+                Math.sin(leanAngle) * topHeight,
+                topHeight * Math.cos(leanAngle),
+                0
+            );
+            
+            bellChamber.rotation.z = -leanAngle;
+            bellChamber.castShadow = true;
+            group.add(bellChamber);
+            
+            // Add bells (simplified)
+            const bellGeo = new THREE.SphereGeometry(1, 16, 16);
+            const bellMat = new THREE.MeshStandardMaterial({ color: 0xB87333 });
+            const bell = new THREE.Mesh(bellGeo, bellMat);
+            
+            bell.position.set(
+                Math.sin(leanAngle) * (topHeight + 1),
+                (topHeight + 1) * Math.cos(leanAngle),
+                0
+            );
+            
+            bell.castShadow = true;
+            group.add(bell);
+
+            group.position.set(x, y, z);
+            return group;
+        }
+
+        function createNeuschwansteinCastle(x, y, z) {
+            const group = new THREE.Group();
+            
+            // Create the base/mountain
+            const baseGeo = new THREE.ConeGeometry(25, 15, 6);
+            const baseMat = new THREE.MeshStandardMaterial({ color: 0x808080 });
+            const base = new THREE.Mesh(baseGeo, baseMat);
+            base.position.y = 7.5;
+            base.castShadow = true;
+            base.receiveShadow = true;
+            group.add(base);
+            
+            // Create the main castle structures on top of the mountain
+            const castleColor = 0xF5F5F5; // White
+            const roofColor = 0x1E90FF; // Blue
+            
+            // Main palace building
+            const mainGeo = new THREE.BoxGeometry(20, 15, 15);
+            const mainMat = new THREE.MeshStandardMaterial({ color: castleColor });
+            const main = new THREE.Mesh(mainGeo, mainMat);
+            main.position.y = 22.5;
+            main.position.z = -2;
+            main.castShadow = true;
+            main.receiveShadow = true;
+            group.add(main);
+            
+            // Main roof
+            const mainRoofGeo = new THREE.ConeGeometry(15, 7, 4);
+            const mainRoofMat = new THREE.MeshStandardMaterial({ color: roofColor });
+            const mainRoof = new THREE.Mesh(mainRoofGeo, mainRoofMat);
+            mainRoof.position.y = 33.5;
+            mainRoof.position.z = -2;
+            mainRoof.rotation.y = Math.PI / 4;
+            mainRoof.castShadow = true;
+            group.add(mainRoof);
+            
+            // Front tower - taller, iconic
+            const frontTowerGeo = new THREE.BoxGeometry(8, 25, 8);
+            const frontTowerMat = new THREE.MeshStandardMaterial({ color: castleColor });
+            const frontTower = new THREE.Mesh(frontTowerGeo, frontTowerMat);
+            frontTower.position.set(0, 28, 7);
+            frontTower.castShadow = true;
+            frontTower.receiveShadow = true;
+            group.add(frontTower);
+            
+            // Front tower roof - cylindrical/cone shape
+            const frontRoofGeo = new THREE.ConeGeometry(6, 8, 8);
+            const frontRoofMat = new THREE.MeshStandardMaterial({ color: roofColor });
+            const frontRoof = new THREE.Mesh(frontRoofGeo, frontRoofMat);
+            frontRoof.position.set(0, 44.5, 7);
+            frontRoof.castShadow = true;
+            group.add(frontRoof);
+            
+            // Create secondary towers
+            function createTower(xPos, zPos, height, width) {
+                const towerGeo = new THREE.BoxGeometry(width, height, width);
+                const tower = new THREE.Mesh(towerGeo, mainMat);
+                tower.position.set(xPos, 15 + height/2, zPos);
+                tower.castShadow = true;
+                tower.receiveShadow = true;
+                group.add(tower);
+                
+                // Tower roof
+                const roofGeo = new THREE.ConeGeometry(width * 0.7, width, 4);
+                const roof = new THREE.Mesh(roofGeo, mainRoofMat);
+                roof.position.set(xPos, 15 + height + width/2, zPos);
+                roof.rotation.y = Math.PI / 4;
+                roof.castShadow = true;
+                group.add(roof);
+            }
+            
+            // Add corner towers
+            createTower(-10, -8, 20, 6);
+            createTower(10, -8, 23, 6);
+            createTower(-8, 5, 18, 5);
+            createTower(8, 5, 18, 5);
+            
+            // Create windows
+            function createWindows(parent, width, height, depth) {
+                const rows = 3;
+                const cols = 5;
+                
+                for (let row = 0; row < rows; row++) {
+                    for (let col = 0; col < cols; col++) {
+                        const windowGeo = new THREE.BoxGeometry(1.5, 2, 0.5);
+                        const windowMat = new THREE.MeshStandardMaterial({ 
+                            color: 0x1E90FF,
+                            transparent: true,
+                            opacity: 0.6
+                        });
+                        const window = new THREE.Mesh(windowGeo, windowMat);
+                        
+                        window.position.set(
+                            -width/2 + 2 + col * (width / cols),
+                            -height/2 + 4 + row * (height / rows),
+                            depth/2 + 0.1
+                        );
+                        
+                        parent.add(window);
+                        
+                        // Add window frame
+                        const frameGeo = new THREE.BoxGeometry(2, 2.5, 0.3);
+                        const frameMat = new THREE.MeshStandardMaterial({ color: 0xDEB887 });
+                        const frame = new THREE.Mesh(frameGeo, frameMat);
+                        frame.position.set(0, 0, -0.2);
+                        window.add(frame);
+                    }
+                }
+            }
+            
+            createWindows(main, 20, 15, 15);
+            createWindows(frontTower, 8, 25, 8);
+            
+            // Add some small decorative turrets
+            for (let i = 0; i < 5; i++) {
+                const angle = (i / 5) * Math.PI * 2;
+                const radius = 10;
+                
+                const turretGeo = new THREE.CylinderGeometry(1, 1, 5, 8);
+                const turret = new THREE.Mesh(turretGeo, mainMat);
+                
+                turret.position.set(
+                    Math.cos(angle) * radius,
+                    35,
+                    -2 + Math.sin(angle) * radius
+                );
+                
+                turret.castShadow = true;
+                group.add(turret);
+                
+                // Turret roof
+                const turretRoofGeo = new THREE.ConeGeometry(1.5, 3, 8);
+                const turretRoof = new THREE.Mesh(turretRoofGeo, mainRoofMat);
+                turretRoof.position.set(
+                    Math.cos(angle) * radius,
+                    39,
+                    -2 + Math.sin(angle) * radius
+                );
+                turretRoof.castShadow = true;
+                group.add(turretRoof);
+            }
+            
+            // Add some trees around the base to simulate the Alpine setting
+            for (let i = 0; i < 12; i++) {
+                const angle = (i / 12) * Math.PI * 2;
+                const radius = 18 + Math.random() * 5;
+                
+                // Create a simple pine tree
+                const trunkGeo = new THREE.CylinderGeometry(0.5, 0.7, 4, 8);
+                const trunkMat = new THREE.MeshStandardMaterial({ color: 0x8B4513 });
+                const trunk = new THREE.Mesh(trunkGeo, trunkMat);
+                
+                trunk.position.set(
+                    Math.cos(angle) * radius,
+                    2,
+                    Math.sin(angle) * radius
+                );
+                
+                trunk.castShadow = true;
+                trunk.receiveShadow = true;
+                group.add(trunk);
+                
+                // Tree top (conical)
+                const topGeo = new THREE.ConeGeometry(2, 8, 8);
+                const topMat = new THREE.MeshStandardMaterial({ color: 0x006400 });
+                const top = new THREE.Mesh(topGeo, topMat);
+                
+                top.position.set(
+                    Math.cos(angle) * radius,
+                    8,
+                    Math.sin(angle) * radius
+                );
+                
+                top.castShadow = true;
+                group.add(top);
+            }
+
+            group.position.set(x, y, z);
+            return group;
+        }
+
+        function createStatueOfLiberty(x, y, z) {
+            const group = new THREE.Group();
+            
+            // Base - star-shaped pedestal
+            const baseGeo = new THREE.CylinderGeometry(8, 10, 10, 8);
+            const baseMat = new THREE.MeshStandardMaterial({ color: 0xA0522D });
+            const base = new THREE.Mesh(baseGeo, baseMat);
+            base.position.y = 5;
+            base.castShadow = true;
+            base.receiveShadow = true;
+            group.add(base);
+            
+            // Second level base
+            const base2Geo = new THREE.CylinderGeometry(7, 8, 4, 8);
+            const base2Mat = new THREE.MeshStandardMaterial({ color: 0xD2B48C });
+            const base2 = new THREE.Mesh(base2Geo, base2Mat);
+            base2.position.y = 12;
+            base2.castShadow = true;
+            base2.receiveShadow = true;
+            group.add(base2);
+            
+            // Statue body (simplified)
+            const bodyGeo = new THREE.CylinderGeometry(2, 3, 20, 8);
+            const patinaMat = new THREE.MeshStandardMaterial({ 
+                color: 0x7CFC00,
+                metalness: 0.8,
+                roughness: 0.3
+            });
+            const body = new THREE.Mesh(bodyGeo, patinaMat);
+            body.position.y = 24;
+            body.castShadow = true;
+            body.receiveShadow = true;
+            group.add(body);
+            
+            // Head
+            const headGeo = new THREE.SphereGeometry(1.5, 16, 16);
+            const head = new THREE.Mesh(headGeo, patinaMat);
+            head.position.y = 35;
+            head.castShadow = true;
+            group.add(head);
+            
+            // Crown with spikes
+            const crownGeo = new THREE.CylinderGeometry(1.8, 1.8, 1, 8);
+            const crown = new THREE.Mesh(crownGeo, patinaMat);
+            crown.position.y = 36;
+            crown.castShadow = true;
+            group.add(crown);
+            
+            // Crown spikes
+            for (let i = 0; i < 7; i++) {
+                const angle = (i / 7) * Math.PI * 2;
+                
+                const spikeGeo = new THREE.ConeGeometry(0.3, 1.5, 4);
+                const spike = new THREE.Mesh(spikeGeo, patinaMat);
+                
+                spike.position.set(
+                    Math.cos(angle) * 1.8,
+                    37,
+                    Math.sin(angle) * 1.8
+                );
+                
+                spike.castShadow = true;
+                group.add(spike);
+            }
+            
+            // Right arm with torch
+            const arm = new THREE.Group();
+            
+            const armGeo = new THREE.CylinderGeometry(0.5, 0.5, 8, 8);
+            const armMesh = new THREE.Mesh(armGeo, patinaMat);
+            armMesh.position.set(0, 4, 0);
+            armMesh.rotation.z = Math.PI / 2.5;
+            arm.add(armMesh);
+            
+            // Torch
+            const torchGeo = new THREE.CylinderGeometry(0.6, 0.4, 2, 8);
+            const torch = new THREE.Mesh(torchGeo, patinaMat);
+            torch.position.set(6.5, 6, 0);
+            arm.add(torch);
+            
+            // Flame
+            const flameGeo = new THREE.ConeGeometry(0.8, 3, 8);
+            const flameMat = new THREE.MeshStandardMaterial({ 
+                color: 0xFF4500,
+                emissive: 0xFF4500,
+                emissiveIntensity: 0.8
+            });
+            const flame = new THREE.Mesh(flameGeo, flameMat);
+            flame.position.set(6.5, 8.5, 0);
+            arm.add(flame);
+            
+            arm.position.set(0, 30, 0);
+            group.add(arm);
+            
+            // Left arm holding tablet
+            const leftArm = new THREE.Group();
+            
+            const leftArmGeo = new THREE.CylinderGeometry(0.5, 0.5, 6, 8);
+            const leftArmMesh = new THREE.Mesh(leftArmGeo, patinaMat);
+            leftArmMesh.position.set(0, -2, 0);
+            leftArmMesh.rotation.z = -Math.PI / 2.5;
+            leftArm.add(leftArmMesh);
+            
+            // Tablet
+            const tabletGeo = new THREE.BoxGeometry(4, 6, 0.5);
+            const tablet = new THREE.Mesh(tabletGeo, patinaMat);
+            tablet.position.set(-5, -2, 0);
+            leftArm.add(tablet);
+            
+            leftArm.position.set(0, 27, 0);
+            group.add(leftArm);
+            
+            // Create water around the base
+            const waterGeo = new THREE.CircleGeometry(30, 32);
+            const waterMat = new THREE.MeshStandardMaterial({ 
+                color: 0x1E90FF,
+                transparent: true,
+                opacity: 0.7,
+                metalness: 0.3,
+                roughness: 0.2
+            });
+            const water = new THREE.Mesh(waterGeo, waterMat);
+            water.rotation.x = -Math.PI / 2;
+            water.position.y = 0.05;
+            group.add(water);
+
+            group.position.set(x, y, z);
+            return group;
+        }
+
+        function createGoldenGateBridge(x, y, z) {
+            const group = new THREE.Group();
+            
+            // Bridge dimensions
+            const bridgeLength = 35;
+            const bridgeWidth = 8;
+            const bridgeColor = 0xFF4500; // International Orange
+            
+            // Base water
+            const waterGeo = new THREE.PlaneGeometry(40, 40);
+            const waterMat = new THREE.MeshStandardMaterial({ 
+                color: 0x1E90FF,
+                transparent: true,
+                opacity: 0.8,
+                metalness: 0.3,
+                roughness: 0.2
+            });
+            const water = new THREE.Mesh(waterGeo, waterMat);
+            water.rotation.x = -Math.PI / 2;
+            water.position.y = 0.05;
+            group.add(water);
+            
+            // Main bridge deck
+            const deckGeo = new THREE.BoxGeometry(bridgeLength, 1, bridgeWidth);
+            const deckMat = new THREE.MeshStandardMaterial({ color: 0x808080 });
+            const deck = new THREE.Mesh(deckGeo, deckMat);
+            deck.position.y = 10;
+            deck.castShadow = true;
+            deck.receiveShadow = true;
+            group.add(deck);
+            
+            // Main towers
+            function createTower(xPos) {
+                const towerBaseGeo = new THREE.BoxGeometry(2, 20, 3);
+                const towerBaseMat = new THREE.MeshStandardMaterial({ color: bridgeColor });
+                
+                // Left leg
+                const leftLeg = new THREE.Mesh(towerBaseGeo, towerBaseMat);
+                leftLeg.position.set(xPos, 10, -bridgeWidth/2 + 1);
+                leftLeg.castShadow = true;
+                leftLeg.receiveShadow = true;
+                group.add(leftLeg);
+                
+                // Right leg
+                const rightLeg = new THREE.Mesh(towerBaseGeo, towerBaseMat);
+                rightLeg.position.set(xPos, 10, bridgeWidth/2 - 1);
+                rightLeg.castShadow = true;
+                rightLeg.receiveShadow = true;
+                group.add(rightLeg);
+                
+                // Top crossbar
+                const crossbarGeo = new THREE.BoxGeometry(3, 2, bridgeWidth);
+                const crossbar = new THREE.Mesh(crossbarGeo, towerBaseMat);
+                crossbar.position.set(xPos, 21, 0);
+                crossbar.castShadow = true;
+                crossbar.receiveShadow = true;
+                group.add(crossbar);
+                
+                // Center strip
+                const centerGeo = new THREE.BoxGeometry(1, 30, 1);
+                const center = new THREE.Mesh(centerGeo, towerBaseMat);
+                center.position.set(xPos, 25, 0);
+                center.castShadow = true;
+                center.receiveShadow = true;
+                group.add(center);
+                
+                // Side strips
+                const sideStripGeo = new THREE.BoxGeometry(0.5, 25, 0.5);
+                
+                const leftStrip = new THREE.Mesh(sideStripGeo, towerBaseMat);
+                leftStrip.position.set(xPos, 22.5, -bridgeWidth/2 + 0.5);
+                leftStrip.castShadow = true;
+                group.add(leftStrip);
+                
+                const rightStrip = new THREE.Mesh(sideStripGeo, towerBaseMat);
+                rightStrip.position.set(xPos, 22.5, bridgeWidth/2 - 0.5);
+                rightStrip.castShadow = true;
+                group.add(rightStrip);
+            }
+            
+            // Create the two main towers
+            createTower(-bridgeLength/4);
+            createTower(bridgeLength/4);
+            
+            // Main suspension cables
+            const cablePoints = [];
+            
+            // Generate points for the catenary curve
+            for (let i = 0; i <= 20; i++) {
+                const t = i / 20;
+                const x = (t - 0.5) * bridgeLength;
+                
+                // Catenary curve formula
+                const a = 5;
+                const y = 25 - a * Math.cosh(x / a) + a * Math.cosh(bridgeLength / (2 * a));
+                
+                cablePoints.push(new THREE.Vector3(x, y, 0));
+            }
+            
+            // Create the cable curve
+            const cableCurve = new THREE.CatmullRomCurve3(cablePoints);
+            
+            // Create left main cable
+            const leftCableGeo = new THREE.TubeGeometry(cableCurve, 50, 0.3, 8, false);
+            const cableMat = new THREE.MeshStandardMaterial({ 
+                color: bridgeColor,
+                metalness: 0.8,
+                roughness: 0.2
+            });
+            const leftCable = new THREE.Mesh(leftCableGeo, cableMat);
+            leftCable.position.z = -bridgeWidth / 2 + 0.5;
+            leftCable.castShadow = true;
+            group.add(leftCable);
+            
+            // Create right main cable
+            const rightCable = leftCable.clone();
+            rightCable.position.z = bridgeWidth / 2 - 0.5;
+            rightCable.castShadow = true;
+            group.add(rightCable);
+            
+            // Create vertical suspender cables
+            const numSuspenders = 10;
+            for (let i = 0; i < numSuspenders; i++) {
+                // Skip suspenders right at tower positions
+                if (i === numSuspenders / 4 || i === 3 * numSuspenders / 4) continue;
+                
+                const t = i / (numSuspenders - 1);
+                const x = (t - 0.5) * bridgeLength;
+                
+                // Get the y position on the cable
+                const point = cableCurve.getPoint(t);
+                
+                // Create suspender
+                const suspenderGeo = new THREE.BoxGeometry(0.1, point.y - 10, 0.1);
+                const suspenderMat = new THREE.MeshStandardMaterial({ color: bridgeColor });
+                
+                // Left suspender
+                const leftSuspender = new THREE.Mesh(suspenderGeo, suspenderMat);
+                leftSuspender.position.set(x, 10 + (point.y - 10) / 2, -bridgeWidth / 2 + 0.5);
+                leftSuspender.castShadow = true;
+                group.add(leftSuspender);
+                
+                // Right suspender
+                const rightSuspender = new THREE.Mesh(suspenderGeo, suspenderMat);
+                rightSuspender.position.set(x, 10 + (point.y - 10) / 2, bridgeWidth / 2 - 0.5);
+                rightSuspender.castShadow = true;
+                group.add(rightSuspender);
+            }
+            
+            // Road lanes and details
+            const roadMarkingsGeo = new THREE.PlaneGeometry(bridgeLength, 0.3);
+            const roadMarkingsMat = new THREE.MeshStandardMaterial({ color: 0xFFFFFF });
+            const roadMarkings = new THREE.Mesh(roadMarkingsGeo, roadMarkingsMat);
+            roadMarkings.rotation.x = -Math.PI / 2;
+            roadMarkings.position.y = 10.51;
+            roadMarkings.receiveShadow = true;
+            group.add(roadMarkings);
+            
+            // Side barriers
+            const barrierGeo = new THREE.BoxGeometry(bridgeLength, 1, 0.5);
+            const barrierMat = new THREE.MeshStandardMaterial({ color: bridgeColor });
+            
+            const leftBarrier = new THREE.Mesh(barrierGeo, barrierMat);
+            leftBarrier.position.set(0, 10.5, -bridgeWidth / 2 + 0.25);
+            leftBarrier.castShadow = true;
+            leftBarrier.receiveShadow = true;
+            group.add(leftBarrier);
+            
+            const rightBarrier = new THREE.Mesh(barrierGeo, barrierMat);
+            rightBarrier.position.set(0, 10.5, bridgeWidth / 2 - 0.25);
+            rightBarrier.castShadow = true;
+            rightBarrier.receiveShadow = true;
+            group.add(rightBarrier);
+            
+            // Add some cars on the bridge
+            const carColors = [0xFF0000, 0x0000FF, 0xFFFF00, 0x00FF00, 0xFFFFFF, 0x000000];
+            
+            for (let i = 0; i < 6; i++) {
+                const carGeo = new THREE.BoxGeometry(2, 0.7, 0.8);
+                const carMat = new THREE.MeshStandardMaterial({ color: carColors[i] });
+                const car = new THREE.Mesh(carGeo, carMat);
+                
+                const lane = i % 2 === 0 ? -1.5 : 1.5;
+                car.position.set(-bridgeLength / 3 + i * 5, 10.85, lane);
+                car.castShadow = true;
+                car.receiveShadow = true;
+                group.add(car);
+            }
+
+            group.position.set(x, y, z);
+            return group;
+        }
+
+        function createEmpireStateBuilding(x, y, z) {
+            const group = new THREE.Group();
+            
+            // Building dimensions
+            const baseWidth = 20;
+            const totalHeight = 40;
+            
+            // Base platform
+            const basePlatformGeo = new THREE.BoxGeometry(baseWidth + 4, 1, baseWidth + 4);
+            const basePlatformMat = new THREE.MeshStandardMaterial({ color: 0x808080 });
+            const basePlatform = new THREE.Mesh(basePlatformGeo, basePlatformMat);
+            basePlatform.position.y = 0.5;
+            basePlatform.receiveShadow = true;
+            group.add(basePlatform);
+            
+            // Create the tiered structure of the building
+            function createSection(width, height, yPos, color = 0xE0E0E0) {
+                const sectionGeo = new THREE.BoxGeometry(width, height, width);
+                const sectionMat = new THREE.MeshStandardMaterial({ color: color });
+                const section = new THREE.Mesh(sectionGeo, sectionMat);
+                section.position.y = yPos;
+                section.castShadow = true;
+                section.receiveShadow = true;
+                group.add(section);
+                
+                // Add windows
+                const windowRows = Math.floor(height / 2);
+                const windowCols = Math.floor(width / 2);
+                
+                for (let side = 0; side < 4; side++) {
+                    for (let row = 0; row < windowRows; row++) {
+                        for (let col = 0; col < windowCols; col++) {
+                            // Skip some windows for variety
+                            if (Math.random() > 0.8) continue;
+                            
+                            const windowGeo = new THREE.PlaneGeometry(0.7, 1);
+                            const windowMat = new THREE.MeshStandardMaterial({ 
+                                color: 0x88AACC,
+                                transparent: true,
+                                opacity: 0.7,
+                                side: THREE.DoubleSide
+                            });
+                            const window = new THREE.Mesh(windowGeo, windowMat);
+                            
+                            // Position window based on side
+                            if (side === 0) { // Front
+                                window.position.set(
+                                    -width / 2 + 1 + col * 2,
+                                    -height / 2 + 1 + row * 2,
+                                    width / 2 + 0.01
+                                );
+                            } else if (side === 1) { // Right
+                                window.position.set(
+                                    width / 2 + 0.01,
+                                    -height / 2 + 1 + row * 2,
+                                    width / 2 - 1 - col * 2
+                                );
+                                window.rotation.y = Math.PI / 2;
+                            } else if (side === 2) { // Back
+                                window.position.set(
+                                    width / 2 - 1 - col * 2,
+                                    -height / 2 + 1 + row * 2,
+                                    -width / 2 - 0.01
+                                );
+                                window.rotation.y = Math.PI;
+                            } else { // Left
+                                window.position.set(
+                                    -width / 2 - 0.01,
+                                    -height / 2 + 1 + row * 2,
+                                    -width / 2 + 1 + col * 2
+                                );
+                                window.rotation.y = -Math.PI / 2;
+                            }
+                            
+                            section.add(window);
+                        }
+                    }
+                }
+                
+                return section;
+            }
+            
+            // Create tiered sections
+            const mainSection = createSection(baseWidth, 25, 13.5);
+            const midSection = createSection(baseWidth * 0.8, 8, 30);
+            const upperSection = createSection(baseWidth * 0.6, 5, 36.5);
+            
+            // Create the spire/antenna
+            const spireGeo = new THREE.CylinderGeometry(1, 2, 8, 8);
+            const spireMat = new THREE.MeshStandardMaterial({ 
+                color: 0xC0C0C0,
+                metalness: 0.8,
+                roughness: 0.2
+            });
+            const spire = new THREE.Mesh(spireGeo, spireMat);
+            spire.position.y = 43;
+            spire.castShadow = true;
+            group.add(spire);
+            
+            // Top antenna
+            const antennaGeo = new THREE.CylinderGeometry(0.2, 0.2, 5, 8);
+            const antenna = new THREE.Mesh(antennaGeo, spireMat);
+            antenna.position.y = 49.5;
+            antenna.castShadow = true;
+            group.add(antenna);
+            
+            // Add Art Deco details
+            function createArtDecoDetail(width, height, depth, xPos, yPos, zPos) {
+                const detailGeo = new THREE.BoxGeometry(width, height, depth);
+                const detailMat = new THREE.MeshStandardMaterial({ color: 0xD3D3D3 });
+                const detail = new THREE.Mesh(detailGeo, detailMat);
+                detail.position.set(xPos, yPos, zPos);
+                detail.castShadow = true;
+                group.add(detail);
+            }
+            
+            // Add vertical Art Deco lines
+            for (let side = 0; side < 4; side++) {
+                const angle = (side / 4) * Math.PI * 2;
+                const xOffset = Math.sin(angle) * (baseWidth / 2);
+                const zOffset = Math.cos(angle) * (baseWidth / 2);
+                
+                for (let i = -2; i <= 2; i += 2) {
+                    const offset1 = Math.sin(angle + Math.PI/2) * i;
+                    const offset2 = Math.cos(angle + Math.PI/2) * i;
+                    
+                    createArtDecoDetail(
+                        0.5, 25, 0.5,
+                        xOffset * 0.9 + offset1,
+                        13.5,
+                        zOffset * 0.9 + offset2
+                    );
+                }
+            }
+
+            group.position.set(x, y, z);
+            return group;
+        }
+
+        function createFallingwater(x, y, z) {
+            const group = new THREE.Group();
+            
+            // Create terrain with water features
+            const terrainGeo = new THREE.BoxGeometry(35, 3, 35);
+            const terrainMat = new THREE.MeshStandardMaterial({ color: 0x228B22 });
+            const terrain = new THREE.Mesh(terrainGeo, terrainMat);
+            terrain.position.y = 1.5;
+            terrain.receiveShadow = true;
+            group.add(terrain);
+            
+            // Create water/stream
+            const waterGeo = new THREE.BoxGeometry(10, 0.5, 25);
+            const waterMat = new THREE.MeshStandardMaterial({ 
+                color: 0x1E90FF,
+                transparent: true,
+                opacity: 0.8,
+                metalness: 0.3,
+                roughness: 0.2
+            });
+            const water = new THREE.Mesh(waterGeo, waterMat);
+            water.position.set(-10, 3.1, -5);
+            group.add(water);
+            
+            // Waterfall
+            const waterfallGeo = new THREE.PlaneGeometry(8, 10);
+            const waterfallMat = new THREE.MeshStandardMaterial({ 
+                color: 0x87CEFA,
+                transparent: true,
+                opacity: 0.7,
+                side: THREE.DoubleSide
+            });
+            const waterfall = new THREE.Mesh(waterfallGeo, waterfallMat);
+            waterfall.position.set(-10, 8, -15);
+            waterfall.rotation.x = Math.PI / 12;
+            group.add(waterfall);
+            
+            // Create the house - Wright's distinctive horizontal planes
+            const concreteColor = 0xE0E0E0;
+            
+            // Ground level
+            const level1Geo = new THREE.BoxGeometry(15, 1, 15);
+            const level1Mat = new THREE.MeshStandardMaterial({ color: concreteColor });
+            const level1 = new THREE.Mesh(level1Geo, level1Mat);
+            level1.position.set(5, 4, 5);
+            level1.castShadow = true;
+            level1.receiveShadow = true;
+            group.add(level1);
+            
+            // Second level - cantilevered over the stream
+            const level2Geo = new THREE.BoxGeometry(12, 1, 20);
+            const level2Mat = new THREE.MeshStandardMaterial({ color: concreteColor });
+            const level2 = new THREE.Mesh(level2Geo, level2Mat);
+            level2.position.set(-2, 8, 0);
+            level2.castShadow = true;
+            level2.receiveShadow = true;
+            group.add(level2);
+            
+            // Third level - another cantilevered section
+            const level3Geo = new THREE.BoxGeometry(15, 1, 12);
+            const level3 = new THREE.Mesh(level3Geo, level2Mat);
+            level3.position.set(5, 12, -2);
+            level3.castShadow = true;
+            level3.receiveShadow = true;
+            group.add(level3);
+            
+            // Core/central part of the house
+            const coreGeo = new THREE.BoxGeometry(10, 12, 10);
+            const glassMat = new THREE.MeshStandardMaterial({ 
+                color: 0xf5f5f5,
+                metalness: 0.1,
+                roughness: 0.8
+            });
+            const core = new THREE.Mesh(coreGeo, glassMat);
+            core.position.set(5, 10, 5);
+            core.castShadow = true;
+            core.receiveShadow = true;
+            group.add(core);
+            
+            // Windows
+            const windowMat = new THREE.MeshStandardMaterial({ 
+                color: 0x87CEFA,
+                transparent: true,
+                opacity: 0.5,
+                side: THREE.DoubleSide
+            });
+            
+            // Create windows on core
+            for (let side = 0; side < 4; side++) {
+                const windowGeo = new THREE.PlaneGeometry(8, 3);
+                const window = new THREE.Mesh(windowGeo, windowMat);
+                
+                switch(side) {
+                    case 0: // Front
+                        window.position.set(5, 10, 10.01);
+                        break;
+                    case 1: // Right
+                        window.position.set(10.01, 10, 5);
+                        window.rotation.y = Math.PI / 2;
+                        break;
+                    case 2: // Back
+                        window.position.set(5, 10, -0.01);
+                        window.rotation.y = Math.PI;
+                        break;
+                    case 3: // Left
+                        window.position.set(-0.01, 10, 5);
+                        window.rotation.y = -Math.PI / 2;
+                        break;
+                }
+                
+                group.add(window);
+            }
+            
+            // Add supporting columns/pillars
+            function createPillar(xPos, yPos, zPos, height) {
+                const pillarGeo = new THREE.BoxGeometry(1, height, 1);
+                const pillarMat = new THREE.MeshStandardMaterial({ color: 0x808080 });
+                const pillar = new THREE.Mesh(pillarGeo, pillarMat);
+                pillar.position.set(xPos, yPos + height/2, zPos);
+                pillar.castShadow = true;
+                pillar.receiveShadow = true;
+                group.add(pillar);
+            }
+            
+            // Support pillars for cantilevered sections
+            createPillar(-6, 3, 0, 5);
+            createPillar(-6, 3, -8, 5);
+            createPillar(2, 3, -8, 9);
+            
+            // Add some rocks around the waterfall
+            function createRock(xPos, yPos, zPos, scale) {
+                const rockGeo = new THREE.DodecahedronGeometry(scale, 0);
+                const rockMat = new THREE.MeshStandardMaterial({ 
+                    color: 0x808080,
+                    roughness: 0.9
+                });
+                const rock = new THREE.Mesh(rockGeo, rockMat);
+                rock.position.set(xPos, yPos, zPos);
+                rock.rotation.set(
+                    Math.random() * Math.PI,
+                    Math.random() * Math.PI,
+                    Math.random() * Math.PI
+                );
+                rock.castShadow = true;
+                rock.receiveShadow = true;
+                group.add(rock);
+            }
+            
+            // Add rocks around the water
+            for (let i = 0; i < 10; i++) {
+                const scale = 0.5 + Math.random() * 1.5;
+                createRock(
+                    -10 + (Math.random() - 0.5) * 8,
+                    3 + scale / 2,
+                    -15 + (Math.random() - 0.5) * 8,
+                    scale
+                );
+            }
+            
+            // Add some trees
+            function createTree(xPos, yPos, zPos, height) {
+                const trunkGeo = new THREE.CylinderGeometry(0.4, 0.6, height, 8);
+                const trunkMat = new THREE.MeshStandardMaterial({ color: 0x8B4513 });
+                const trunk = new THREE.Mesh(trunkGeo, trunkMat);
+                trunk.position.set(xPos, yPos + height/2, zPos);
+                trunk.castShadow = true;
+                trunk.receiveShadow = true;
+                group.add(trunk);
+                
+                const foliageGeo = new THREE.SphereGeometry(height/2, 16, 16);
+                const foliageMat = new THREE.MeshStandardMaterial({ color: 0x006400 });
+                const foliage = new THREE.Mesh(foliageGeo, foliageMat);
+                foliage.position.set(xPos, yPos + height, zPos);
+                foliage.castShadow = true;
+                group.add(foliage);
+            }
+            
+            // Add some trees around the house
+            createTree(15, 3, 15, 8);
+            createTree(15, 3, -10, 10);
+            createTree(-15, 3, 15, 12);
+            createTree(-15, 3, -15, 9);
+
+            group.position.set(x, y, z);
+            return group;
+        }
+
+        function createWhiteHouse(x, y, z) {
+            const group = new THREE.Group();
+            
+            // Base platform/lawn
+            const baseGeo = new THREE.BoxGeometry(40, 0.5, 40);
+            const baseMat = new THREE.MeshStandardMaterial({ color: 0x228B22 });
+            const base = new THREE.Mesh(baseGeo, baseMat);
+            base.position.y = 0.25;
+            base.receiveShadow = true;
+            group.add(base);
+            
+            // Main building
+            const mainGeo = new THREE.BoxGeometry(25, 12, 15);
+            const whiteMat = new THREE.MeshStandardMaterial({ color: 0xFFFFF0 });
+            const main = new THREE.Mesh(mainGeo, whiteMat);
+            main.position.y = 6.5;
+            main.castShadow = true;
+            main.receiveShadow = true;
+            group.add(main);
+            
+            // Roof
+            const roofGeo = new THREE.BoxGeometry(26, 1, 16);
+            const roofMat = new THREE.MeshStandardMaterial({ color: 0xE0E0E0 });
+            const roof = new THREE.Mesh(roofGeo, roofMat);
+            roof.position.y = 13;
+            roof.castShadow = true;
+            group.add(roof);
+            
+            // North Portico (front)
+            const porticoBaseGeo = new THREE.BoxGeometry(10, 1, 6);
+            const porticoBase = new THREE.Mesh(porticoBaseGeo, whiteMat);
+            porticoBase.position.set(0, 1, 10.5);
+            porticoBase.castShadow = true;
+            porticoBase.receiveShadow = true;
+            group.add(porticoBase);
+            
+            // Portico columns
+            function createColumn(xPos, zPos) {
+                const columnGeo = new THREE.CylinderGeometry(0.5, 0.5, 10, 16);
+                const column = new THREE.Mesh(columnGeo, whiteMat);
+                column.position.set(xPos, 6, zPos);
+                column.castShadow = true;
+                column.receiveShadow = true;
+                group.add(column);
+                
+                // Create capital
+                const capitalGeo = new THREE.BoxGeometry(1.2, 0.8, 1.2);
+                const capital = new THREE.Mesh(capitalGeo, whiteMat);
+                capital.position.set(xPos, 11, zPos);
+                capital.castShadow = true;
+                group.add(capital);
+            }
+            
+            // Front columns
+            createColumn(-3.5, 10.5);
+            createColumn(-1.2, 10.5);
+            createColumn(1.2, 10.5);
+            createColumn(3.5, 10.5);
+            
+            // Portico roof
+            const porticoRoofGeo = new THREE.BoxGeometry(10, 2, 6);
+            const porticoRoof = new THREE.Mesh(porticoRoofGeo, whiteMat);
+            porticoRoof.position.set(0, 12, 10.5);
+            porticoRoof.castShadow = true;
+            group.add(porticoRoof);
+            
+            // Portico triangular pediment
+            const pedimentShape = new THREE.Shape();
+            pedimentShape.moveTo(-5, 0);
+            pedimentShape.lineTo(5, 0);
+            pedimentShape.lineTo(0, 2);
+            pedimentShape.lineTo(-5, 0);
+            
+            const extrudeSettings = {
+                depth: 0.5,
+                bevelEnabled: false
+            };
+            
+            const pedimentGeo = new THREE.ExtrudeGeometry(pedimentShape, extrudeSettings);
+            const pediment = new THREE.Mesh(pedimentGeo, whiteMat);
+            pediment.position.set(0, 13, 13.5);
+            pediment.rotation.x = -Math.PI / 2;
+            pediment.castShadow = true;
+            group.add(pediment);
+            
+            // Windows
+            const windowMat = new THREE.MeshStandardMaterial({
+                color: 0x87CEFA,
+                transparent: true,
+                opacity: 0.5
+            });
+            
+            // Create windows on main building
+            for (let i = -2; i <= 2; i++) {
+                for (let j = 0; j < 2; j++) {
+                    // Front windows
+                    const windowGeo = new THREE.PlaneGeometry(2, 3);
+                    const window = new THREE.Mesh(windowGeo, windowMat);
+                    window.position.set(i * 5, 6.5 + j * 5, 7.51);
+                    group.add(window);
+                    
+                    // Back windows
+                    const backWindow = window.clone();
+                    backWindow.position.z = -7.51;
+                    backWindow.rotation.y = Math.PI;
+                    group.add(backWindow);
+                    
+                    // Side windows
+                    if (Math.abs(i) <= 1) {
+                        const sideWindow1 = window.clone();
+                        sideWindow1.position.set(12.51, 6.5 + j * 5, i * 4);
+                        sideWindow1.rotation.y = Math.PI / 2;
+                        group.add(sideWindow1);
+                        
+                        const sideWindow2 = window.clone();
+                        sideWindow2.position.set(-12.51, 6.5 + j * 5, i * 4);
+                        sideWindow2.rotation.y = -Math.PI / 2;
+                        group.add(sideWindow2);
+                    }
+                }
+            }
+            
+            // Front door
+            const doorGeo = new THREE.PlaneGeometry(2.5, 4);
+            const doorMat = new THREE.MeshStandardMaterial({ color: 0x8B4513 });
+            const door = new THREE.Mesh(doorGeo, doorMat);
+            door.position.set(0, 3, 7.52);
+            group.add(door);
+            
+            // Add some trees and landscaping
+            function createTree(x, z) {
+                const trunkGeo = new THREE.CylinderGeometry(0.3, 0.4, 3, 8);
+                const trunkMat = new THREE.MeshStandardMaterial({ color: 0x8B4513 });
+                const trunk = new THREE.Mesh(trunkGeo, trunkMat);
+                trunk.position.set(x, 1.5, z);
+                trunk.castShadow = true;
+                trunk.receiveShadow = true;
+                group.add(trunk);
+                
+                const foliageGeo = new THREE.SphereGeometry(1.5, 16, 16);
+                const foliageMat = new THREE.MeshStandardMaterial({ color: 0x006400 });
+                const foliage = new THREE.Mesh(foliageGeo, foliageMat);
+                foliage.position.set(x, 3.5, z);
+                foliage.castShadow = true;
+                group.add(foliage);
+            }
+            
+            // Add trees
+            createTree(-15, 15);
+            createTree(15, 15);
+            createTree(-15, -15);
+            createTree(15, -15);
+            
+            // Create fence
+            function createFence() {
+                const fenceGeo = new THREE.BoxGeometry(42, 1, 0.2);
+                const fenceMat = new THREE.MeshStandardMaterial({ color: 0xD3D3D3 });
+                
+                // Front fence
+                const frontFence = new THREE.Mesh(fenceGeo, fenceMat);
+                frontFence.position.set(0, 0.5, 20);
+                frontFence.castShadow = true;
+                frontFence.receiveShadow = true;
+                group.add(frontFence);
+                
+                // Back fence
+                const backFence = new THREE.Mesh(fenceGeo, fenceMat);
+                backFence.position.set(0, 0.5, -20);
+                backFence.castShadow = true;
+                backFence.receiveShadow = true;
+                group.add(backFence);
+                
+                // Side fences
+                const sideFenceGeo = new THREE.BoxGeometry(0.2, 1, 40);
+                
+                const leftFence = new THREE.Mesh(sideFenceGeo, fenceMat);
+                leftFence.position.set(-21, 0.5, 0);
+                leftFence.castShadow = true;
+                leftFence.receiveShadow = true;
+                group.add(leftFence);
+                
+                const rightFence = new THREE.Mesh(sideFenceGeo, fenceMat);
+                rightFence.position.set(21, 0.5, 0);
+                rightFence.castShadow = true;
+                rightFence.receiveShadow = true;
+                group.add(rightFence);
+            }
+            
+            createFence();
+
+            group.position.set(x, y, z);
+            return group;
+        }
+
+        function createMachuPicchu(x, y, z) {
+            const group = new THREE.Group();
+            
+            // Create mountain/base
+            const mountainGeo = new THREE.ConeGeometry(20, 15, 6);
+            const mountainMat = new THREE.MeshStandardMaterial({ color: 0x808080 });
+            const mountain = new THREE.Mesh(mountainGeo, mountainMat);
+            mountain.position.y = 7.5;
+            mountain.castShadow = true;
+            mountain.receiveShadow = true;
+            group.add(mountain);
+            
+            // Create terraced areas
+            function createTerrace(y, radius, segments) {
+                const terraceGeo = new THREE.CylinderGeometry(radius, radius, 1, segments);
+                const terraceMat = new THREE.MeshStandardMaterial({ color: 0xD3D3D3 });
+                const terrace = new THREE.Mesh(terraceGeo, terraceMat);
+                terrace.position.y = y;
+                terrace.castShadow = true;
+                terrace.receiveShadow = true;
+                group.add(terrace);
+                
+                // Add some vegetation
+                const grassGeo = new THREE.BoxGeometry(radius * 1.8, 0.1, radius * 1.8);
+                const grassMat = new THREE.MeshStandardMaterial({ color: 0x228B22 });
+                const grass = new THREE.Mesh(grassGeo, grassMat);
+                grass.position.y = y + 0.55;
+                grass.receiveShadow = true;
+                group.add(grass);
+            }
+            
+            // Create main terraces
+            createTerrace(3, 16, 6);
+            createTerrace(6, 12, 6);
+            createTerrace(9, 9, 6);
+            createTerrace(12, 6, 6);
+            createTerrace(15, 3, 6);
+            
+            // Create Inca stone buildings
+            function createStoneBuilding(xPos, yPos, zPos, width, depth) {
+                const height = 2 + Math.random();
+                
+                const buildingGeo = new THREE.BoxGeometry(width, height, depth);
+                const buildingMat = new THREE.MeshStandardMaterial({ color: 0xD2B48C });
+                const building = new THREE.Mesh(buildingGeo, buildingMat);
+                building.position.set(xPos, yPos + height/2, zPos);
+                building.castShadow = true;
+                building.receiveShadow = true;
+                group.add(building);
+                
+                // Add doorway
+                const doorwayGeo = new THREE.BoxGeometry(1, 1.5, 0.5);
+                const doorwayMat = new THREE.MeshStandardMaterial({ color: 0x000000 });
+                const doorway = new THREE.Mesh(doorwayGeo, doorwayMat);
+                doorway.position.set(xPos, yPos + 0.75, zPos + depth/2 - 0.2);
+                group.add(doorway);
+            }
+            
+            // Create stone buildings on different terraces
+            // First terrace
+            for (let i = 0; i < 8; i++) {
+                const angle = (i / 8) * Math.PI * 2;
+                const radius = 10 + Math.random() * 3;
+                
+                createStoneBuilding(
+                    Math.cos(angle) * radius,
+                    3,
+                    Math.sin(angle) * radius,
+                    3 + Math.random() * 2,
+                    3 + Math.random() * 2
+                );
+            }
+            
+            // Second terrace
+            for (let i = 0; i < 6; i++) {
+                const angle = (i / 6) * Math.PI * 2;
+                const radius = 8 + Math.random() * 2;
+                
+                createStoneBuilding(
+                    Math.cos(angle) * radius,
+                    6,
+                    Math.sin(angle) * radius,
+                    2.5 + Math.random() * 2,
+                    2.5 + Math.random() * 2
+                );
+            }
+            
+            // Third terrace
+            for (let i = 0; i < 4; i++) {
+                const angle = (i / 4) * Math.PI * 2;
+                const radius = 6 + Math.random() * 1.5;
+                
+                createStoneBuilding(
+                    Math.cos(angle) * radius,
+                    9,
+                    Math.sin(angle) * radius,
+                    2 + Math.random() * 1.5,
+                    2 + Math.random() * 1.5
+                );
+            }
+            
+            // Temple at the top
+            createStoneBuilding(0, 15, 0, 4, 4);
+            
+            // Create stone pathways between buildings
+            function createPath(startX, startY, startZ, endX, endY, endZ) {
+                // Calculate direction and length
+                const dirX = endX - startX;
+                const dirZ = endZ - startZ;
+                const length = Math.sqrt(dirX * dirX + dirZ * dirZ);
+                
+                // Create the path
+                const pathGeo = new THREE.BoxGeometry(length, 0.2, 1);
+                const pathMat = new THREE.MeshStandardMaterial({ color: 0xA9A9A9 });
+                const path = new THREE.Mesh(pathGeo, pathMat);
+                
+                // Position at midpoint
+                path.position.set(
+                    (startX + endX) / 2,
+                    startY + 0.1,
+                    (startZ + endZ) / 2
+                );
+                
+                // Rotate to align with direction
+                path.rotation.y = Math.atan2(dirX, dirZ);
+                
+                path.receiveShadow = true;
+                group.add(path);
+            }
+            
+            // Add some stone pathways
+            createPath(-10, 3, 0, 10, 3, 0);
+            createPath(0, 3, -10, 0, 3, 10);
+            createPath(-8, 6, 0, 8, 6, 0);
+            createPath(0, 6, -8, 0, 6, 8);
+            createPath(-5, 9, 0, 5, 9, 0);
+            createPath(0, 9, -5, 0, 9, 5);
+            
+            // Add stairs between terraces
+            function createStairs(startY, endY, xPos, zPos, width, facingAngle) {
+                const height = endY - startY;
+                const steps = Math.floor(height * 2);
+                const stepHeight = height / steps;
+                const stepDepth = 0.5;
+                
+                for (let i = 0; i < steps; i++) {
+                    const stepGeo = new THREE.BoxGeometry(width, stepHeight, stepDepth);
+                    const stepMat = new THREE.MeshStandardMaterial({ color: 0xA9A9A9 });
+                    const step = new THREE.Mesh(stepGeo, stepMat);
+                    
+                    step.position.set(
+                        xPos + Math.sin(facingAngle) * i * stepDepth,
+                        startY + stepHeight * (i + 0.5),
+                        zPos + Math.cos(facingAngle) * i * stepDepth
+                    );
+                    
+                    step.rotation.y = facingAngle;
+                    step.castShadow = true;
+                    step.receiveShadow = true;
+                    group.add(step);
+                }
+            }
+            
+            // Add stairs connecting terraces
+            createStairs(3, 6, 0, 14, 2, 0);
+            createStairs(6, 9, 0, 10, 2, 0);
+            createStairs(9, 12, 0, 7, 1.5, 0);
+            createStairs(12, 15, 0, 4, 1, 0);
+
+            group.position.set(x, y, z);
+            return group;
+        }
+
+        function createChristTheRedeemer(x, y, z) {
+            const group = new THREE.Group();
+            
+            // Create mountain/pedestal
+            const baseGeo = new THREE.ConeGeometry(20, 15, 6);
+            const baseMat = new THREE.MeshStandardMaterial({ color: 0x228B22 });
+            const base = new THREE.Mesh(baseGeo, baseMat);
+            base.position.y = 7.5;
+            base.castShadow = true;
+            base.receiveShadow = true;
+            group.add(base);
+            
+            // Create the statue pedestal
+            const pedestalGeo = new THREE.BoxGeometry(10, 2, 10);
+            const pedestalMat = new THREE.MeshStandardMaterial({ color: 0xD3D3D3 });
+            const pedestal = new THREE.Mesh(pedestalGeo, pedestalMat);
+            pedestal.position.y = 15.5;
+            pedestal.castShadow = true;
+            pedestal.receiveShadow = true;
+            group.add(pedestal);
+            
+            // Create the statue body
+            const bodyGeo = new THREE.BoxGeometry(2, 10, 2);
+            const bodyMat = new THREE.MeshStandardMaterial({ color: 0xF5F5F5 });
+            const body = new THREE.Mesh(bodyGeo, bodyMat);
+            body.position.y = 21.5;
+            body.castShadow = true;
+            body.receiveShadow = true;
+            group.add(body);
+            
+            // Create statue head
+            const headGeo = new THREE.SphereGeometry(1.5, 16, 16);
+            const head = new THREE.Mesh(headGeo, bodyMat);
+            head.position.y = 27.5;
+            head.castShadow = true;
+            group.add(head);
+            
+            // Create arms
+            // Left arm
+            const leftArmGroup = new THREE.Group();
+            
+            const leftShoulderGeo = new THREE.BoxGeometry(1.5, 1.5, 1.5);
+            const leftShoulder = new THREE.Mesh(leftShoulderGeo, bodyMat);
+            leftShoulder.position.set(-1.5, 26, 0);
+            leftArmGroup.add(leftShoulder);
+            
+            const leftArmGeo = new THREE.BoxGeometry(10, 1.5, 1.5);
+            const leftArm = new THREE.Mesh(leftArmGeo, bodyMat);
+            leftArm.position.set(-7, 26, 0);
+            leftArmGroup.add(leftArm);
+            
+            // Set the rotation point to the shoulder
+            leftArmGroup.position.set(0, 0, 0);
+            leftArmGroup.castShadow = true;
+            group.add(leftArmGroup);
+            
+            // Right arm
+            const rightArmGroup = new THREE.Group();
+            
+            const rightShoulderGeo = new THREE.BoxGeometry(1.5, 1.5, 1.5);
+            const rightShoulder = new THREE.Mesh(rightShoulderGeo, bodyMat);
+            rightShoulder.position.set(1.5, 26, 0);
+            rightArmGroup.add(rightShoulder);
+            
+            const rightArmGeo = new THREE.BoxGeometry(10, 1.5, 1.5);
+            const rightArm = new THREE.Mesh(rightArmGeo, bodyMat);
+            rightArm.position.set(7, 26, 0);
+            rightArmGroup.add(rightArm);
+            
+            rightArmGroup.position.set(0, 0, 0);
+            rightArmGroup.castShadow = true;
+            group.add(rightArmGroup);
+            
+            // Create a small staircase leading up to the statue
+            const stairsWidth = 5;
+            const numSteps = 10;
+            
+            for (let i = 0; i < numSteps; i++) {
+                const stepGeo = new THREE.BoxGeometry(stairsWidth, 0.5, 1);
+                const stepMat = new THREE.MeshStandardMaterial({ color: 0xA9A9A9 });
+                const step = new THREE.Mesh(stepGeo, stepMat);
+                
+                step.position.set(
+                    0,
+                    15 - i * 0.5,
+                    5 + i * 1
+                );
+                
+                step.castShadow = true;
+                step.receiveShadow = true;
+                group.add(step);
+            }
+            
+            // Add some trees around the base
+            function createTree(angle, height) {
+                const radius = 12 + Math.random() * 5;
+                
+                const trunkGeo = new THREE.CylinderGeometry(0.3, 0.5, height / 3, 8);
+                const trunkMat = new THREE.MeshStandardMaterial({ color: 0x8B4513 });
+                const trunk = new THREE.Mesh(trunkGeo, trunkMat);
+                
+                trunk.position.set(
+                    Math.cos(angle) * radius,
+                    height / 6,
+                    Math.sin(angle) * radius
+                );
+                
+                trunk.castShadow = true;
+                trunk.receiveShadow = true;
+                group.add(trunk);
+                
+                const foliageGeo = new THREE.SphereGeometry(height / 4, 16, 16);
+                const foliageMat = new THREE.MeshStandardMaterial({ color: 0x006400 });
+                const foliage = new THREE.Mesh(foliageGeo, foliageMat);
+                
+                foliage.position.set(
+                    Math.cos(angle) * radius,
+                    height / 3,
+                    Math.sin(angle) * radius
+                );
+                
+                foliage.castShadow = true;
+                group.add(foliage);
+            }
+            
+            // Add several trees around the base
+            for (let i = 0; i < 12; i++) {
+                const angle = (i / 12) * Math.PI * 2;
+                const height = 3 + Math.random() * 3;
+                createTree(angle, height);
+            }
+
+            group.position.set(x, y, z);
+            return group;
+        }
+
+        function createGreatPyramid(x, y, z) {
+            const group = new THREE.Group();
+            
+            // Create desert base
+            const baseGeo = new THREE.CircleGeometry(25, 32);
+            const baseMat = new THREE.MeshStandardMaterial({ color: 0xE6C88B });
+            const base = new THREE.Mesh(baseGeo, baseMat);
+            base.rotation.x = -Math.PI / 2;
+            base.receiveShadow = true;
+            group.add(base);
+            
+            // Create the pyramid
+            const pyramidGeo = new THREE.ConeGeometry(20, 20, 4);
+            const pyramidMat = new THREE.MeshStandardMaterial({ color: 0xD2B48C });
+            const pyramid = new THREE.Mesh(pyramidGeo, pyramidMat);
+            pyramid.position.y = 10;
+            pyramid.rotation.y = Math.PI / 4;
+            pyramid.castShadow = true;
+            pyramid.receiveShadow = true;
+            group.add(pyramid);
+            
+            // Add some smaller pyramids nearby
+            const smallPyramid1 = new THREE.Mesh(
+                new THREE.ConeGeometry(8, 8, 4),
+                pyramidMat
+            );
+            smallPyramid1.position.set(-15, 4, -15);
+            smallPyramid1.rotation.y = Math.PI / 4;
+            smallPyramid1.castShadow = true;
+            smallPyramid1.receiveShadow = true;
+            group.add(smallPyramid1);
+            
+            const smallPyramid2 = new THREE.Mesh(
+                new THREE.ConeGeometry(6, 6, 4),
+                pyramidMat
+            );
+            smallPyramid2.position.set(15, 3, -10);
+            smallPyramid2.rotation.y = Math.PI / 4;
+            smallPyramid2.castShadow = true;
+            smallPyramid2.receiveShadow = true;
+            group.add(smallPyramid2);
+            
+            // Create visible "steps" on the pyramid
+            function createPyramidLayer(size, height, yPos) {
+                const layerGeo = new THREE.BoxGeometry(size, height, size);
+                const layer = new THREE.Mesh(layerGeo, pyramidMat);
+                layer.position.y = yPos;
+                layer.castShadow = true;
+                layer.receiveShadow = true;
+                group.add(layer);
+            }
+            
+            // Create visible layers
+            const numLayers = 10;
+            for (let i = 0; i < numLayers; i++) {
+                const t = i / (numLayers - 1);
+                const size = 40 * (1 - t);
+                const yPos = 20 * t;
+                
+                createPyramidLayer(size, 1, yPos);
+            }
+            
+            // Create an entrance to the pyramid
+            const entranceGeo = new THREE.BoxGeometry(3, 4, 2);
+            const entranceMat = new THREE.MeshStandardMaterial({ color: 0x000000 });
+            const entrance = new THREE.Mesh(entranceGeo, entranceMat);
+            entrance.position.set(0, 2, 20);
+            group.add(entrance);
+            
+            // Add some palm trees around the pyramids
+            function createPalmTree(xPos, zPos) {
+                // Trunk
+                const trunkGeo = new THREE.CylinderGeometry(0.5, 0.7, 8, 8);
+                const trunkMat = new THREE.MeshStandardMaterial({ color: 0x8B4513 });
+                const trunk = new THREE.Mesh(trunkGeo, trunkMat);
+                trunk.position.set(xPos, 4, zPos);
+                trunk.castShadow = true;
+                trunk.receiveShadow = true;
+                group.add(trunk);
+                
+                // Create palm fronds
+                for (let i = 0; i < 7; i++) {
+                    const angle = (i / 7) * Math.PI * 2;
+                    
+                    const frondGeo = new THREE.BoxGeometry(0.3, 4, 1);
+                    const frondMat = new THREE.MeshStandardMaterial({ color: 0x006400 });
+                    const frond = new THREE.Mesh(frondGeo, frondMat);
+                    
+                    // Position frond at top of trunk with some angle
+                    frond.position.set(
+                        xPos + Math.cos(angle) * 2,
+                        8,
+                        zPos + Math.sin(angle) * 2
+                    );
+                    
+                    // Rotate to point outward
+                    frond.rotation.x = Math.PI / 4;
+                    frond.rotation.y = angle;
+                    
+                    frond.castShadow = true;
+                    group.add(frond);
+                }
+            }
+            
+            // Add palm trees
+            createPalmTree(15, 15);
+            createPalmTree(-15, 15);
+            createPalmTree(15, -15);
+            createPalmTree(-15, -15);
+
+            group.position.set(x, y, z);
+            return group;
+        }
+
+        function createGreatSphinx(x, y, z) {
+            const group = new THREE.Group();
+            
+            // Create desert base
+            const baseGeo = new THREE.CircleGeometry(25, 32);
+            const baseMat = new THREE.MeshStandardMaterial({ color: 0xE6C88B });
+            const base = new THREE.Mesh(baseGeo, baseMat);
+            base.rotation.x = -Math.PI / 2;
+            base.receiveShadow = true;
+            group.add(base);
+            
+            // Create the sphinx base/body
+            const bodyGeo = new THREE.BoxGeometry(20, 6, 8);
+            const sphinxMat = new THREE.MeshStandardMaterial({ color: 0xD2B48C });
+            const body = new THREE.Mesh(bodyGeo, sphinxMat);
+            body.position.y = 3;
+            body.castShadow = true;
+            body.receiveShadow = true;
+            group.add(body);
+            
+            // Create front legs/paws
+            const pawGeo = new THREE.BoxGeometry(6, 3, 5);
+            const pawMat = new THREE.MeshStandardMaterial({ color: 0xC2B280 });
+            
+            const leftPaw = new THREE.Mesh(pawGeo, pawMat);
+            leftPaw.position.set(-6, 1.5, 6);
+            leftPaw.castShadow = true;
+            leftPaw.receiveShadow = true;
+            group.add(leftPaw);
+            
+            const rightPaw = new THREE.Mesh(pawGeo, pawMat);
+            rightPaw.position.set(6, 1.5, 6);
+            rightPaw.castShadow = true;
+            rightPaw.receiveShadow = true;
+            group.add(rightPaw);
+            
+            // Create head
+            const headGeo = new THREE.BoxGeometry(6, 8, 8);
+            const head = new THREE.Mesh(headGeo, sphinxMat);
+            head.position.set(0, 9, 10);
+            head.castShadow = true;
+            head.receiveShadow = true;
+            group.add(head);
+            
+            // Create headdress
+            const headdressGeo = new THREE.BoxGeometry(8, 2, 6);
+            const headdress = new THREE.Mesh(headdressGeo, sphinxMat);
+            headdress.position.set(0, 11, 10);
+            headdress.castShadow = true;
+            group.add(headdress);
+            
+            // Create face features (simplified)
+            // Nose
+            const noseGeo = new THREE.BoxGeometry(1, 2, 1);
+            const noseMat = new THREE.MeshStandardMaterial({ color: 0xC2B280 });
+            const nose = new THREE.Mesh(noseGeo, noseMat);
+            nose.position.set(0, 9, 14.5);
+            group.add(nose);
+            
+            // Eyes
+            const eyeGeo = new THREE.BoxGeometry(1, 0.5, 0.5);
+            const eyeMat = new THREE.MeshStandardMaterial({ color: 0x000000 });
+            
+            const leftEye = new THREE.Mesh(eyeGeo, eyeMat);
+            leftEye.position.set(-1.5, 10, 14.3);
+            group.add(leftEye);
+            
+            const rightEye = new THREE.Mesh(eyeGeo, eyeMat);
+            rightEye.position.set(1.5, 10, 14.3);
+            group.add(rightEye);
+            
+            // Mouth
+            const mouthGeo = new THREE.BoxGeometry(2, 0.5, 0.5);
+            const mouth = new THREE.Mesh(mouthGeo, eyeMat);
+            mouth.position.set(0, 8, 14.3);
+            group.add(mouth);
+            
+            // Add some wear and erosion details
+            function addErosionDetail(x, y, z, size) {
+                const detailGeo = new THREE.SphereGeometry(size, 8, 8);
+                const detailMat = new THREE.MeshStandardMaterial({ color: 0xC2B280 });
+                const detail = new THREE.Mesh(detailGeo, detailMat);
+                detail.position.set(x, y, z);
+                group.add(detail);
+            }
+            
+            // Add erosion details to simulate wear
+            for (let i = 0; i < 20; i++) {
+                const x = (Math.random() - 0.5) * 20;
+                const z = (Math.random() - 0.5) * 15;
+                
+                // Calculate y position based on where it is on the body
+                let y;
+                if (Math.abs(z) > 5) {
+                    y = 3 + (Math.random() - 0.5);
+                } else if (z > 5) {
+                    y = 1.5 + (Math.random() - 0.5);
+                } else {
+                    y = 9 + (Math.random() - 0.5) * 6;
+                }
+                
+                addErosionDetail(x, y, z, 0.5 + Math.random() * 0.5);
+            }
+            
+            // Add a small pyramid in the background
+            const pyramidGeo = new THREE.ConeGeometry(8, 10, 4);
+            const pyramidMat = new THREE.MeshStandardMaterial({ color: 0xD2B48C });
+            const pyramid = new THREE.Mesh(pyramidGeo, pyramidMat);
+            pyramid.position.set(0, 5, -15);
+            pyramid.rotation.y = Math.PI / 4;
+            pyramid.castShadow = true;
+            pyramid.receiveShadow = true;
+            group.add(pyramid);
+            
+            // Add some palm trees
+            function createPalmTree(xPos, zPos) {
+                // Trunk
+                const trunkGeo = new THREE.CylinderGeometry(0.3, 0.4, 5, 8);
+                const trunkMat = new THREE.MeshStandardMaterial({ color: 0x8B4513 });
+                const trunk = new THREE.Mesh(trunkGeo, trunkMat);
+                trunk.position.set(xPos, 2.5, zPos);
+                trunk.castShadow = true;
+                trunk.receiveShadow = true;
+                group.add(trunk);
+                
+                // Palm fronds
+                for (let i = 0; i < 5; i++) {
+                    const angle = (i / 5) * Math.PI * 2;
+                    
+                    const frondGeo = new THREE.BoxGeometry(0.2, 2, 0.5);
+                    const frondMat = new THREE.MeshStandardMaterial({ color: 0x006400 });
+                    const frond = new THREE.Mesh(frondGeo, frondMat);
+                    
+                    frond.position.set(
+                        xPos + Math.cos(angle) * 1,
+                        5,
+                        zPos + Math.sin(angle) * 1
+                    );
+                    
+                    frond.rotation.x = Math.PI / 6;
+                    frond.rotation.y = angle;
+                    
+                    frond.castShadow = true;
+                    group.add(frond);
+                }
+            }
+            
+            // Add palm trees
+            createPalmTree(15, 10);
+            createPalmTree(-15, 10);
+
+            group.position.set(x, y, z);
+            return group;
+        }
+
+        function createGreatMosqueOfDjenne(x, y, z) {
+            const group = new THREE.Group();
+            
+            // Base platform
+            const baseGeo = new THREE.BoxGeometry(35, 1, 25);
+            const baseMat = new THREE.MeshStandardMaterial({ color: 0xE6C88B });
+            const base = new THREE.Mesh(baseGeo, baseMat);
+            base.position.y = 0.5;
+            base.receiveShadow = true;
+            group.add(base);
+            
+            // Main mosque body
+            const bodyGeo = new THREE.BoxGeometry(30, 10, 20);
+            const adobeMat = new THREE.MeshStandardMaterial({ color: 0xD2B48C });
+            const body = new THREE.Mesh(bodyGeo, adobeMat);
+            body.position.y = 6;
+            body.castShadow = true;
+            body.receiveShadow = true;
+            group.add(body);
+            
+            // Create the distinctive protruding wooden beams
+            function createBeams(yPos, count, length) {
+                for (let i = 0; i < count; i++) {
+                    const beamGeo = new THREE.CylinderGeometry(0.3, 0.3, length, 8);
+                    const beamMat = new THREE.MeshStandardMaterial({ color: 0x8B4513 });
+                    const beam = new THREE.Mesh(beamGeo, beamMat);
+                    
+                    beam.rotation.z = Math.PI / 2;
+                    beam.position.set(15 + length/2, yPos, -10 + i * 20 / (count - 1));
+                    
+                    beam.castShadow = true;
+                    group.add(beam);
+                    
+                    // Symmetrical beam on other side
+                    const beam2 = beam.clone();
+                    beam2.position.x = -15 - length/2;
+                    group.add(beam2);
+                }
+                
+                // Front and back beams
+                for (let i = 0; i < count; i++) {
+                    const beamGeo = new THREE.CylinderGeometry(0.3, 0.3, length, 8);
+                    const beamMat = new THREE.MeshStandardMaterial({ color: 0x8B4513 });
+                    const beam = new THREE.Mesh(beamGeo, beamMat);
+                    
+                    beam.rotation.x = Math.PI / 2;
+                    beam.position.set(-15 + i * 30 / (count - 1), yPos, 10 + length/2);
+                    
+                    beam.castShadow = true;
+                    group.add(beam);
+                    
+                    // Symmetrical beam on other side
+                    const beam2 = beam.clone();
+                    beam2.position.z = -10 - length/2;
+                    group.add(beam2);
+                }
+            }
+            
+            // Add beams at different levels
+            createBeams(3, 5, 2);
+            createBeams(6, 5, 2);
+            createBeams(9, 5, 2);
+            
+            // Create the central tall tower/minaret
+            const towerGeo = new THREE.BoxGeometry(6, 15, 6);
+            const tower = new THREE.Mesh(towerGeo, adobeMat);
+            tower.position.set(0, 13.5, 10);
+            tower.castShadow = true;
+            tower.receiveShadow = true;
+            group.add(tower);
+            
+            // Add the characteristic conical tops
+            function createTowerTop(xPos, yPos, zPos, scale) {
+                const topGeo = new THREE.ConeGeometry(scale * 3, scale * 5, 4);
+                const topMat = new THREE.MeshStandardMaterial({ color: 0xD2B48C });
+                const top = new THREE.Mesh(topGeo, topMat);
+                top.position.set(xPos, yPos, zPos);
+                top.castShadow = true;
+                group.add(top);
+                
+                // Add wooden spikes sticking out
+                for (let i = 0; i < 4; i++) {
+                    const angle = (i / 4) * Math.PI * 2;
+                    
+                    const spikeGeo = new THREE.CylinderGeometry(0.2, 0.2, 1, 4);
+                    const spikeMat = new THREE.MeshStandardMaterial({ color: 0x8B4513 });
+                    const spike = new THREE.Mesh(spikeGeo, spikeMat);
+                    
+                    spike.position.set(
+                        xPos + Math.cos(angle) * scale * 1.5,
+                        yPos - scale * 1,
+                        zPos + Math.sin(angle) * scale * 1.5
+                    );
+                    
+                    spike.rotation.z = Math.cos(angle) * Math.PI / 6;
+                    spike.rotation.x = Math.sin(angle) * Math.PI / 6;
+                    
+                    spike.castShadow = true;
+                    group.add(spike);
+                }
+            }
+            
+            // Main tower top
+            createTowerTop(0, 24, 10, 2);
+            
+            // Create corner towers
+            function createCornerTower(xPos, zPos) {
+                const towerGeo = new THREE.BoxGeometry(4, 12, 4);
+                const tower = new THREE.Mesh(towerGeo, adobeMat);
+                tower.position.set(xPos, 12, zPos);
+                tower.castShadow = true;
+                tower.receiveShadow = true;
+                group.add(tower);
+                
+                // Add top
+                createTowerTop(xPos, 20, zPos, 1.5);
+            }
+            
+            // Add corner towers
+            createCornerTower(-13, 8);
+            createCornerTower(13, 8);
+            createCornerTower(-13, -8);
+            createCornerTower(13, -8);
+            
+            // Add the characteristic adobe textured facade
+            function createAdobeDetail(xPos, yPos, zPos, width, height) {
+                const detailGeo = new THREE.BoxGeometry(width, height, 0.5);
+                const detailMat = new THREE.MeshStandardMaterial({ color: 0xC2B280 });
+                const detail = new THREE.Mesh(detailGeo, detailMat);
+                detail.position.set(xPos, yPos, zPos);
+                detail.castShadow = true;
+                detail.receiveShadow = true;
+                group.add(detail);
+            }
+            
+            // Add adobe texture details to front facade
+            for (let x = -12; x <= 12; x += 4) {
+                for (let y = 4; y <= 8; y += 4) {
+                    createAdobeDetail(x, y, 10.3, 2, 2);
+                }
+            }
+            
+            // Create the front entrance
+            const entranceGeo = new THREE.BoxGeometry(4, 6, 1);
+            const entranceMat = new THREE.MeshStandardMaterial({ color: 0x8B4513 });
+            const entrance = new THREE.Mesh(entranceGeo, entranceMat);
+            entrance.position.set(0, 3, 10.3);
+            entrance.castShadow = true;
+            group.add(entrance);
+            
+            // Add some traditional ladders leaning against the building
+            function createLadder(xPos, zPos, height, angle, rotation) {
+                const ladderGroup = new THREE.Group();
+                
+                // Side rails
+                for (let i = -1; i <= 1; i += 2) {
+                    const railGeo = new THREE.BoxGeometry(0.2, height, 0.2);
+                    const railMat = new THREE.MeshStandardMaterial({ color: 0x8B4513 });
+                    const rail = new THREE.Mesh(railGeo, railMat);
+                    rail.position.x = i * 0.4;
+                    ladderGroup.add(rail);
+                }
+                
+                // Rungs
+                const numRungs = Math.floor(height / 0.5);
+                for (let i = 0; i < numRungs; i++) {
+                    const rungGeo = new THREE.BoxGeometry(1, 0.2, 0.2);
+                    const rungMat = new THREE.MeshStandardMaterial({ color: 0x8B4513 });
+                    const rung = new THREE.Mesh(rungGeo, rungMat);
+                    rung.position.y = -height / 2 + i * height / numRungs;
+                    ladderGroup.add(rung);
+                }
+                
+                ladderGroup.position.set(xPos, height / 2, zPos);
+                ladderGroup.rotation.x = angle;
+                ladderGroup.rotation.y = rotation;
+                ladderGroup.castShadow = true;
+                
+                group.add(ladderGroup);
+            }
+            
+            // Add ladders
+            createLadder(10, 10.5, 12, -Math.PI / 6, 0);
+            createLadder(-10, 10.5, 12, -Math.PI / 6, 0);
+
+            group.position.set(x, y, z);
+            return group;
+        }
+
+        function createLotusTemple(x, y, z) {
+            const group = new THREE.Group();
+            
+            // Base platform
+            const baseGeo = new THREE.CircleGeometry(20, 32);
+            const baseMat = new THREE.MeshStandardMaterial({ color: 0xE0E0E0 });
+            const base = new THREE.Mesh(baseGeo, baseMat);
+            base.rotation.x = -Math.PI / 2;
+            base.receiveShadow = true;
+            group.add(base);
+            
+            // Create the reflecting pools
+            const poolGeo = new THREE.RingGeometry(12, 19, 32);
+            const poolMat = new THREE.MeshStandardMaterial({ 
+                color: 0x1E90FF,
+                transparent: true,
+                opacity: 0.7,
+                metalness: 0.3,
+                roughness: 0.2
+            });
+            const pool = new THREE.Mesh(poolGeo, poolMat);
+            pool.rotation.x = -Math.PI / 2;
+            pool.position.y = 0.05;
+            group.add(pool);
+            
+            // Create central platform
+            const innerPlatformGeo = new THREE.CircleGeometry(12, 32);
+            const innerPlatformMat = new THREE.MeshStandardMaterial({ color: 0xFFFFFF });
+            const innerPlatform = new THREE.Mesh(innerPlatformGeo, innerPlatformMat);
+            innerPlatform.rotation.x = -Math.PI / 2;
+            innerPlatform.position.y = 0.1;
+            innerPlatform.receiveShadow = true;
+            group.add(innerPlatform);
+            
+            // Create steps up to the temple
+            for (let i = 0; i < 9; i++) {
+                const angle = (i / 9) * Math.PI * 2;
+                
+                const stepsPlatformGeo = new THREE.BoxGeometry(5, 1, 2);
+                const stepsPlatformMat = new THREE.MeshStandardMaterial({ color: 0xFFFFFF });
+                const stepsPlatform = new THREE.Mesh(stepsPlatformGeo, stepsPlatformMat);
+                
+                stepsPlatform.position.set(
+                    Math.cos(angle) * 15.5,
+                    0.5,
+                    Math.sin(angle) * 15.5
+                );
+                
+                stepsPlatform.rotation.y = angle + Math.PI / 2;
+                stepsPlatform.castShadow = true;
+                stepsPlatform.receiveShadow = true;
+                
+                group.add(stepsPlatform);
+            }
+            
+            // Create the lotus petals
+            function createPetal(angle, tier, isStanding) {
+                const radius = 10 - tier * 3;
+                const height = 15;
+                const width = 5 - tier * 1;
+                
+                // Create a curved petal shape
+                const points = [];
+                const segments = 20;
+                
+                for (let i = 0; i <= segments; i++) {
+                    const t = i / segments;
+                    
+                    // Create curved shape
+                    const x = width * (1 - Math.pow(t - 0.5, 2) * 3);
+                    let y;
+                    
+                    if (isStanding) {
+                        // Standing petals
+                        y = t * height;
+                    } else {
+                        // Inward curving petals
+                        y = height * 0.3 * Math.sin(t * Math.PI);
+                    }
+                    
+                    points.push(new THREE.Vector2(x, y));
+                }
+                
+                // Create the petal geometry by revolving the curve around the y-axis
+                const petalShape = new THREE.Shape();
+                petalShape.moveTo(points[0].x, points[0].y);
+                
+                for (let i = 1; i <= segments; i++) {
+                    petalShape.lineTo(points[i].x, points[i].y);
+                }
+                
+                // Connect back to first point
+                petalShape.lineTo(-points[segments].x, points[segments].y);
+                
+                for (let i = segments - 1; i >= 0; i--) {
+                    petalShape.lineTo(-points[i].x, points[i].y);
+                }
+                
+                const petalGeo = new THREE.ExtrudeGeometry(petalShape, {
+                    depth: 0.5,
+                    bevelEnabled: false
+                });
+                
+                const petalMat = new THREE.MeshStandardMaterial({ color: 0xFFFFFF });
+                const petal = new THREE.Mesh(petalGeo, petalMat);
+                
+                // Position and rotate the petal
+                if (isStanding) {
+                    petal.position.set(
+                        Math.cos(angle) * radius,
+                        1,
+                        Math.sin(angle) * radius
+                    );
+                    
+                    petal.rotation.y = angle + Math.PI / 2;
+                } else {
+                    petal.position.set(
+                        Math.cos(angle) * radius,
+                        10 - tier * 2,
+                        Math.sin(angle) * radius
+                    );
+                    
+                    petal.rotation.x = Math.PI / 2;
+                    petal.rotation.y = angle + Math.PI / 2;
+                }
+                
+                petal.castShadow = true;
+                petal.receiveShadow = true;
+                
+                group.add(petal);
+            }
+            
+            // Create lotus petals - three tiers
+            for (let tier = 0; tier < 3; tier++) {
+                const numPetals = 9 - tier * 2;
+                
+                for (let i = 0; i < numPetals; i++) {
+                    const angle = (i / numPetals) * Math.PI * 2;
+                    createPetal(angle, tier, false);
+                }
+            }
+            
+            // Add standing petals in the center
+            for (let i = 0; i < 9; i++) {
+                const angle = (i / 9) * Math.PI * 2;
+                createPetal(angle, 0, true);
+            }
+            
+            // Central dome under petals
+            const domeGeo = new THREE.SphereGeometry(8, 32, 32, 0, Math.PI * 2, 0, Math.PI / 2);
+            const domeMat = new THREE.MeshStandardMaterial({ color: 0xFFFFFF });
+            const dome = new THREE.Mesh(domeGeo, domeMat);
+            dome.position.y = 1;
+            dome.castShadow = true;
+            dome.receiveShadow = true;
+            group.add(dome);
+            
+            // Add entrance
+            const entranceGeo = new THREE.BoxGeometry(5, 5, 5);
+            const entranceMat = new THREE.MeshStandardMaterial({ color: 0xFFFFFF });
+            const entrance = new THREE.Mesh(entranceGeo, entranceMat);
+            entrance.position.set(0, 2.5, 8);
+            entrance.castShadow = true;
+            entrance.receiveShadow = true;
+            group.add(entrance);
+            
+            // Door
+            const doorGeo = new THREE.PlaneGeometry(3, 4);
+            const doorMat = new THREE.MeshStandardMaterial({ color: 0x8B4513 });
+            const door = new THREE.Mesh(doorGeo, doorMat);
+            door.position.set(0, 2, 10.51);
+            group.add(door);
+
+            group.position.set(x, y, z);
+            return group;
+        }
+
+        // Create map of building types to creation functions
+        const buildingMap = new Map();
+        buildingsData.forEach(building => {
+            buildingMap.set(building.name, building.createFunction);
+        });
+
+        // Shuffle the buildings array to randomize placement
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        const shuffledBuildings = shuffleArray([...buildingsData]);
+
+        // Calculate grid positions for each building
+        const gridPositions = [];
+        for (let x = 0; x < gridSize; x++) {
+            for (let z = 0; z < gridSize; z++) {
+                const gridWidth = blockSize * gridSize + streetWidth * (gridSize + 1);
+                const halfGridWidth = gridWidth / 2;
+                
+                // Calculate the center of each block
+                const posX = -halfGridWidth + streetWidth + x * (blockSize + streetWidth) + blockSize / 2;
+                const posZ = -halfGridWidth + streetWidth + z * (blockSize + streetWidth) + blockSize / 2;
+                
+                gridPositions.push({ x: posX, z: posZ });
+            }
+        }
+
+        // Place buildings on the grid
+        const buildingInstances = [];
         
-        const geometry = new THREE.BoxGeometry();
-        const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
-        const cube = new THREE.Mesh(geometry, material);
-        scene.add(cube);
-        
-        camera.position.z = 5;
+        for (let i = 0; i < Math.min(shuffledBuildings.length, gridPositions.length); i++) {
+            const building = shuffledBuildings[i];
+            const position = gridPositions[i];
+            
+            const buildingInstance = building.createFunction(position.x, 0, position.z);
+            buildingInstance.userData = {
+                name: building.name,
+                description: building.description,
+                location: building.location
+            };
+            scene.add(buildingInstance);
+            buildingInstances.push(buildingInstance);
+        }
+
+        // Ray casting for building selection
+        const raycaster = new THREE.Raycaster();
+        const mouse = new THREE.Vector2();
+        const buildingInfo = document.getElementById('building-info');
+        const buildingName = document.getElementById('building-name');
+        const buildingDesc = document.getElementById('building-desc');
+
+        function onMouseMove(event) {
+            // Calculate mouse position in normalized device coordinates
+            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+            
+            // Update the raycaster
+            raycaster.setFromCamera(mouse, camera);
+            
+            // Get intersected objects
+            const intersects = raycaster.intersectObjects(scene.children, true);
+            
+            // Clear any existing hover state
+            document.body.style.cursor = 'default';
+            buildingInfo.style.display = 'none';
+            
+            // Check for intersection with buildings
+            if (intersects.length > 0) {
+                // Find the parent building - traverse up the object hierarchy
+                let currentObject = intersects[0].object;
+                let buildingFound = false;
+                
+                while (currentObject) {
+                    if (currentObject.userData && currentObject.userData.name) {
+                        document.body.style.cursor = 'pointer';
+                        buildingName.textContent = currentObject.userData.name + ' (' + currentObject.userData.location + ')';
+                        buildingDesc.textContent = currentObject.userData.description;
+                        buildingInfo.style.display = 'block';
+                        buildingFound = true;
+                        break;
+                    }
+                    currentObject = currentObject.parent;
+                }
+                
+                if (!buildingFound) {
+                    buildingInfo.style.display = 'none';
+                }
+            }
+        }
+
+        window.addEventListener('mousemove', onMouseMove, false);
+
+        // Animation loop
+        const clock = new THREE.Clock();
         
         function animate() {
             requestAnimationFrame(animate);
-            cube.rotation.x += 0.01;
-            cube.rotation.y += 0.01;
+            
+            const delta = clock.getDelta();
+            
+            // Update controls
+            controls.update();
+            
             renderer.render(scene, camera);
         }
-        
+
         animate();
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        // Hide loading when everything is ready
+        window.onload = function() {
+            document.getElementById('loading').style.display = 'none';
+        };
     </script>
 </body>
 </html>
