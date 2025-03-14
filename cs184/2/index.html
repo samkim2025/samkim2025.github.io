@@ -123,36 +123,56 @@
         
         <p><strong>2. Take a look at the provided .bzc files and create your own Bezier curve with 6 control points of your choosing. Use this Bezier curve for your screenshots below.</strong><br></p>
         <div class="image-container">
-            <h3>New Bezier Curve</h3>
-            <img src="media/3.2.jpg" alt="Original Robot">
+            <h3>Bezier Curve with 6 control points</h3>
+            <img src="media/1.1.png" alt="6-Point Bezier">
         </div>
         
         <p><strong>3. Show screenshots of each step / level of the evaluation from the original control points down to the final evaluated point.</strong><br></p>
         <div class="grid-container">
             <div class="image-container">
-                <h3>Sample Rate = 1 (1x1)</h3>
-                <img src="media/2.2.1.png" alt="Sample Rate 1">
-                <p>At sample_rate = 1 (no supersampling), the edges appear extremely jagged and there are even gaps between the red pixels where the triangle should normally be. We can even notice jaggies in the original viewpoint, not just from the pixel inspector. This is because each pixel is binary (fully covered or not).</p>
+                <h3>Original Bezier</h3>
+                <img src="media/1.1.png" alt="Original 6 points">
+                <p>The original 6 control points defining my Bezier curve.</p>
             </div>
     
             <div class="image-container">
-                <h3>Sample Rate = 4 (2x2)</h3>
-                <img src="media/2.2.2.png" alt="Sample Rate 4">
-                <p>At sample_rate = 4, we do not see any of the gaps from sample rate 1 in the pixel inspector, and there is some blur/smoothness. This is because taking 4 samples allows us to have gradients/shades.</p>
+                <h3>Level 1</h3>
+                <img src="media/1.2.png" alt="Level 1">
+                <p>After one step of de Casteljau's algorithm, we have 5 intermediate points (blue) generated from the original control points.</p>
             </div>
     
             <div class="image-container">
-                <h3>Sample Rate = 16 (4x4)</h3>
-                <img src="media/2.2.3.png" alt="Sample Rate 16">
-                <p>At sample_rate = 16, the blur is much more gradual/spread out. At sample_rate = 4, only one pixel was used to show the lightest, non-white pixel, but at sample_rate = 16, three pixels were used. In other words, with 16 samples, pixels are more likely to take on intermediate values/shades. </p>
+                <h3>Level 2</h3>
+                <img src="media/1.3.png" alt="Level 2">
+                <p>After two steps, we have 4 intermediate points (blue) generated from the previous level's points.</p>
+            </div>
+        </div>
+
+        <div class="grid-container">
+            <div class="image-container">
+                <h3>Level 3</h3>
+                <img src="media/1.4.png" alt="Level 3">
+                <p>After three steps, we have 3 intermediate points (blue).</p>
+            </div>
+    
+            <div class="image-container">
+                <h3>Level 4</h3>
+                <img src="media/1.5.png" alt="Level 4">
+                <p>After four steps, we have 2 intermediate points (blue).</p>
+            </div>
+    
+            <div class="image-container">
+                <h3>Level 5</h3>
+                <img src="media/1.6.png" alt="Level 5">
+                <p>After five steps, we have the final point (red) that lies on the Bezier curve at parameter t.</p>
             </div>
         </div>
         
 
         <p><strong>4. Show a screenshot of a slightly different Bezier curve by moving the original control points around and modifying the parameter t via mouse scrolling.</strong><br></p>
         <div class="image-container">
-            <h3>New Bezier Curve</h3>
-            <img src="media/3.2.jpg" alt="Original Robot">
+            <h3>Modified Bezier Curve with t = 0.8</h3>
+            <img src="media/1.7.png" alt="Alternate Bezier">
         </div>
     </div>
 
