@@ -111,9 +111,11 @@
         <h3>Part 1: Bezier Curves with 1D de Casteljau Subdivision</h3>
         <p><strong>1. Briefly explain de Casteljau’s algorithm and how you implemented it in order to evaluate Bezier curves.</strong><br>
         De Casteljau's algorithm is a recursive method to evaluate points on a Bezier curve at a given parameter value t (where t ranges from 0 to 1). The algorithm works like this:
-            1. Start with n+1 control points that define an nth degree Bezier curve
-            2. For each recursive step, perform linear interpolation between adjacent points to create a new set of n points
-            3. Continue this process until a single point remains, which is the point on the Bezier curve at parameter t
+            <ul>
+                <li>Start with n+1 control points that define an nth degree Bezier curve.</li>
+                <li>For each recursive step, perform linear interpolation between adjacent points to create a new set of n points.</li>
+                <li>Continue this process until a single point remains, which is the point on the Bezier curve at parameter t.</li>
+            </ul>
         In my implementation, I followed this algorithm by:
         <ul>
             <li>Taking the input vector of control points</li>
@@ -181,14 +183,26 @@
     <h2>Part 2: Bezier Surfaces with Separable 1D de Casteljau</h2>
     <div class="algorithm-steps">
         <p><strong>1. Briefly explain how de Casteljau algorithm extends to Bezier surfaces and how you implemented it in order to evaluate Bezier surfaces.</strong><br>
-        <p>Supersampling is useful because it helps improve the quality of images by smoothing out “jaggies” that appear when we rasterize diagonals or curved shapes. 
-        It works by first dividing each pixel into multiple smaller subpixel samples. Then, I tested the coverage of each subpixel sample (i.e. does it lie inside or outside the shape?). 
-        Finally, I accumulated all subpixel colors and averaged them to form the final color of the pixel. This produces smoother, antialiased edges because pixels partially covered by the shape will be colored with a lighter shade of the shape color. </p>
+        <p> De Casteljau's algorithm extends naturally from curves to surfaces through a technique called separable 1D de Casteljau. While a Bezier curve is defined by a 1D array of control points and one parameter t, a Bezier surface is defined by a 2D grid of control points and two parameters (u,v). The algorithm works like this:</p>
+        <ul>
+            <li>First Parametric Direction: For each row of control points in the grid, we apply the 1D de Casteljau algorithm using parameter u. This gives us n points (where n is the number of rows).</li>
+            <li>Second Parametric Direction: We then treat these n points as control points for another Bezier curve, and apply de Casteljau again using parameter v.</li>
+            <li>Final Result: The result is a single point that lies on the Bezier surface at coordinates (u,v).</li>
+        </ul>
+        <p>In my implementation:
+        <ul>
+             <li><span class="code">evaluateStep</span>: Implements a single step of linear interpolation between adjacent 3D points, just like with curves but extended to 3D space. </li>
+             <li><span class="code">evaluate1D</span>: Fully evaluates a Bezier curve by repeatedly applying evaluateStep until arriving at a single point. </li>
+             <li><span class="code">evaluate</span>: Coordinates the two-direction evaluation by first applying evaluate1D to each row of control points with parameter u, then applying evaluate1D again to these intermediate results with parameter v</p></li>
+        </ul>
+        <p>This approach is elegant because it reuses the same algorithm in two directions, avoiding the need for a specialized 2D algorithm. It works because Bezier surfaces have the mathematical property of being "bi-parametric" - they can be evaluated independently in each parametric direction.</p>
+
         <p><strong>2. Show a screenshot of <span class="code">bez/teapot.bez</span> (not <span class="code">.dae</span>) evaluated by your implementation.</strong><br>
         <div class="image-container">
             <h3>bez/teapot.bez</h3>
             <img src="media/2.1.png" alt="teapot">
         </div>
+       This approach is elegant because it reuses the same algorithm in two directions, avoiding the need for a specialized 2D algorithm. It works because Bezier surfaces have the mathematical property of being "bi-parametric" - they can be evaluated independently in each parametric direction.
 
 
 
