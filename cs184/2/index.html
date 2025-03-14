@@ -233,6 +233,7 @@
     <h2>Part 4: Edge Flip</h2>
     <div class="algorithm-steps">
         <p><strong>1. Briefly explain how you implemented the edge flip operation and describe any interesting implementation / debugging tricks you have used. </strong><br>
+        <p>In my implementation, I started by checking if the edge is a boundary edge. If it is, I returned the edge immediately without flipping. Otherwise, I retrieved the halfedges, vertices, and faces involved in the edge flip. Then, I swap the vertices connected by the edge and update the halfedges and their next pointers to maintain the cyclic structure of the faces. I also update the face pointers for each halfedge to ensure the correct faces are assigned after the flip. I also carefully managed the relationships between halfedges, vertices, and faces, ensuring that no references are lost. For debugging, I found it helpful to check the integrity of the mesh after each operation.</p>
         <p><strong>2. Show screenshots of the teapot before and after some edge flips. </strong><br>
         <div class="grid-container grid-2x2">
             <div class="image-container">
@@ -241,7 +242,7 @@
             </div>
             <div class="image-container">
                 <h3>Teapot after some edge flips</h3>
-                <img src="media/3.2.png" alt="Flipped Teapot">
+                <img src="media/4.2.png" alt="Flipped Teapot">
             </div>
         </div>
     </div>
