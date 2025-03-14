@@ -110,7 +110,7 @@
     <div class="algorithm-steps">
         <h3>Part 1: Bezier Curves with 1D de Casteljau Subdivision</h3>
         <p><strong>1. Briefly explain de Casteljau’s algorithm and how you implemented it in order to evaluate Bezier curves.</strong><br>
-        De Casteljau's algorithm is a recursive method to evaluate points on a Bezier curve at a given parameter value t (where t ranges from 0 to 1). The algorithm works as follows:
+        De Casteljau's algorithm is a recursive method to evaluate points on a Bezier curve at a given parameter value t (where t ranges from 0 to 1). The algorithm works like this:
             1. Start with n+1 control points that define an nth degree Bezier curve
             2. For each recursive step, perform linear interpolation between adjacent points to create a new set of n points
             3. Continue this process until a single point remains, which is the point on the Bezier curve at parameter t
@@ -128,10 +128,26 @@
         </div>
         
         <p><strong>3. Show screenshots of each step / level of the evaluation from the original control points down to the final evaluated point.</strong><br></p>
-        <div class="image-container">
-            <h3>New Bezier Curve</h3>
-            <img src="media/3.2.jpg" alt="Original Robot">
+        <div class="grid-container">
+            <div class="image-container">
+                <h3>Sample Rate = 1 (1x1)</h3>
+                <img src="media/2.2.1.png" alt="Sample Rate 1">
+                <p>At sample_rate = 1 (no supersampling), the edges appear extremely jagged and there are even gaps between the red pixels where the triangle should normally be. We can even notice jaggies in the original viewpoint, not just from the pixel inspector. This is because each pixel is binary (fully covered or not).</p>
+            </div>
+    
+            <div class="image-container">
+                <h3>Sample Rate = 4 (2x2)</h3>
+                <img src="media/2.2.2.png" alt="Sample Rate 4">
+                <p>At sample_rate = 4, we do not see any of the gaps from sample rate 1 in the pixel inspector, and there is some blur/smoothness. This is because taking 4 samples allows us to have gradients/shades.</p>
+            </div>
+    
+            <div class="image-container">
+                <h3>Sample Rate = 16 (4x4)</h3>
+                <img src="media/2.2.3.png" alt="Sample Rate 16">
+                <p>At sample_rate = 16, the blur is much more gradual/spread out. At sample_rate = 4, only one pixel was used to show the lightest, non-white pixel, but at sample_rate = 16, three pixels were used. In other words, with 16 samples, pixels are more likely to take on intermediate values/shades. </p>
+            </div>
         </div>
+        
 
         <p><strong>4. Show a screenshot of a slightly different Bezier curve by moving the original control points around and modifying the parameter t via mouse scrolling.</strong><br></p>
         <div class="image-container">
