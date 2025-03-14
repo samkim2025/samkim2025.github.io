@@ -115,10 +115,12 @@
             2. For each recursive step, perform linear interpolation between adjacent points to create a new set of n points
             3. Continue this process until a single point remains, which is the point on the Bezier curve at parameter t
         In my implementation, I followed this algorithm by:
-            * Taking the input vector of control points
-            * Creating a new vector to store intermediate points
-            * For each pair of adjacent points (p_i and p_{i+1}), computing a new point using linear interpolation: p_i' = (1-t) * p_i + t * p_{i+1}
-            * Returning the new vector of intermediate points
+        <ul>
+            <li>Taking the input vector of control points</li>
+            <li>Creating a new vector to store intermediate points</li>
+            <li> For each pair of adjacent points (p_i and p_{i+1}), computing a new point using linear interpolation: p_i' = (1-t) * p_i + t * p_{i+1}</li>
+            <li>Returning the new vector of intermediate points</li>
+        </ul>
         This single step of the algorithm reduces n points to n-1 points. When called repeatedly, it eventually produces a single point lying on the Bezier curve.</p>
         
         <p><strong>2. Take a look at the provided .bzc files and create your own Bezier curve with 6 control points of your choosing. Use this Bezier curve for your screenshots below.</strong><br></p>
@@ -176,13 +178,27 @@
         </div>
     </div>
 
-    <h2>Task 2: Antialiasing by Supersampling</h2>
+    <h2>Part 2: Bezier Surfaces with Separable 1D de Casteljau</h2>
     <div class="algorithm-steps">
-        <p><strong>1. Walk through your supersampling algorithm and data structures. Why is supersampling useful? Explain how you used supersampling to antialias your triangles.</strong><br>
+        <p><strong>1. Briefly explain how de Casteljau algorithm extends to Bezier surfaces and how you implemented it in order to evaluate Bezier surfaces.</strong><br>
         <p>Supersampling is useful because it helps improve the quality of images by smoothing out “jaggies” that appear when we rasterize diagonals or curved shapes. 
         It works by first dividing each pixel into multiple smaller subpixel samples. Then, I tested the coverage of each subpixel sample (i.e. does it lie inside or outside the shape?). 
         Finally, I accumulated all subpixel colors and averaged them to form the final color of the pixel. This produces smoother, antialiased edges because pixels partially covered by the shape will be colored with a lighter shade of the shape color. </p>
-        <p><strong>Key Data Structures:</strong></p>
+        <p><strong>2. Show a screenshot of <span class="code">bez/teapot.bez</span> (not <span class="code">.dae</span>) evaluated by your implementation.</strong><br>
+        <div class="image-container">
+            <h3>bez/teapot.bez</h3>
+            <img src="media/2.1.png" alt="teapot">
+        </div>
+
+
+
+
+
+
+
+
+
+            
         <ul>
             <li><span class="code">sample_rate</span>: An integer, specifies how many total subpixel samples each pixel contains. For example, sample_rate = 4 means we have a 2x2 grid of sub-pixels per pixel.</li>
             <li><span class="code">sample_buffer</span>: A 1D array of Color objects, each storing an (R, G, B) value in floating point. It’s size is width * height * sample_rate, and each pixel has sample_rate sub-sample slots.</li>
