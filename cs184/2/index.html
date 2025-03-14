@@ -229,147 +229,56 @@
             </div>
         </div>
     </div>
-    
 
-
-
-
-
-
-
-        
-
-    
-    <!-- Task 3 Section -->
-    <h2>Task 3: Transforms</h2>
-    <div class="grid-container grid-2x2">
-        <div class="image-container">
-            <h3>Original Robot</h3>
-            <img src="media/3.2.jpg" alt="Original Robot">
-        </div>
-        <div class="image-container">
-            <h3>Modified Robot</h3>
-            <img src="media/3.1.png" alt="Modified Robot">
-        </div>
-    </div>
+    <h2>Part 4: Edge Flip</h2>
     <div class="algorithm-steps">
-        <h3>Ride-Hailing Robot</h3>
-        <p>To create this ride-hailing robot, I tried playing with four things:
-            <ul>
-                <li>Color: I changed the color of the robot by transforming the polygon fill value for each box to “#000000” instead of the original “#EF161F”.</li>
-                <li>Rotation of the head: I rotated the head back to an upright position (angle = 0).</li>
-                <li>The left arm: I rotated the left arm by 270 degrees to give it the semblance that it’s calling for a cab.</li>
-                <li>The right arm: For the right arm, I wanted to experiment with the possibility of rotating each “segment” of the arm separately. I kept the upper part of the arm (i.e. the bicep equivalent), but only played with the “hand”. I translated the hand left and up after rotating it 90 degrees.</li>
-            </ul>
-        </p>
-    </div>
-    
-    
-    <!-- Task 4 Section -->
-    <h2>Task 4: Barycentric Coordinates</h2>
-    <div class="grid-container grid-2x2">
-        <div class="image-container">
-            <h3>Barycentric Triangle</h3>
-            <img src="media/4.1.png" alt="Barycentric Triangle">
-        </div>
-        <div class="image-container">
-            <h3>Barycentric Circle</h3>
-            <img src="media/4.2.png" alt="Barycentric Triangle">
+        <p><strong>1. Briefly explain how you implemented the edge flip operation and describe any interesting implementation / debugging tricks you have used. </strong><br>
+        <p><strong>2. Show screenshots of the teapot before and after some edge flips. </strong><br>
+        <div class="grid-container grid-2x2">
+            <div class="image-container">
+                <h3>Original teapot before edge flips</h3>
+                <img src="media/4.1.png" alt="Original Teapot">
+            </div>
+            <div class="image-container">
+                <h3>Teapot after some edge flips</h3>
+                <img src="media/3.2.png" alt="Flipped Teapot">
+            </div>
         </div>
     </div>
+
+    <h2>Part 5: Edge Split</h2>
     <div class="algorithm-steps">
-        <p><strong>Explain barycentric coordinates in your own words and use an image to aid you in your explanation.</strong><br>
-        <p>In a triangle with vertices (v0, v1, and v2), we can express any point p inside the triangle as a weighted combination of the vertices. 
-            In other words, p = a*v0 + b*v1 + c*v2. The weights a, b, and c must add up to 1, and they must be greater than or equal to zero.  
-            These weights are the barycentric coordinates of p relative to the triangle. To interpolate colors, we do the same idea but in color space. 
-            This actually makes a lot of sense given that we have three axes in color (RGB) and a triangle has three vertices. Color(p)=αColor(v0​)+βColor(v1​)+γColor(v2​). 
-            And Color(v_i) is the color value we assign to vertex i. As p moves around inside the triangle, the barycentric coordinates change, blending the colors. </p>
+        <p><strong>1. Briefly explain how you implemented the edge split operation and describe any interesting implementation / debugging tricks you have used. </strong><br>
+        <p><strong>2. Show screenshots of a mesh before and after some edge splits. </strong><br>
+        <div class="grid-container grid-2x2">
+            <div class="image-container">
+                <h3>Original teapot before edge flips</h3>
+                <img src="media/4.1.png" alt="Original Teapot">
+            </div>
+            <div class="image-container">
+                <h3>Teapot after some edge flips</h3>
+                <img src="media/3.2.png" alt="Flipped Teapot">
+            </div>
+        </div>
+        <p><strong>3. Show screenshots of a mesh before and after a combination of both edge splits and edge flips. </strong><br>
+        <p><strong>4. If you have implemented support for boundary edges, show screenshots of your implementation properly handling split operations on boundary edges.</strong></p>
     </div>
-    
-        
-    <!-- Task 5 Section -->
-    <h2>Task 5: "Pixel Sampling" For Texture Mapping</h2>
+
+    <h2>Part 6: Loop Subdivision for Mesh Upsampling</h2>
     <div class="algorithm-steps">
-        <p><strong>1. Explain pixel sampling in your own words and describe how you implemented it to perform texture mapping. </strong><br>
-        <p>Pixel sampling determines how textures map onto surfaces during rendering. When a texture is applied to a 3D surface, each pixel on the screen corresponds to a portion of the texture image. 
-            Since the texture’s resolution usually does not match with the screen’s, we have to interpolate colors from nearby texels. </p>
-        <p><strong>2. Briefly discuss the two different pixel sampling methods, nearest and bilinear. </strong><br>
-        <p>There are two sampling methods, nearest neighbors and bilinear. Nearest neighbors selects the closest single texel to the sampled texture coordinate. 
-            First, I ensured that the UV coordinates stay within [0, 1] by setting up the min/max boundaries. Then, I scaled the UVs to texture dimensions and rounded it to the nearest integer values.
-            Finally, I checked the bounds to prevent accessing texture that is out of bounds. The bilinear approach, on the other hand, blends 4 nearest texels using distance-based weights. 
-            First, I found the fractional position between texels, and sampled the 4 nearest texel centers. Then I calculated the weighted average based on the positions of each sub-texel, interpolating the values.
-            Nearest neighbors preserved the sharp jaggies, but bilinear sampling showed blur.</p>
-    </div>
-    <div class="grid-container grid-2x2">
-        <div class="image-container">
-            <h3>Nearest & 1 sample per pixel</h3>
-            <img src="media/5.1.png" alt="Nearest 1x">
-            <p>Sharp edges with visible aliasing</p>
+        <p><strong>1. Briefly explain how you implemented the loop subdivision and describe any interesting implementation / debugging tricks you have used. </strong><br>
+        <p><strong>2. Take some notes, as well as some screenshots, of your observations on how meshes behave after loop subdivision. What happens to sharp corners and edges? Can you reduce this effect by pre-splitting some edges? </strong><br>
+        <div class="grid-container grid-2x2">
+            <div class="image-container">
+                <h3>Original teapot before edge flips</h3>
+                <img src="media/4.1.png" alt="Original Teapot">
+            </div>
+            <div class="image-container">
+                <h3>Teapot after some edge flips</h3>
+                <img src="media/3.2.png" alt="Flipped Teapot">
+            </div>
         </div>
-        <div class="image-container">
-            <h3>Nearest & 16 sample per pixel</h3>
-            <img src="media/5.2.png" alt="Nearest 16x">
-            <p>Reduced noise but still jagged</p>
-        </div>
-        <div class="image-container">
-            <h3>Bilinear & 1 sample per pixel</h3>
-            <img src="media/5.3.png" alt="Bilinear 1x">
-            <p>Smoother edges despite low samples</p>
-        </div>
-        <div class="image-container">
-            <h3>Bilinear & 16 sample per pixel</h3>
-            <img src="media/5.4.png" alt="Bilinear 16x">
-            <p>Optimal quality with smooth gradients</p>
-        </div>
-    </div>
-    
-    <div class="image-container">
-        <h3>Relative Differences Across Sampling Methods</h3>
-        <p>I noticed the biggest relative difference between nearest/bilinear at 1 sample per pixel. 
-        Sharp edges showed major aliasing with the nearest neighbors approach, but the bilinear approach hid the jaggies (texels had smoother transition). 
-        At 16 samples per pixel, the noise was too removed to notice any significant difference between nearest/bilinear. </p>
-    </div>
-    
-    <!-- Task 6 Section -->
-    <h2>Task 6: Level Sampling with Mipmaps for Texture Mapping</h2>
-    <div class="algorithm-steps">
-        <p><strong>1. Explain level sampling in your own words and describe how you implemented it for texture mapping. </strong><br>
-        <p>Level sampling selects the appropriate mipmap level for texture mapping based on the distance and angle of the surface relative to the viewer.
-            During rasterization, I calculated the UV coordinates for each sample point through barycentric interpolation. I also computed partial derivatives by examining the neighboring pixels.
-            These derivatives showed how quickly UV coordinates change across the texture space, which allows me to determine the appropriate mipmap level for sampling.
-            My implementation has three sampling methods:
-            <ul>
-                <li><span class="code">L_ZERO</span>: Take the simplest approach, always sampling from the base mipmap. This allows us to bypass level calculations entirely.</li>
-                <li><span class="code">L_NEAREST</span>: Compute the optimal mipmap level based on the rate at which UV coordinates change, and rounds to the nearest available level. I had to first ensure that the UV coordinates stay within [0, 1] by setting up the min/max boundaries. </li>
-                <li><span class="code">L_LINEAR</span>: This is the most sophisticated approach. First, I found the fractional position between texels (i.e. bilinear filtering), and sampled the 4 nearest texel centers. Then I calculated the weighted average based on the positions of each sub-texel, interpolating the values. This combination effectively smoothes the transition between mipmap levels when textures change scale.</li>
-            </ul>
-            </p>
-        <p><strong>2. You can now adjust your sampling technique by selecting pixel sampling, level sampling, or the number of samples per pixel. Describe the tradeoffs between speed, memory usage, and antialiasing power between the three various techniques. </strong><br>
-        <p>Combining high sample rates with trilinear filtering (P_LINEAR + L_LINEAR) achieves the highest visual quality but demands significant compute and memory. On the other hand, (P_NEAREST + L_ZERO) maximizes performance by accessing memory in more simple patterns, but will result in aliasing.</p>
-        <ul>
-            <li>Pixel Sampling: P_NEAREST performs single-texel lookups, so it delivers the fastest performanc and uses memory minimally. However, it produces noticeable jaggies, especially for textures viewed at angles. P_LINEAR uses bilinear interpolation between four neighboring texels, which gives me smoother outputs. However, it uses four memory reads per sample and is slower too.</li>
-            <li>Level Sampling: L_ZERO exclusively uses the baes texture, so it's computationally efficient but requires a lot of memory when it tries to access high-res base textures from afar. L_NEAREST selects the most appropriate mipmap level, which reduces the amount of aliasing artifacts present as well as memory requirements. This is because it accesses smaller mipmaps for textures that are far away. L_LINEAR produces the best quality as it implements full trilinear filtering, but requires twice the texture samples and memory compared to L_NEAREST.</li> 
-            <li>Sampling Rate: Increases in sampling rate linearly scales both memory usage and the time required for computation. This is because 4x and 16x sampling rates supersamples more samples per pixel.</li>
-        </ul>
-    </div>
-    
-    <div class="grid-container grid-2x2">
-        <div class="image-container">
-            <h3>L_ZERO/P_NEAREST</h3>
-            <img src="media/6.1.png" alt="Level 0 Nearest">
-        </div>
-        <div class="image-container">
-            <h3>L_ZERO/P_LINEAR</h3>
-            <img src="media/6.2.png" alt="Level 0 Linear">
-        </div>
-        <div class="image-container">
-            <h3>L_NEAREST/P_NEAREST</h3>
-            <img src="media/6.3.png" alt="Level Nearest">
-        </div>
-        <div class="image-container">
-            <h3>L_NEAREST/P_LINEAR</h3>
-            <img src="media/6.4.png" alt="Level Linear">
-        </div>
+        <p><strong>3. Load dae/cube.dae. Perform several iterations of loop subdivision on the cube. Notice that the cube becomes slightly asymmetric after repeated subdivisions. Can you pre-process the cube with edge flips and splits so that the cube subdivides symmetrically? Document these effects and explain why they occur. Also explain how your pre-processing helps alleviate the effects. </strong><br>
     </div>
 </body>
 </html>
