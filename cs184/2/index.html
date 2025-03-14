@@ -250,24 +250,38 @@
     <h2>Part 5: Edge Split</h2>
     <div class="algorithm-steps">
         <p><strong>1. Briefly explain how you implemented the edge split operation and describe any interesting implementation / debugging tricks you have used. </strong><br>
+        <p>I first handled the special case where the edge is on the boundary, returning early if necessary. Then, I identified and stored all relevant halfedges, vertices, edges, and faces associated with the edge being split. I created a new vertex at the midpoint of the edge and introduced four new edges and corresponding halfedges to properly integrate the new vertex into the mesh. I carefully reassigned halfedge twins, vertex references, and face assignments to ensure a consistent and valid halfedge data structure. 
+        A key debugging trick I used was to visualize the halfedge connectivity step by step. I printed out halfedge and vertex assignments to track their relationships, ensuring that each new element was correctly linked. Testing with both simple and complex meshes helped catch issues like incorrect twin assignments or improper face updates.</p>
         <p><strong>2. Show screenshots of a mesh before and after some edge splits. </strong><br>
         <div class="grid-container grid-2x2">
             <div class="image-container">
-                <h3>Original teapot before edge flips</h3>
+                <h3>Original teapot before edge splits</h3>
                 <img src="media/4.1.png" alt="Original Teapot">
             </div>
             <div class="image-container">
-                <h3>Teapot after some edge flips</h3>
-                <img src="media/3.2.png" alt="Flipped Teapot">
+                <h3>Teapot after some edge splits</h3>
+                <img src="media/5.2.png" alt="Split Teapot">
             </div>
         </div>
         <p><strong>3. Show screenshots of a mesh before and after a combination of both edge splits and edge flips. </strong><br>
-        <p><strong>4. If you have implemented support for boundary edges, show screenshots of your implementation properly handling split operations on boundary edges.</strong></p>
+        <div class="grid-container grid-2x2">
+            <div class="image-container">
+                <h3>Original teapot before edge splits/flips</h3>
+                <img src="media/4.1.png" alt="Original Teapot">
+            </div>
+            <div class="image-container">
+                <h3>Teapot after some edge splits/flips</h3>
+                <img src="media/5.3.png" alt="Split and Flipped Teapot">
+            </div>
+        </div>
     </div>
 
     <h2>Part 6: Loop Subdivision for Mesh Upsampling</h2>
     <div class="algorithm-steps">
         <p><strong>1. Briefly explain how you implemented the loop subdivision and describe any interesting implementation / debugging tricks you have used. </strong><br>
+        <p>I first checked if the edge was on the boundary and returned early if necessary. I then identified and stored all relevant halfedges, vertices, edges, and faces associated with the edge being split. Instead of computing the midpoint manually, I used the newPosition already precomputed in the upsampling process and marked the new vertex accordingly.
+        Next, I created four new edges and corresponding halfedges, properly linking them to maintain a valid halfedge data structure. I also set flags to distinguish between new and existing edges, which was useful for subsequent operations like edge flipping. Ensuring correct face and halfedge assignments was crucial to maintaining mesh consistency.
+        An interesting debugging trick I used was to verify that every new vertex and edge was properly connected by iterating over the mesh and checking halfedge cycles. I also leveraged visualization tools to render the mesh after each split to confirm that the topology was correctly updated. Additionally, I tracked the isNew flags to ensure new edges were only flipped when necessary, preventing unintended mesh distortions.</p>
         <p><strong>2. Take some notes, as well as some screenshots, of your observations on how meshes behave after loop subdivision. What happens to sharp corners and edges? Can you reduce this effect by pre-splitting some edges? </strong><br>
         <div class="grid-container grid-2x2">
             <div class="image-container">
