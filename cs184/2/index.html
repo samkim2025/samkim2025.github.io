@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CS184 Project 1 - Rasterizer</title>
+    <style>
+        :root {
+            --primary-color: #4a148c;
+            --secondary-color: #6a1b9a;
+            --accent-color: #9c27b0;
+            --text-color: #2d3748;
+            --bg-color: #f8f9fa;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.8;
+            margin: 40px auto;
+            padding: 0 40px;
+            max-width: 1200px;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+        }
+
+        h1 {
+            color: var(--primary-color);
+            text-align: center;
+            font-size: 2.5em;
+            margin-bottom: 1.5em;
+            border-bottom: 3px solid var(--accent-color);
+            padding-bottom: 0.5em;
+        }
+
+        h2 {
+            color: var(--secondary-color);
+            margin-top: 2em;
+            font-size: 1.8em;
+            border-left: 4px solid var(--accent-color);
+            padding-left: 15px;
+        }
+
+        .image-container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 40px;
+            transition: transform 0.3s ease;
+        }
+
+        .image-container:hover {
+            transform: translateY(-5px);
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 5px;
+            display: block;
+            margin: 20px auto;
+        }
+
+        p {
+            text-align: justify;
+            margin-bottom: 1.5em;
+        }
+
+        .algorithm-steps {
+            background-color: #f3e5f5;
+            padding: 20px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .grid-2x2 {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .code {
+            font-family: 'Courier New', Courier, monospace;
+            background-color: #f8f9fa;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 20px;
+            }
+            
+            .grid-container, .grid-2x2 {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>CS184 Project 1: Rasterizer</h1>
+
+    <h2>Task 1: Drawing Single-Color Triangles</h2>
+    
+    <div class="image-container">
+        <h3>Basic Triangle Rasterization</h3>
+        <img src="media/1.3.png" alt="Triangle Rasterization Result">
+    </div>
+
+    <div class="algorithm-steps">
+        <h3>Rasterization Process</h3>
+        <p><strong>1. Walk through how you rasterize triangles in your own words.</strong><br>
+        The original input parameters, (x0, y0), (x1, y1) and (x2, y2), represent coordinates that define a triangle. I first calculated the min and max values for X and Y to ensure that I only considered pixels that could possibly belong to this triangle. 
+        This prevents us from having to iterate over the whole screen. For each pixel within this sampling box, I checked whether the center point (x+0.5, y+0.5) lies inside the triangle. If it is, the pixel is covered by the triangle and I fill it. 
+        To check whether or not the point is in the triangle, I used the edge function that we learned in class. For each triangle edge, take the cross product of the edge vector AB = B - A and the vector from the same vertex to our sample point AP. 
+        If all cross products are non-negative, the sample point is inside the triangle (including the edge itself). If the sample point is inside, I set the pixel to the color of the triangle.</p>
+        
+        <p><strong>2. Explain how your algorithm is no worse than one that checks each sample within the bounding box of the triangle. The bounding box of the triangle is defined as the smallest rectangle that can be drawn whilst ensuring that the entire triangle is within it.</strong><br>
+        Each pixel in the bounding box is tested exactly once, at its center. This is a simple rule that determines whether a pixel should be drawn or not, and it’s efficient because we don’t waste resources by checking pixels outside the triangle’s bounding box (determined by taking the min/max values along both axes). 
+        We are avoiding a brute-force approach that would look at the entire image.</p>
+    </div>
+
+    <h2>Task 2: Antialiasing by Supersampling</h2>
+    <div class="algorithm-steps">
+        <p><strong>1. Walk through your supersampling algorithm and data structures. Why is supersampling useful? Explain how you used supersampling to antialias your triangles.</strong><br>
+        <p>Supersampling is useful because it helps improve the quality of images by smoothing out “jaggies” that appear when we rasterize diagonals or curved shapes. 
+        It works by first dividing each pixel into multiple smaller subpixel samples. Then, I tested the coverage of each subpixel sample (i.e. does it lie inside or outside the shape?). 
+        Finally, I accumulated all subpixel colors and averaged them to form the final color of the pixel. This produces smoother, antialiased edges because pixels partially covered by the shape will be colored with a lighter shade of the shape color. </p>
+        <p><strong>Key Data Structures:</strong></p>
+        <ul>
+            <li><span class="code">sample_rate</span>: An integer, specifies how many total subpixel samples each pixel contains. For example, sample_rate = 4 means we have a 2x2 grid of sub-pixels per pixel.</li>
+            <li><span class="code">sample_buffer</span>: A 1D array of Color objects, each storing an (R, G, B) value in floating point. It’s size is width * height * sample_rate, and each pixel has sample_rate sub-sample slots.</li>
+            <li><span class="code">rgb_framebuffer_target</span>: This is the final display buffer, storing one 8-bit (R, G, B) per pixel (so 3 * width * height bytes total). This buffer is what we see on display, and we write to it only once after rasterizing in resolve_to_framebuffer().</li>
+        </ul>
+        <p><strong>2. What modifications did you make to the rasterization pipeline in the process?</strong><br>
+        <ol>
+            <li>I replaced the original, one color per pixel approach by storing multiple colors (one per subsample) in sample_buffer.</li>
+            <li>Instead of testing only one center point per pixel, I looped over the sub-sample grid inside the pixel. For each sub-sample, I checked if that point is inside the triangle by computing the cross product. And if it was inside, I stored the triangle color into sample_buffer at the corresponding subsample index.</li>
+            <li>After rasterizing all triangles, I call resolve_to_framebuffer(). For each pixel, I sum the sample_rate subsample colors and average them. I then convert this average into an 8-bit color and write it to rgb_framebuffer_target.</li>
+            <li>I make sure to clear the sample_buffer to a default color (white) at the start of each frame clear_buffers() so that the old data doesn’t persist.</li>
+        </ol>
+    </div>
+
+    <div class="grid-container">
+        <div class="image-container">
+            <h3>Sample Rate = 1 (1x1)</h3>
+            <img src="media/2.2.1.png" alt="Sample Rate 1">
+            <p>At sample_rate = 1 (no supersampling), the edges appear extremely jagged and there are even gaps between the red pixels where the triangle should normally be. We can even notice jaggies in the original viewpoint, not just from the pixel inspector. This is because each pixel is binary (fully covered or not).</p>
+        </div>
+
+        <div class="image-container">
+            <h3>Sample Rate = 4 (2x2)</h3>
+            <img src="media/2.2.2.png" alt="Sample Rate 4">
+            <p>At sample_rate = 4, we do not see any of the gaps from sample rate 1 in the pixel inspector, and there is some blur/smoothness. This is because taking 4 samples allows us to have gradients/shades.</p>
+        </div>
+
+        <div class="image-container">
+            <h3>Sample Rate = 16 (4x4)</h3>
+            <img src="media/2.2.3.png" alt="Sample Rate 16">
+            <p>At sample_rate = 16, the blur is much more gradual/spread out. At sample_rate = 4, only one pixel was used to show the lightest, non-white pixel, but at sample_rate = 16, three pixels were used. In other words, with 16 samples, pixels are more likely to take on intermediate values/shades. </p>
+        </div>
+    </div>
+
+    
+    <!-- Task 3 Section -->
+    <h2>Task 3: Transforms</h2>
+    <div class="grid-container grid-2x2">
+        <div class="image-container">
+            <h3>Original Robot</h3>
+            <img src="media/3.2.jpg" alt="Original Robot">
+        </div>
+        <div class="image-container">
+            <h3>Modified Robot</h3>
+            <img src="media/3.1.png" alt="Modified Robot">
+        </div>
+    </div>
+    <div class="algorithm-steps">
+        <h3>Ride-Hailing Robot</h3>
+        <p>To create this ride-hailing robot, I tried playing with four things:
+            <ul>
+                <li>Color: I changed the color of the robot by transforming the polygon fill value for each box to “#000000” instead of the original “#EF161F”.</li>
+                <li>Rotation of the head: I rotated the head back to an upright position (angle = 0).</li>
+                <li>The left arm: I rotated the left arm by 270 degrees to give it the semblance that it’s calling for a cab.</li>
+                <li>The right arm: For the right arm, I wanted to experiment with the possibility of rotating each “segment” of the arm separately. I kept the upper part of the arm (i.e. the bicep equivalent), but only played with the “hand”. I translated the hand left and up after rotating it 90 degrees.</li>
+            </ul>
+        </p>
+    </div>
+    
+    
+    <!-- Task 4 Section -->
+    <h2>Task 4: Barycentric Coordinates</h2>
+    <div class="grid-container grid-2x2">
+        <div class="image-container">
+            <h3>Barycentric Triangle</h3>
+            <img src="media/4.1.png" alt="Barycentric Triangle">
+        </div>
+        <div class="image-container">
+            <h3>Barycentric Circle</h3>
+            <img src="media/4.2.png" alt="Barycentric Triangle">
+        </div>
+    </div>
+    <div class="algorithm-steps">
+        <p><strong>Explain barycentric coordinates in your own words and use an image to aid you in your explanation.</strong><br>
+        <p>In a triangle with vertices (v0, v1, and v2), we can express any point p inside the triangle as a weighted combination of the vertices. 
+            In other words, p = a*v0 + b*v1 + c*v2. The weights a, b, and c must add up to 1, and they must be greater than or equal to zero.  
+            These weights are the barycentric coordinates of p relative to the triangle. To interpolate colors, we do the same idea but in color space. 
+            This actually makes a lot of sense given that we have three axes in color (RGB) and a triangle has three vertices. Color(p)=αColor(v0​)+βColor(v1​)+γColor(v2​). 
+            And Color(v_i) is the color value we assign to vertex i. As p moves around inside the triangle, the barycentric coordinates change, blending the colors. </p>
+    </div>
+    
+        
+    <!-- Task 5 Section -->
+    <h2>Task 5: "Pixel Sampling" For Texture Mapping</h2>
+    <div class="algorithm-steps">
+        <p><strong>1. Explain pixel sampling in your own words and describe how you implemented it to perform texture mapping. </strong><br>
+        <p>Pixel sampling determines how textures map onto surfaces during rendering. When a texture is applied to a 3D surface, each pixel on the screen corresponds to a portion of the texture image. 
+            Since the texture’s resolution usually does not match with the screen’s, we have to interpolate colors from nearby texels. </p>
+        <p><strong>2. Briefly discuss the two different pixel sampling methods, nearest and bilinear. </strong><br>
+        <p>There are two sampling methods, nearest neighbors and bilinear. Nearest neighbors selects the closest single texel to the sampled texture coordinate. 
+            First, I ensured that the UV coordinates stay within [0, 1] by setting up the min/max boundaries. Then, I scaled the UVs to texture dimensions and rounded it to the nearest integer values.
+            Finally, I checked the bounds to prevent accessing texture that is out of bounds. The bilinear approach, on the other hand, blends 4 nearest texels using distance-based weights. 
+            First, I found the fractional position between texels, and sampled the 4 nearest texel centers. Then I calculated the weighted average based on the positions of each sub-texel, interpolating the values.
+            Nearest neighbors preserved the sharp jaggies, but bilinear sampling showed blur.</p>
+    </div>
+    <div class="grid-container grid-2x2">
+        <div class="image-container">
+            <h3>Nearest & 1 sample per pixel</h3>
+            <img src="media/5.1.png" alt="Nearest 1x">
+            <p>Sharp edges with visible aliasing</p>
+        </div>
+        <div class="image-container">
+            <h3>Nearest & 16 sample per pixel</h3>
+            <img src="media/5.2.png" alt="Nearest 16x">
+            <p>Reduced noise but still jagged</p>
+        </div>
+        <div class="image-container">
+            <h3>Bilinear & 1 sample per pixel</h3>
+            <img src="media/5.3.png" alt="Bilinear 1x">
+            <p>Smoother edges despite low samples</p>
+        </div>
+        <div class="image-container">
+            <h3>Bilinear & 16 sample per pixel</h3>
+            <img src="media/5.4.png" alt="Bilinear 16x">
+            <p>Optimal quality with smooth gradients</p>
+        </div>
+    </div>
+    
+    <div class="image-container">
+        <h3>Relative Differences Across Sampling Methods</h3>
+        <p>I noticed the biggest relative difference between nearest/bilinear at 1 sample per pixel. 
+        Sharp edges showed major aliasing with the nearest neighbors approach, but the bilinear approach hid the jaggies (texels had smoother transition). 
+        At 16 samples per pixel, the noise was too removed to notice any significant difference between nearest/bilinear. </p>
+    </div>
+    
+    <!-- Task 6 Section -->
+    <h2>Task 6: Level Sampling with Mipmaps for Texture Mapping</h2>
+    <div class="algorithm-steps">
+        <p><strong>1. Explain level sampling in your own words and describe how you implemented it for texture mapping. </strong><br>
+        <p>Level sampling selects the appropriate mipmap level for texture mapping based on the distance and angle of the surface relative to the viewer.
+            During rasterization, I calculated the UV coordinates for each sample point through barycentric interpolation. I also computed partial derivatives by examining the neighboring pixels.
+            These derivatives showed how quickly UV coordinates change across the texture space, which allows me to determine the appropriate mipmap level for sampling.
+            My implementation has three sampling methods:
+            <ul>
+                <li><span class="code">L_ZERO</span>: Take the simplest approach, always sampling from the base mipmap. This allows us to bypass level calculations entirely.</li>
+                <li><span class="code">L_NEAREST</span>: Compute the optimal mipmap level based on the rate at which UV coordinates change, and rounds to the nearest available level. I had to first ensure that the UV coordinates stay within [0, 1] by setting up the min/max boundaries. </li>
+                <li><span class="code">L_LINEAR</span>: This is the most sophisticated approach. First, I found the fractional position between texels (i.e. bilinear filtering), and sampled the 4 nearest texel centers. Then I calculated the weighted average based on the positions of each sub-texel, interpolating the values. This combination effectively smoothes the transition between mipmap levels when textures change scale.</li>
+            </ul>
+            </p>
+        <p><strong>2. You can now adjust your sampling technique by selecting pixel sampling, level sampling, or the number of samples per pixel. Describe the tradeoffs between speed, memory usage, and antialiasing power between the three various techniques. </strong><br>
+        <p>Combining high sample rates with trilinear filtering (P_LINEAR + L_LINEAR) achieves the highest visual quality but demands significant compute and memory. On the other hand, (P_NEAREST + L_ZERO) maximizes performance by accessing memory in more simple patterns, but will result in aliasing.</p>
+        <ul>
+            <li>Pixel Sampling: P_NEAREST performs single-texel lookups, so it delivers the fastest performanc and uses memory minimally. However, it produces noticeable jaggies, especially for textures viewed at angles. P_LINEAR uses bilinear interpolation between four neighboring texels, which gives me smoother outputs. However, it uses four memory reads per sample and is slower too.</li>
+            <li>Level Sampling: L_ZERO exclusively uses the baes texture, so it's computationally efficient but requires a lot of memory when it tries to access high-res base textures from afar. L_NEAREST selects the most appropriate mipmap level, which reduces the amount of aliasing artifacts present as well as memory requirements. This is because it accesses smaller mipmaps for textures that are far away. L_LINEAR produces the best quality as it implements full trilinear filtering, but requires twice the texture samples and memory compared to L_NEAREST.</li> 
+            <li>Sampling Rate: Increases in sampling rate linearly scales both memory usage and the time required for computation. This is because 4x and 16x sampling rates supersamples more samples per pixel.</li>
+        </ul>
+    </div>
+    
+    <div class="grid-container grid-2x2">
+        <div class="image-container">
+            <h3>L_ZERO/P_NEAREST</h3>
+            <img src="media/6.1.png" alt="Level 0 Nearest">
+        </div>
+        <div class="image-container">
+            <h3>L_ZERO/P_LINEAR</h3>
+            <img src="media/6.2.png" alt="Level 0 Linear">
+        </div>
+        <div class="image-container">
+            <h3>L_NEAREST/P_NEAREST</h3>
+            <img src="media/6.3.png" alt="Level Nearest">
+        </div>
+        <div class="image-container">
+            <h3>L_NEAREST/P_LINEAR</h3>
+            <img src="media/6.4.png" alt="Level Linear">
+        </div>
+    </div>
+</body>
+</html>
