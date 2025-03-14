@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CS184 Project 1 - Rasterizer</title>
+    <title>CS184 Project 2 - Modeling Geometries</title>
     <style>
         :root {
             --primary-color: #4a148c;
@@ -103,26 +103,41 @@
     </style>
 </head>
 <body>
-    <h1>CS184 Project 1: Rasterizer</h1>
+    <h1>CS184 Project 2: Modeling Geometry</h1>
 
-    <h2>Task 1: Drawing Single-Color Triangles</h2>
-    
-    <div class="image-container">
-        <h3>Basic Triangle Rasterization</h3>
-        <img src="media/1.3.png" alt="Triangle Rasterization Result">
-    </div>
+    <h2>Section 1: Bezier Curves and Surfaces</h2>
 
     <div class="algorithm-steps">
-        <h3>Rasterization Process</h3>
-        <p><strong>1. Walk through how you rasterize triangles in your own words.</strong><br>
-        The original input parameters, (x0, y0), (x1, y1) and (x2, y2), represent coordinates that define a triangle. I first calculated the min and max values for X and Y to ensure that I only considered pixels that could possibly belong to this triangle. 
-        This prevents us from having to iterate over the whole screen. For each pixel within this sampling box, I checked whether the center point (x+0.5, y+0.5) lies inside the triangle. If it is, the pixel is covered by the triangle and I fill it. 
-        To check whether or not the point is in the triangle, I used the edge function that we learned in class. For each triangle edge, take the cross product of the edge vector AB = B - A and the vector from the same vertex to our sample point AP. 
-        If all cross products are non-negative, the sample point is inside the triangle (including the edge itself). If the sample point is inside, I set the pixel to the color of the triangle.</p>
+        <h3>Part 1: Bezier Curves with 1D de Casteljau Subdivision</h3>
+        <p><strong>1. Briefly explain de Casteljau’s algorithm and how you implemented it in order to evaluate Bezier curves.</strong><br>
+        De Casteljau's algorithm is a recursive method to evaluate points on a Bezier curve at a given parameter value t (where t ranges from 0 to 1). The algorithm works as follows:
+            1. Start with n+1 control points that define an nth degree Bezier curve
+            2. For each recursive step, perform linear interpolation between adjacent points to create a new set of n points
+            3. Continue this process until a single point remains, which is the point on the Bezier curve at parameter t
+        In my implementation, I followed this algorithm by:
+            * Taking the input vector of control points
+            * Creating a new vector to store intermediate points
+            * For each pair of adjacent points (p_i and p_{i+1}), computing a new point using linear interpolation: p_i' = (1-t) * p_i + t * p_{i+1}
+            * Returning the new vector of intermediate points
+        This single step of the algorithm reduces n points to n-1 points. When called repeatedly, it eventually produces a single point lying on the Bezier curve.</p>
         
-        <p><strong>2. Explain how your algorithm is no worse than one that checks each sample within the bounding box of the triangle. The bounding box of the triangle is defined as the smallest rectangle that can be drawn whilst ensuring that the entire triangle is within it.</strong><br>
-        Each pixel in the bounding box is tested exactly once, at its center. This is a simple rule that determines whether a pixel should be drawn or not, and it’s efficient because we don’t waste resources by checking pixels outside the triangle’s bounding box (determined by taking the min/max values along both axes). 
-        We are avoiding a brute-force approach that would look at the entire image.</p>
+        <p><strong>2. Take a look at the provided .bzc files and create your own Bezier curve with 6 control points of your choosing. Use this Bezier curve for your screenshots below.</strong><br></p>
+        <div class="image-container">
+            <h3>New Bezier Curve</h3>
+            <img src="media/3.2.jpg" alt="Original Robot">
+        </div>
+        
+        <p><strong>3. Show screenshots of each step / level of the evaluation from the original control points down to the final evaluated point.</strong><br></p>
+        <div class="image-container">
+            <h3>New Bezier Curve</h3>
+            <img src="media/3.2.jpg" alt="Original Robot">
+        </div>
+
+        <p><strong>4. Show a screenshot of a slightly different Bezier curve by moving the original control points around and modifying the parameter t via mouse scrolling.</strong><br></p>
+        <div class="image-container">
+            <h3>New Bezier Curve</h3>
+            <img src="media/3.2.jpg" alt="Original Robot">
+        </div>
     </div>
 
     <h2>Task 2: Antialiasing by Supersampling</h2>
