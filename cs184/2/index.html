@@ -283,17 +283,47 @@
         Next, I created four new edges and corresponding halfedges, properly linking them to maintain a valid halfedge data structure. I also set flags to distinguish between new and existing edges, which was useful for subsequent operations like edge flipping. Ensuring correct face and halfedge assignments was crucial to maintaining mesh consistency.
         An interesting debugging trick I used was to verify that every new vertex and edge was properly connected by iterating over the mesh and checking halfedge cycles. I also leveraged visualization tools to render the mesh after each split to confirm that the topology was correctly updated. Additionally, I tracked the isNew flags to ensure new edges were only flipped when necessary, preventing unintended mesh distortions.</p>
         <p><strong>2. Take some notes, as well as some screenshots, of your observations on how meshes behave after loop subdivision. What happens to sharp corners and edges? Can you reduce this effect by pre-splitting some edges? </strong><br>
-        <div class="grid-container grid-2x2">
+        <p>After applying Loop subdivision, sharp edges and corners become increasingly rounded, and the overall shape appears smoother. By introducing additional edge loops (i.e., pre-splitting edges) around sharp features, we can preserve more of the original form by concentrating additional vertices and maintaining rigidity locally. This approach mitigates the otherwise pronounced smoothing effect, allowing us to retain crisp edges where desired.</p>
+        <div class="grid-container">
             <div class="image-container">
-                <h3>Original teapot before edge flips</h3>
-                <img src="media/4.1.png" alt="Original Teapot">
+                <h3>Original Cube</h3>
+                <img src="media/6.1.png" alt="Original Cube">
+                <p>The original cube.</p>
             </div>
+    
             <div class="image-container">
-                <h3>Teapot after some edge flips</h3>
-                <img src="media/3.2.png" alt="Flipped Teapot">
+                <h3>Upsampled once</h3>
+                <img src="media/6.4.png" alt="Cube Upsampled Once">
+                <p>The cube after one upsampling.</p>
+            </div>
+    
+            <div class="image-container">
+                <h3>Upsampled twice</h3>
+                <img src="media/6.5.png" alt="Upsampled Twice">
+                <p>The cube after two upsampling.</p>
             </div>
         </div>
         <p><strong>3. Load dae/cube.dae. Perform several iterations of loop subdivision on the cube. Notice that the cube becomes slightly asymmetric after repeated subdivisions. Can you pre-process the cube with edge flips and splits so that the cube subdivides symmetrically? Document these effects and explain why they occur. Also explain how your pre-processing helps alleviate the effects. </strong><br>
+        <p>The cube becomes slightly asymmetric after repeated Loop subdivision due to inconsistent initial triangulation, which causes uneven vertex placement. This happens because loop subdivision operates on triangles, and if the diagonals within the cube’s quad faces are not consistently aligned, different areas subdivide differently. To ensure symmetry, I pre-processed the cube by consistently flipping diagonal edges across all faces, ensuring a uniform triangulation pattern. Additionally, I strategically splitted the edges by adding supportive edge loops to help guide vertex placement evenly. </p>
+        <div class="grid-container">
+            <div class="image-container">
+                <h3>Original Cube</h3>
+                <img src="media/6.1.png" alt="Original Cube">
+                <p>The original cube.</p>
+            </div>
+    
+            <div class="image-container">
+                <h3>Upsampled once after pre-processing</h3>
+                <img src="media/6.2.png" alt="Cube Upsampled Once">
+                <p>The cube after one upsampling.</p>
+            </div>
+    
+            <div class="image-container">
+                <h3>Upsampled twice after pre-processing</h3>
+                <img src="media/6.3.png" alt="Upsampled Twice">
+                <p>The cube after two upsampling.</p>
+            </div>
+        </div>
     </div>
 </body>
 </html>
