@@ -202,10 +202,33 @@
             <h3>bez/teapot.bez</h3>
             <img src="media/2.1.png" alt="teapot">
         </div>
-       This approach is elegant because it reuses the same algorithm in two directions, avoiding the need for a specialized 2D algorithm. It works because Bezier surfaces have the mathematical property of being "bi-parametric" - they can be evaluated independently in each parametric direction.
+       This approach works elegantly because it reuses the same algorithm in two directions, avoiding the need for a specialized 2D algorithm. It works because Bezier surfaces have the mathematical property of being "bi-parametric" - they can be evaluated independently in each parametric direction.
+    </div>
 
-
-
+    <h2>Part 3: Area-Weighted Vertex Normals</h2>
+    <div class="algorithm-steps">
+        <p><strong>1. Briefly explain how you implemented the area-weighted vertex normals. </strong><br>
+        <p>To implement area-weighted vertex normals, I calculated the normal at each vertex by considering all the faces (triangles) connected to it. For each face, I:
+            <ul>
+                <li>Computed the face normal weighted by its area using the cross product of two edges of the triangle.</li>
+                <li>Accumulated these area-weighted normals.</li>
+                <li>Normalized the result to get a unit normal vector.</li>
+            </ul>
+        The key insight is that the cross product of two edges not only gives the direction of the normal but also has a magnitude proportional to the area of the triangle. This means that larger faces contribute more to the final normal direction, which is geometrically appropriate.
+        My implementation iterates around each vertex using the half-edge data structure, computing the area-weighted normal for each non-boundary face, and summing them up. This produces a normal that better represents the local geometry around the vertex, which is essential for smooth shading.</p>
+        <p><strong>2. Show screenshots of dae/teapot.dae (not .bez) comparing teapot shading with and without vertex normals.</strong><br>
+        <div class="grid-container grid-2x2">
+            <div class="image-container">
+                <h3>Default Flat Shading</h3>
+                <img src="media/3.1.png" alt="Default flat shading">
+            </div>
+            <div class="image-container">
+                <h3>Phong Shading</h3>
+                <img src="media/3.2.png" alt="Phong Shading">
+            </div>
+        </div>
+    </div>
+    
 
 
 
@@ -214,26 +237,6 @@
 
 
         
-
-    <div class="grid-container">
-        <div class="image-container">
-            <h3>Sample Rate = 1 (1x1)</h3>
-            <img src="media/2.2.1.png" alt="Sample Rate 1">
-            <p>At sample_rate = 1 (no supersampling), the edges appear extremely jagged and there are even gaps between the red pixels where the triangle should normally be. We can even notice jaggies in the original viewpoint, not just from the pixel inspector. This is because each pixel is binary (fully covered or not).</p>
-        </div>
-
-        <div class="image-container">
-            <h3>Sample Rate = 4 (2x2)</h3>
-            <img src="media/2.2.2.png" alt="Sample Rate 4">
-            <p>At sample_rate = 4, we do not see any of the gaps from sample rate 1 in the pixel inspector, and there is some blur/smoothness. This is because taking 4 samples allows us to have gradients/shades.</p>
-        </div>
-
-        <div class="image-container">
-            <h3>Sample Rate = 16 (4x4)</h3>
-            <img src="media/2.2.3.png" alt="Sample Rate 16">
-            <p>At sample_rate = 16, the blur is much more gradual/spread out. At sample_rate = 4, only one pixel was used to show the lightest, non-white pixel, but at sample_rate = 16, three pixels were used. In other words, with 16 samples, pixels are more likely to take on intermediate values/shades. </p>
-        </div>
-    </div>
 
     
     <!-- Task 3 Section -->
