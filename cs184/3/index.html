@@ -135,10 +135,32 @@
         </div>
     </div>
 
+ Initial Bounding Box Computation: For each node, I first compute a bounding box that encapsulates all primitives in the current set.
+Leaf Node Creation: If the number of primitives is less than or equal to max_leaf_size (4 by default), I create a leaf node that stores references to these primitives.
+Splitting Axis Selection: For internal nodes, I select the axis with the largest extent (x, y, or z) for splitting. This approach tends to create more balanced trees by splitting along the dimension where primitives are most spread out.
+Split Point Determination: I use the average of centroids along the chosen axis as my splitting point. This heuristic works well for most scenes because:
+
+It adapts to the actual distribution of objects in the scene
+It's more robust than simply taking the midpoint of the bounding box
+It's computationally efficient compared to more complex heuristics
+
+
+Primitive Partitioning: I partition primitives based on whether their centroids fall below or above the split point.
+Edge Case Handling: To prevent infinite recursion, I handle the case where all primitives might end up on one side of the split by falling back to sorting primitives along the chosen axis and splitting them in the middle.
+Recursive Construction: I recursively build the left and right subtrees until the entire scene is organized into a hierarchical structure.
+    
     <h2>Part 2: Bounding Volume Hierarchy</h2>
     <div class="algorithm-steps">
         <p><strong>1. Walk through your BVH construction algorithm. Explain the heuristic you chose for picking the splitting point.</strong><br>
-        <p>  ...</p>
+        <ul>
+            <li>For each node, I first compute a bounding box that includes all primitives in the current set.</li>
+            <li>If the number of primitives is less than or equal to <span class="code">max_leaf_size</span> (4 by default), I create a leaf node that stores references to these primitives.</li>
+            <li>For internal nodes, I select the axis with the largest extent (x, y, or z) for splitting. This approach tends to create more balanced trees by splitting along the dimension where primitives are most spread out.</li>
+            <li>Next, I use the average of centroids along the chosen axis as my splitting point. This heuristic works well for most scenes because it adapts to the actual distribution of objects in the scene, is more robust than simply taking the midpoint of the bounding box, and is computationally efficient compared to more complex heuristics.</li>
+            <li>Then, I partition primitives based on whether their centroids fall below or above the split point.</li>
+            <li>To prevent infinite recursion, I handle the case where all primitives might end up on one side of the split by falling back to sorting primitives along the chosen axis and splitting them in the middle.</li>
+            <li>Finally, I recursively build the left and right subtrees until the entire scene is organized into a hierarchical structure.</li>
+        </ul>
         <p><strong>2. Show images with normal shading for a few large .dae files that you can only render with BVH acceleration.</strong><br>
         <div class="grid-container">
             <div class="image-container">
@@ -162,31 +184,54 @@
         <p><strong>3. Compare rendering times on a few scenes with moderately complex geometries with and without BVH acceleration. Present your results in a one-paragraph analysis.</strong><br></p>
         <p> ... </p>
     </div>
-
     
-    <h2>Part 1: Bezier Curves with 1D de Casteljau Subdivision</h2>
+    <h2>Part 3: Direct Illumination</h2>
     <div class="algorithm-steps">
-        <p><strong>1. Briefly explain de Casteljau’s algorithm and how you implemented it in order to evaluate Bezier curves.</strong><br>
-        De Casteljau's algorithm is a recursive method to evaluate points on a Bezier curve at a given parameter value t (where t ranges from 0 to 1). The algorithm works like this:
-        <ul>
-            <li>Start with n+1 control points that define an nth degree Bezier curve.</li>
-            <li>For each recursive step, perform linear interpolation between adjacent points to create a new set of n points.</li>
-            <li>Continue this process until a single point remains, which is the point on the Bezier curve at parameter t.</li>
-        </ul>
-        In my implementation, I followed this algorithm by:
-        <ul>
-            <li>Taking the input vector of control points</li>
-            <li>Creating a new vector to store intermediate points</li>
-            <li> For each pair of adjacent points (p_i and p_{i+1}), computing a new point using linear interpolation: p_i' = (1-t) * p_i + t * p_{i+1}</li>
-            <li>Returning the new vector of intermediate points</li>
-        </ul>
-        This single step of the algorithm reduces n points to n-1 points. When called repeatedly, it eventually produces a single point lying on the Bezier curve.</p>
-        
-        <p><strong>2. Take a look at the provided .bzc files and create your own Bezier curve with 6 control points of your choosing. Use this Bezier curve for your screenshots below.</strong><br></p>
-        <div class="image-container">
-            <h3>Bezier Curve with 6 control points</h3>
-            <img src="media/1.1.png" alt="6-Point Bezier">
+        <p><strong>1. Walk through both implementations of the direct lighting function.</strong><br></p>
+        <p>... </p>
+        <p><strong>2. Show some images rendered with both implementations of the direct lighting function.</strong><br></p>
+        <div class="grid-container">
+            <div class="image-container">
+                <h3>Level 3</h3>
+                <img src="media/1.4.png" alt="Level 3">
+                <p>After three steps, we have 3 intermediate points (blue).</p>
+            </div>
+    
+            <div class="image-container">
+                <h3>Level 4</h3>
+                <img src="media/1.5.png" alt="Level 4">
+                <p>After four steps, we have 2 intermediate points (blue).</p>
+            </div>
+    
+            <div class="image-container">
+                <h3>Level 5</h3>
+                <img src="media/1.6.png" alt="Level 5">
+                <p>After five steps, we have the final point (red) that lies on the Bezier curve at parameter t.</p>
+            </div>
         </div>
+        <p><strong>3. Focus on one particular scene with at least one area light and compare the noise levels in soft shadows when rendering with 1, 4, 16, and 64 light rays (the -l flag) and with 1 sample per pixel (the -s flag) using light sampling, not uniform hemisphere sampling.</strong><br></p>
+        <div class="grid-container">
+            <div class="image-container">
+                <h3>Level 3</h3>
+                <img src="media/1.4.png" alt="Level 3">
+                <p>After three steps, we have 3 intermediate points (blue).</p>
+            </div>
+    
+            <div class="image-container">
+                <h3>Level 4</h3>
+                <img src="media/1.5.png" alt="Level 4">
+                <p>After four steps, we have 2 intermediate points (blue).</p>
+            </div>
+    
+            <div class="image-container">
+                <h3>Level 5</h3>
+                <img src="media/1.6.png" alt="Level 5">
+                <p>After five steps, we have the final point (red) that lies on the Bezier curve at parameter t.</p>
+            </div>
+        </div>
+        <p><strong>4. Compare the results between uniform hemisphere sampling and lighting sampling in a one-paragraph analysis.</strong><br></p>
+        <p> ... </p>
+        
         
         <p><strong>3. Show screenshots of each step / level of the evaluation from the original control points down to the final evaluated point.</strong><br></p>
         <div class="grid-container">
