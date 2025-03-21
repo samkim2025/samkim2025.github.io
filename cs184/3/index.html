@@ -103,13 +103,37 @@
     </style>
 </head>
 <body>
-    <h1>CS184 Project 2: Modeling Geometry</h1>
-    <h2>https://samkim2025.github.io/cs184/2/index.html</h2>
+    <h1>CS184 Project 3: Ray Pathtracer</h1>
+    <h2>https://samkim2025.github.io/cs184/3/index.html</h2>
 
     <h2>Overview</h2>
     <p>In this assignment, I implemented core algorithms for Bézier curve and surface evaluation, vertex normal computation, and mesh subdivision techniques, including edge flips, splits, and Loop subdivision. The Bézier curve and patch implementations use de Casteljau’s algorithm to recursively compute intermediate points, ensuring smooth interpolation. The vertex normal calculation uses area-weighted triangle normals to provide a better approximation of smooth shading. The mesh subdivision methods allow for refining geometry while maintaining consistency, leveraging edge flips and splits for uniformity. Through this work, I gained insight into the mathematical foundations of geometric modeling and the impact of different data structures on computational efficiency and accuracy.</p>
     
-    <h1>Section 1: Bezier Curves and Surfaces</h1>
+    <h2>Part 1: Ray Generation and Scene Intersection</h2>
+    <div class="algorithm-steps">
+        <p><strong>1. Walk through the ray generation and primitive intersection parts of the rendering pipeline.</strong><br>
+        <ul>
+            <li>Ray Generation: Using <span class="code">raytrace_pixel()</span>,   I generate  multiple sample rays through different points within the pixel for each pixel in the image. I determine the sample positions using a grid sampler that provides random offsets within the pixel. Each raw pixel coordinate (x,y) is then converted to normalized camera space coordinates in the range [0,1]×[0,1]. 
+                The camera finally generates rays from these normalized coordinates using <span class="code">camera->generate_ray()</span>, which creates rays that originate from the camera position and pass through the corresponding point on the image plane.</li>
+            <li>Scene Traversal: Each ray is cast into the scene to find intersections with scene primitives. The est_radiance_global_illumination() function traces the ray through the scene. The BVH (Bounding Volume Hierarchy) acceleration structure is used to efficiently find potential intersections.</li>
+            <li>Primitive Intersection: Each ray is tested against primitives (triangles and spheres) to find the closest intersection point. Rays have parameters <span class="code">min_t</span> and <span class="code">max_t</span> that define the valid range for intersections. When an intersection is found, the ray's <span class="code">max_t</span>max_t is updated to this intersection distance, ensuring that future intersection tests only consider closer objects. 
+                For each valid intersection, information such as the intersection point, surface normal, and material properties is stored.</li>
+            <li>Shading: In the initial implementation, I used a simple debug visualization with the surface normal as color.</li>
+        </ul>
+        <p><strong>2.  Explain the triangle intersection algorithm you implemented in your own words.</strong><br>
+        <ul>
+            <li>The algorithm starts by computing two edge vectors of the triangle: <span class="code">e1 = p2 - p1</span> and <span class="code">e2 = p3 - p1</span>. These define the triangle's plane and orientation.</li>
+            <li>I calculated the determinant <span class="code">a</span> using the cross product of the ray direction and one edge: <span class="code">h = cross(r.d, e2)</span> and <span class="code">a = dot(e1, h)</span>. This determinant tells us if the ray is parallel to the triangle (if near zero) or at what angle it intersects.</li>
+            <li>The algorithm directly computes barycentric coordinates <span class="code">u</span> and <span class="code">v</span> (with <span class="code">w = 1-u-v</span> implied), which tell us if the intersection point is inside the triangle and allow us to interpolate vertex attributes (like normals) at the intersection point.</li>
+            <li>For a valid intersection, we need the ray and triangle not to be parallel (|a| > epsilon), barycentric coordinates to be within bounds (<span class="code">0 ≤ u</span>, <span class="code">v ≤ 1</span> and <span class="code">u+v ≤ 1</span>), and the intersection distance <span class="code">t</span> to be within the ray's valid range <span class="code">(min_t ≤ t ≤ max_t)</span>.</li>
+            <li>If all checks pass, we interpolate the vertex normals using the barycentric coordinates to get the surface normal at the intersection point: <span class="code">isect->n = (w * n1 + u * n2 + v * n3).unit();</span></li>
+        </ul>
+        <p><strong>3. Show images with normal shading for a few small .dae files.</strong><br>
+        <div class="image-container">
+            <h3>bez/teapot.bez</h3>
+            <img src="media/2.1.png" alt="teapot">
+        </div>
+    </div>
     
     <h2>Part 1: Bezier Curves with 1D de Casteljau Subdivision</h2>
     <div class="algorithm-steps">
