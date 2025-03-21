@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CS184 Project 2 - Modeling Geometries</title>
+    <style>
+        :root {
+            --primary-color: #4a148c;
+            --secondary-color: #6a1b9a;
+            --accent-color: #9c27b0;
+            --text-color: #2d3748;
+            --bg-color: #f8f9fa;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.8;
+            margin: 40px auto;
+            padding: 0 40px;
+            max-width: 1200px;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+        }
+
+        h1 {
+            color: var(--primary-color);
+            text-align: center;
+            font-size: 2.5em;
+            margin-bottom: 1.5em;
+            border-bottom: 3px solid var(--accent-color);
+            padding-bottom: 0.5em;
+        }
+
+        h2 {
+            color: var(--secondary-color);
+            margin-top: 2em;
+            font-size: 1.8em;
+            border-left: 4px solid var(--accent-color);
+            padding-left: 15px;
+        }
+
+        .image-container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 40px;
+            transition: transform 0.3s ease;
+        }
+
+        .image-container:hover {
+            transform: translateY(-5px);
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 5px;
+            display: block;
+            margin: 20px auto;
+        }
+
+        p {
+            text-align: justify;
+            margin-bottom: 1.5em;
+        }
+
+        .algorithm-steps {
+            background-color: #f3e5f5;
+            padding: 20px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .grid-2x2 {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .code {
+            font-family: 'Courier New', Courier, monospace;
+            background-color: #f8f9fa;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 20px;
+            }
+            
+            .grid-container, .grid-2x2 {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>CS184 Project 2: Modeling Geometry</h1>
+    <h2>https://samkim2025.github.io/cs184/2/index.html</h2>
+
+    <h2>Overview</h2>
+    <p>In this assignment, I implemented core algorithms for Bézier curve and surface evaluation, vertex normal computation, and mesh subdivision techniques, including edge flips, splits, and Loop subdivision. The Bézier curve and patch implementations use de Casteljau’s algorithm to recursively compute intermediate points, ensuring smooth interpolation. The vertex normal calculation uses area-weighted triangle normals to provide a better approximation of smooth shading. The mesh subdivision methods allow for refining geometry while maintaining consistency, leveraging edge flips and splits for uniformity. Through this work, I gained insight into the mathematical foundations of geometric modeling and the impact of different data structures on computational efficiency and accuracy.</p>
+    
+    <h1>Section 1: Bezier Curves and Surfaces</h1>
+    
+    <h2>Part 1: Bezier Curves with 1D de Casteljau Subdivision</h2>
+    <div class="algorithm-steps">
+        <p><strong>1. Briefly explain de Casteljau’s algorithm and how you implemented it in order to evaluate Bezier curves.</strong><br>
+        De Casteljau's algorithm is a recursive method to evaluate points on a Bezier curve at a given parameter value t (where t ranges from 0 to 1). The algorithm works like this:
+        <ul>
+            <li>Start with n+1 control points that define an nth degree Bezier curve.</li>
+            <li>For each recursive step, perform linear interpolation between adjacent points to create a new set of n points.</li>
+            <li>Continue this process until a single point remains, which is the point on the Bezier curve at parameter t.</li>
+        </ul>
+        In my implementation, I followed this algorithm by:
+        <ul>
+            <li>Taking the input vector of control points</li>
+            <li>Creating a new vector to store intermediate points</li>
+            <li> For each pair of adjacent points (p_i and p_{i+1}), computing a new point using linear interpolation: p_i' = (1-t) * p_i + t * p_{i+1}</li>
+            <li>Returning the new vector of intermediate points</li>
+        </ul>
+        This single step of the algorithm reduces n points to n-1 points. When called repeatedly, it eventually produces a single point lying on the Bezier curve.</p>
+        
+        <p><strong>2. Take a look at the provided .bzc files and create your own Bezier curve with 6 control points of your choosing. Use this Bezier curve for your screenshots below.</strong><br></p>
+        <div class="image-container">
+            <h3>Bezier Curve with 6 control points</h3>
+            <img src="media/1.1.png" alt="6-Point Bezier">
+        </div>
+        
+        <p><strong>3. Show screenshots of each step / level of the evaluation from the original control points down to the final evaluated point.</strong><br></p>
+        <div class="grid-container">
+            <div class="image-container">
+                <h3>Original Bezier</h3>
+                <img src="media/1.1.png" alt="Original 6 points">
+                <p>The original 6 control points defining my Bezier curve.</p>
+            </div>
+    
+            <div class="image-container">
+                <h3>Level 1</h3>
+                <img src="media/1.2.png" alt="Level 1">
+                <p>After one step of de Casteljau's algorithm, we have 5 intermediate points (blue) generated from the original control points.</p>
+            </div>
+    
+            <div class="image-container">
+                <h3>Level 2</h3>
+                <img src="media/1.3.png" alt="Level 2">
+                <p>After two steps, we have 4 intermediate points (blue) generated from the previous level's points.</p>
+            </div>
+        </div>
+
+        <div class="grid-container">
+            <div class="image-container">
+                <h3>Level 3</h3>
+                <img src="media/1.4.png" alt="Level 3">
+                <p>After three steps, we have 3 intermediate points (blue).</p>
+            </div>
+    
+            <div class="image-container">
+                <h3>Level 4</h3>
+                <img src="media/1.5.png" alt="Level 4">
+                <p>After four steps, we have 2 intermediate points (blue).</p>
+            </div>
+    
+            <div class="image-container">
+                <h3>Level 5</h3>
+                <img src="media/1.6.png" alt="Level 5">
+                <p>After five steps, we have the final point (red) that lies on the Bezier curve at parameter t.</p>
+            </div>
+        </div>
+
+        <p><strong>4. Show a screenshot of a slightly different Bezier curve by moving the original control points around and modifying the parameter t via mouse scrolling.</strong><br></p>
+        <div class="image-container">
+            <h3>Modified Bezier Curve with t = 0.8</h3>
+            <img src="media/1.7.png" alt="Alternate Bezier">
+        </div>
+    </div>
+
+    <h2>Part 2: Bezier Surfaces with Separable 1D de Casteljau</h2>
+    <div class="algorithm-steps">
+        <p><strong>1. Briefly explain how de Casteljau algorithm extends to Bezier surfaces and how you implemented it in order to evaluate Bezier surfaces.</strong><br>
+        <p> De Casteljau's algorithm extends naturally from curves to surfaces through a technique called separable 1D de Casteljau. While a Bezier curve is defined by a 1D array of control points and one parameter t, a Bezier surface is defined by a 2D grid of control points and two parameters (u,v). The algorithm works like this:</p>
+        <ul>
+            <li>First Parametric Direction: For each row of control points in the grid, we apply the 1D de Casteljau algorithm using parameter u. This gives us n points (where n is the number of rows).</li>
+            <li>Second Parametric Direction: We then treat these n points as control points for another Bezier curve, and apply de Casteljau again using parameter v.</li>
+            <li>Final Result: The result is a single point that lies on the Bezier surface at coordinates (u,v).</li>
+        </ul>
+        <p>In my implementation:
+        <ul>
+             <li><span class="code">evaluateStep</span>: Implements a single step of linear interpolation between adjacent 3D points, just like with curves but extended to 3D space. </li>
+             <li><span class="code">evaluate1D</span>: Fully evaluates a Bezier curve by repeatedly applying evaluateStep until arriving at a single point. </li>
+             <li><span class="code">evaluate</span>: Coordinates the two-direction evaluation by first applying evaluate1D to each row of control points with parameter u, then applying evaluate1D again to these intermediate results with parameter v</p></li>
+        </ul>
+        <p>This approach works elegantly because it reuses the same algorithm in two directions, avoiding the need for a specialized 2D algorithm. It works because Bezier surfaces have the mathematical property of being "bi-parametric" - they can be evaluated independently in each parametric direction.</p>
+
+        <p><strong>2. Show a screenshot of <span class="code">bez/teapot.bez</span> (not <span class="code">.dae</span>) evaluated by your implementation.</strong><br>
+        <div class="image-container">
+            <h3>bez/teapot.bez</h3>
+            <img src="media/2.1.png" alt="teapot">
+        </div>
+    </div>
+
+
+    <h1>Section 2: Triangle Meshes and Half-Edge Data Structure</h1>
+    <h2>Part 3: Area-Weighted Vertex Normals</h2>
+    <div class="algorithm-steps">
+        <p><strong>1. Briefly explain how you implemented the area-weighted vertex normals. </strong><br>
+        <p>To implement area-weighted vertex normals, I calculated the normal at each vertex by considering all the faces (triangles) connected to it. For each face, I:
+            <ul>
+                <li>Computed the face normal weighted by its area using the cross product of two edges of the triangle.</li>
+                <li>Accumulated these area-weighted normals.</li>
+                <li>Normalized the result to get a unit normal vector.</li>
+            </ul>
+        The key insight is that the cross product of two edges not only gives the direction of the normal but also has a magnitude proportional to the area of the triangle. This means that larger faces contribute more to the final normal direction, which is geometrically appropriate.
+        My implementation iterates around each vertex using the half-edge data structure, computing the area-weighted normal for each non-boundary face, and summing them up. This produces a normal that better represents the local geometry around the vertex, which is essential for smooth shading.</p>
+        <p><strong>2. Show screenshots of dae/teapot.dae (not .bez) comparing teapot shading with and without vertex normals.</strong><br>
+        <div class="grid-container grid-2x2">
+            <div class="image-container">
+                <h3>Default Flat Shading</h3>
+                <img src="media/3.1.png" alt="Default flat shading">
+            </div>
+            <div class="image-container">
+                <h3>Phong Shading</h3>
+                <img src="media/3.2.png" alt="Phong Shading">
+            </div>
+        </div>
+    </div>
+
+    <h2>Part 4: Edge Flip</h2>
+    <div class="algorithm-steps">
+        <p><strong>1. Briefly explain how you implemented the edge flip operation and describe any interesting implementation / debugging tricks you have used. </strong><br>
+        <p>In my implementation, I started by checking if the edge is a boundary edge. If it is, I returned the edge immediately without flipping. Otherwise, I retrieved the halfedges, vertices, and faces involved in the edge flip. Then, I swap the vertices connected by the edge and update the halfedges and their next pointers to maintain the cyclic structure of the faces. I also update the face pointers for each halfedge to ensure the correct faces are assigned after the flip. I also carefully managed the relationships between halfedges, vertices, and faces, ensuring that no references are lost. For debugging, I found it helpful to check the integrity of the mesh after each operation.</p>
+        <p><strong>2. Show screenshots of the teapot before and after some edge flips. </strong><br>
+        <div class="grid-container grid-2x2">
+            <div class="image-container">
+                <h3>Original teapot before edge flips</h3>
+                <img src="media/4.1.png" alt="Original Teapot">
+            </div>
+            <div class="image-container">
+                <h3>Teapot after some edge flips</h3>
+                <img src="media/4.2.png" alt="Flipped Teapot">
+            </div>
+        </div>
+    </div>
+
+    <h2>Part 5: Edge Split</h2>
+    <div class="algorithm-steps">
+        <p><strong>1. Briefly explain how you implemented the edge split operation and describe any interesting implementation / debugging tricks you have used. </strong><br>
+        <p>I first handled the special case where the edge is on the boundary, returning early if necessary. Then, I identified and stored all relevant halfedges, vertices, edges, and faces associated with the edge being split. I created a new vertex at the midpoint of the edge and introduced four new edges and corresponding halfedges to properly integrate the new vertex into the mesh. I carefully reassigned halfedge twins, vertex references, and face assignments to ensure a consistent and valid halfedge data structure. 
+        A key debugging trick I used was to visualize the halfedge connectivity step by step. I printed out halfedge and vertex assignments to track their relationships, ensuring that each new element was correctly linked. Testing with both simple and complex meshes helped catch issues like incorrect twin assignments or improper face updates.</p>
+        <p><strong>2. Show screenshots of a mesh before and after some edge splits. </strong><br>
+        <div class="grid-container grid-2x2">
+            <div class="image-container">
+                <h3>Original teapot before edge splits</h3>
+                <img src="media/4.1.png" alt="Original Teapot">
+            </div>
+            <div class="image-container">
+                <h3>Teapot after some edge splits</h3>
+                <img src="media/5.2.png" alt="Split Teapot">
+            </div>
+        </div>
+        <p><strong>3. Show screenshots of a mesh before and after a combination of both edge splits and edge flips. </strong><br>
+        <div class="grid-container grid-2x2">
+            <div class="image-container">
+                <h3>Original teapot before edge splits/flips</h3>
+                <img src="media/4.1.png" alt="Original Teapot">
+            </div>
+            <div class="image-container">
+                <h3>Teapot after some edge splits/flips</h3>
+                <img src="media/5.3.png" alt="Split and Flipped Teapot">
+            </div>
+        </div>
+    </div>
+
+    <h2>Part 6: Loop Subdivision for Mesh Upsampling</h2>
+    <div class="algorithm-steps">
+        <p><strong>1. Briefly explain how you implemented the loop subdivision and describe any interesting implementation / debugging tricks you have used. </strong><br>
+        <p>I first checked if the edge was on the boundary and returned early if necessary. I then identified and stored all relevant halfedges, vertices, edges, and faces associated with the edge being split. Instead of computing the midpoint manually, I used the newPosition already precomputed in the upsampling process and marked the new vertex accordingly.
+        Next, I created four new edges and corresponding halfedges, properly linking them to maintain a valid halfedge data structure. I also set flags to distinguish between new and existing edges, which was useful for subsequent operations like edge flipping. Ensuring correct face and halfedge assignments was crucial to maintaining mesh consistency.
+        An interesting debugging trick I used was to verify that every new vertex and edge was properly connected by iterating over the mesh and checking halfedge cycles. I also leveraged visualization tools to render the mesh after each split to confirm that the topology was correctly updated. Additionally, I tracked the isNew flags to ensure new edges were only flipped when necessary, preventing unintended mesh distortions.</p>
+        <p><strong>2. Take some notes, as well as some screenshots, of your observations on how meshes behave after loop subdivision. What happens to sharp corners and edges? Can you reduce this effect by pre-splitting some edges? </strong><br>
+        <p>After applying Loop subdivision, sharp edges and corners become increasingly rounded, and the overall shape appears smoother. By introducing additional edge loops (i.e., pre-splitting edges) around sharp features, we can preserve more of the original form by concentrating additional vertices and maintaining rigidity locally. This approach mitigates the otherwise pronounced smoothing effect, allowing us to retain crisp edges where desired.</p>
+        <div class="grid-container">
+            <div class="image-container">
+                <h3>Original Cube</h3>
+                <img src="media/6.1.png" alt="Original Cube">
+                <p>The original cube.</p>
+            </div>
+    
+            <div class="image-container">
+                <h3>Upsampled twice</h3>
+                <img src="media/6.4.png" alt="Cube Upsampled twice">
+                <p>The cube after two upsampling.</p>
+            </div>
+    
+            <div class="image-container">
+                <h3>Upsampled three times</h3>
+                <img src="media/6.5.png" alt="Upsampled Three Times">
+                <p>The cube after three upsampling.</p>
+            </div>
+        </div>
+        <p><strong>3. Load dae/cube.dae. Perform several iterations of loop subdivision on the cube. Notice that the cube becomes slightly asymmetric after repeated subdivisions. Can you pre-process the cube with edge flips and splits so that the cube subdivides symmetrically? Document these effects and explain why they occur. Also explain how your pre-processing helps alleviate the effects. </strong><br>
+        <p>The cube becomes slightly asymmetric after repeated Loop subdivision due to inconsistent initial triangulation, which causes uneven vertex placement. This happens because loop subdivision operates on triangles, and if the diagonals within the cube’s quad faces are not consistently aligned, different areas subdivide differently. To ensure symmetry, I pre-processed the cube by consistently flipping diagonal edges across all faces, ensuring a uniform triangulation pattern. Additionally, I strategically splitted the edges by adding supportive edge loops to help guide vertex placement evenly. </p>
+        <div class="grid-container">
+            <div class="image-container">
+                <h3>Original Cube</h3>
+                <img src="media/6.1.png" alt="Original Cube">
+                <p>The original cube.</p>
+            </div>
+    
+            <div class="image-container">
+                <h3>Upsampled once after pre-processing</h3>
+                <img src="media/6.2.png" alt="Cube Upsampled Once">
+                <p>The cube after one upsampling.</p>
+            </div>
+    
+            <div class="image-container">
+                <h3>Upsampled twice after pre-processing</h3>
+                <img src="media/6.3.png" alt="Upsampled Twice">
+                <p>The cube after two upsampling.</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
