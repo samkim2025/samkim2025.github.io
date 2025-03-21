@@ -134,20 +134,6 @@
             <img src="media/2.1.png" alt="teapot">
         </div>
     </div>
-
- Initial Bounding Box Computation: For each node, I first compute a bounding box that encapsulates all primitives in the current set.
-Leaf Node Creation: If the number of primitives is less than or equal to max_leaf_size (4 by default), I create a leaf node that stores references to these primitives.
-Splitting Axis Selection: For internal nodes, I select the axis with the largest extent (x, y, or z) for splitting. This approach tends to create more balanced trees by splitting along the dimension where primitives are most spread out.
-Split Point Determination: I use the average of centroids along the chosen axis as my splitting point. This heuristic works well for most scenes because:
-
-It adapts to the actual distribution of objects in the scene
-It's more robust than simply taking the midpoint of the bounding box
-It's computationally efficient compared to more complex heuristics
-
-
-Primitive Partitioning: I partition primitives based on whether their centroids fall below or above the split point.
-Edge Case Handling: To prevent infinite recursion, I handle the case where all primitives might end up on one side of the split by falling back to sorting primitives along the chosen axis and splitting them in the middle.
-Recursive Construction: I recursively build the left and right subtrees until the entire scene is organized into a hierarchical structure.
     
     <h2>Part 2: Bounding Volume Hierarchy</h2>
     <div class="algorithm-steps">
@@ -230,201 +216,35 @@ Recursive Construction: I recursively build the left and right subtrees until th
             </div>
         </div>
         <p><strong>4. Compare the results between uniform hemisphere sampling and lighting sampling in a one-paragraph analysis.</strong><br></p>
-        <p> ... </p>
+        <p> Uniform hemisphere sampling and direct light sampling represent two fundamentally different approaches to solving the same integral in the rendering equation. Light sampling delivers superior results in almost all practical scenarios, especially for scenes with small or distant light sources. 
+            With hemisphere sampling, the probability of randomly hitting a small light source is extremely low, resulting in high variance (noise) unless an impractically large number of samples are used. This is particularly evident in scenes with point lights, which hemisphere sampling essentially cannot handle. 
+            Light sampling, by contrast, guarantees that every sample contributes to the final image, resulting in much lower noise for the same number of samples. The difference is most dramatic in scenes with focused lighting, where hemisphere sampling produces extremely noisy images even with high sample counts, while light sampling produces clean results with relatively few samples.
+            For scenes with very large area lights or highly occluded geometries, the gap narrows somewhat, but light sampling remains the more efficient technique. The only potential advantage of hemisphere sampling is its simplicity and the fact that it can accidentally capture some indirect illumination effects (light bouncing off non-emissive surfaces), though this is better handled with explicit global illumination techniques. </p>
+    </div>
         
-        
-        <p><strong>3. Show screenshots of each step / level of the evaluation from the original control points down to the final evaluated point.</strong><br></p>
-        <div class="grid-container">
-            <div class="image-container">
-                <h3>Original Bezier</h3>
-                <img src="media/1.1.png" alt="Original 6 points">
-                <p>The original 6 control points defining my Bezier curve.</p>
-            </div>
-    
-            <div class="image-container">
-                <h3>Level 1</h3>
-                <img src="media/1.2.png" alt="Level 1">
-                <p>After one step of de Casteljau's algorithm, we have 5 intermediate points (blue) generated from the original control points.</p>
-            </div>
-    
-            <div class="image-container">
-                <h3>Level 2</h3>
-                <img src="media/1.3.png" alt="Level 2">
-                <p>After two steps, we have 4 intermediate points (blue) generated from the previous level's points.</p>
-            </div>
-        </div>
-
-        <div class="grid-container">
-            <div class="image-container">
-                <h3>Level 3</h3>
-                <img src="media/1.4.png" alt="Level 3">
-                <p>After three steps, we have 3 intermediate points (blue).</p>
-            </div>
-    
-            <div class="image-container">
-                <h3>Level 4</h3>
-                <img src="media/1.5.png" alt="Level 4">
-                <p>After four steps, we have 2 intermediate points (blue).</p>
-            </div>
-    
-            <div class="image-container">
-                <h3>Level 5</h3>
-                <img src="media/1.6.png" alt="Level 5">
-                <p>After five steps, we have the final point (red) that lies on the Bezier curve at parameter t.</p>
-            </div>
-        </div>
-
-        <p><strong>4. Show a screenshot of a slightly different Bezier curve by moving the original control points around and modifying the parameter t via mouse scrolling.</strong><br></p>
-        <div class="image-container">
-            <h3>Modified Bezier Curve with t = 0.8</h3>
-            <img src="media/1.7.png" alt="Alternate Bezier">
-        </div>
+    <h2>Part 4: Global Illumination</h2>
+    <div class="algorithm-steps">
+        <p><strong>1. Walk through your implementation of the indirect lighting function.</strong><br></p>
+        <p>...</p>
+        <p><strong>2. Show some images rendered with global (direct and indirect) illumination. Use 1024 samples per pixel.</strong><br></p>
+        <p>...</p>
+        <p><strong>3. Pick one scene and compare rendered views first with only direct illumination, then only indirect illumination. Use 1024 samples per pixel. (You will have to edit PathTracer::at_least_one_bounce_radiance(...) in your code to generate these views.)</strong><br></p>
+        <p>...</p>
+        <p><strong>4. For CBbunny.dae, render the mth bounce of light with max_ray_depth set to 0, 1, 2, 3, 4, and 5 (the -m flag), and isAccumBounces=false. Explain in your write-up what you see for the 2nd and 3rd bounce of light, and how it contributes to the quality of the rendered image compared to rasterization. Use 1024 samples per pixel.</strong><br></p>
+        <p>...</p>
+        <p><strong>5. Compare rendered views of accumulated and unaccumulated bounces for CBbunny.dae with max_ray_depth set to 0, 1, 2, 3, 4, and 5 (the -m flag). Use 1024 samples per pixel.</strong><br></p>
+        <p>...</p>
+        <p><strong>6. Pick one scene and compare rendered views with various sample-per-pixel rates, including at least 1, 2, 4, 8, 16, 64, and 1024. Use 4 light rays.</strong><br></p>
+        <p>...</p>
     </div>
 
-    <h2>Part 2: Bezier Surfaces with Separable 1D de Casteljau</h2>
+    <h2>Part 5: Adaptive Sampling</h2>
     <div class="algorithm-steps">
-        <p><strong>1. Briefly explain how de Casteljau algorithm extends to Bezier surfaces and how you implemented it in order to evaluate Bezier surfaces.</strong><br>
-        <p> De Casteljau's algorithm extends naturally from curves to surfaces through a technique called separable 1D de Casteljau. While a Bezier curve is defined by a 1D array of control points and one parameter t, a Bezier surface is defined by a 2D grid of control points and two parameters (u,v). The algorithm works like this:</p>
-        <ul>
-            <li>First Parametric Direction: For each row of control points in the grid, we apply the 1D de Casteljau algorithm using parameter u. This gives us n points (where n is the number of rows).</li>
-            <li>Second Parametric Direction: We then treat these n points as control points for another Bezier curve, and apply de Casteljau again using parameter v.</li>
-            <li>Final Result: The result is a single point that lies on the Bezier surface at coordinates (u,v).</li>
-        </ul>
-        <p>In my implementation:
-        <ul>
-             <li><span class="code">evaluateStep</span>: Implements a single step of linear interpolation between adjacent 3D points, just like with curves but extended to 3D space. </li>
-             <li><span class="code">evaluate1D</span>: Fully evaluates a Bezier curve by repeatedly applying evaluateStep until arriving at a single point. </li>
-             <li><span class="code">evaluate</span>: Coordinates the two-direction evaluation by first applying evaluate1D to each row of control points with parameter u, then applying evaluate1D again to these intermediate results with parameter v</p></li>
-        </ul>
-        <p>This approach works elegantly because it reuses the same algorithm in two directions, avoiding the need for a specialized 2D algorithm. It works because Bezier surfaces have the mathematical property of being "bi-parametric" - they can be evaluated independently in each parametric direction.</p>
-
-        <p><strong>2. Show a screenshot of <span class="code">bez/teapot.bez</span> (not <span class="code">.dae</span>) evaluated by your implementation.</strong><br>
-        <div class="image-container">
-            <h3>bez/teapot.bez</h3>
-            <img src="media/2.1.png" alt="teapot">
-        </div>
-    </div>
-
-
-    <h1>Section 2: Triangle Meshes and Half-Edge Data Structure</h1>
-    <h2>Part 3: Area-Weighted Vertex Normals</h2>
-    <div class="algorithm-steps">
-        <p><strong>1. Briefly explain how you implemented the area-weighted vertex normals. </strong><br>
-        <p>To implement area-weighted vertex normals, I calculated the normal at each vertex by considering all the faces (triangles) connected to it. For each face, I:
-            <ul>
-                <li>Computed the face normal weighted by its area using the cross product of two edges of the triangle.</li>
-                <li>Accumulated these area-weighted normals.</li>
-                <li>Normalized the result to get a unit normal vector.</li>
-            </ul>
-        The key insight is that the cross product of two edges not only gives the direction of the normal but also has a magnitude proportional to the area of the triangle. This means that larger faces contribute more to the final normal direction, which is geometrically appropriate.
-        My implementation iterates around each vertex using the half-edge data structure, computing the area-weighted normal for each non-boundary face, and summing them up. This produces a normal that better represents the local geometry around the vertex, which is essential for smooth shading.</p>
-        <p><strong>2. Show screenshots of dae/teapot.dae (not .bez) comparing teapot shading with and without vertex normals.</strong><br>
-        <div class="grid-container grid-2x2">
-            <div class="image-container">
-                <h3>Default Flat Shading</h3>
-                <img src="media/3.1.png" alt="Default flat shading">
-            </div>
-            <div class="image-container">
-                <h3>Phong Shading</h3>
-                <img src="media/3.2.png" alt="Phong Shading">
-            </div>
-        </div>
-    </div>
-
-    <h2>Part 4: Edge Flip</h2>
-    <div class="algorithm-steps">
-        <p><strong>1. Briefly explain how you implemented the edge flip operation and describe any interesting implementation / debugging tricks you have used. </strong><br>
-        <p>In my implementation, I started by checking if the edge is a boundary edge. If it is, I returned the edge immediately without flipping. Otherwise, I retrieved the halfedges, vertices, and faces involved in the edge flip. Then, I swap the vertices connected by the edge and update the halfedges and their next pointers to maintain the cyclic structure of the faces. I also update the face pointers for each halfedge to ensure the correct faces are assigned after the flip. I also carefully managed the relationships between halfedges, vertices, and faces, ensuring that no references are lost. For debugging, I found it helpful to check the integrity of the mesh after each operation.</p>
-        <p><strong>2. Show screenshots of the teapot before and after some edge flips. </strong><br>
-        <div class="grid-container grid-2x2">
-            <div class="image-container">
-                <h3>Original teapot before edge flips</h3>
-                <img src="media/4.1.png" alt="Original Teapot">
-            </div>
-            <div class="image-container">
-                <h3>Teapot after some edge flips</h3>
-                <img src="media/4.2.png" alt="Flipped Teapot">
-            </div>
-        </div>
-    </div>
-
-    <h2>Part 5: Edge Split</h2>
-    <div class="algorithm-steps">
-        <p><strong>1. Briefly explain how you implemented the edge split operation and describe any interesting implementation / debugging tricks you have used. </strong><br>
-        <p>I first handled the special case where the edge is on the boundary, returning early if necessary. Then, I identified and stored all relevant halfedges, vertices, edges, and faces associated with the edge being split. I created a new vertex at the midpoint of the edge and introduced four new edges and corresponding halfedges to properly integrate the new vertex into the mesh. I carefully reassigned halfedge twins, vertex references, and face assignments to ensure a consistent and valid halfedge data structure. 
-        A key debugging trick I used was to visualize the halfedge connectivity step by step. I printed out halfedge and vertex assignments to track their relationships, ensuring that each new element was correctly linked. Testing with both simple and complex meshes helped catch issues like incorrect twin assignments or improper face updates.</p>
-        <p><strong>2. Show screenshots of a mesh before and after some edge splits. </strong><br>
-        <div class="grid-container grid-2x2">
-            <div class="image-container">
-                <h3>Original teapot before edge splits</h3>
-                <img src="media/4.1.png" alt="Original Teapot">
-            </div>
-            <div class="image-container">
-                <h3>Teapot after some edge splits</h3>
-                <img src="media/5.2.png" alt="Split Teapot">
-            </div>
-        </div>
-        <p><strong>3. Show screenshots of a mesh before and after a combination of both edge splits and edge flips. </strong><br>
-        <div class="grid-container grid-2x2">
-            <div class="image-container">
-                <h3>Original teapot before edge splits/flips</h3>
-                <img src="media/4.1.png" alt="Original Teapot">
-            </div>
-            <div class="image-container">
-                <h3>Teapot after some edge splits/flips</h3>
-                <img src="media/5.3.png" alt="Split and Flipped Teapot">
-            </div>
-        </div>
-    </div>
-
-    <h2>Part 6: Loop Subdivision for Mesh Upsampling</h2>
-    <div class="algorithm-steps">
-        <p><strong>1. Briefly explain how you implemented the loop subdivision and describe any interesting implementation / debugging tricks you have used. </strong><br>
-        <p>I first checked if the edge was on the boundary and returned early if necessary. I then identified and stored all relevant halfedges, vertices, edges, and faces associated with the edge being split. Instead of computing the midpoint manually, I used the newPosition already precomputed in the upsampling process and marked the new vertex accordingly.
-        Next, I created four new edges and corresponding halfedges, properly linking them to maintain a valid halfedge data structure. I also set flags to distinguish between new and existing edges, which was useful for subsequent operations like edge flipping. Ensuring correct face and halfedge assignments was crucial to maintaining mesh consistency.
-        An interesting debugging trick I used was to verify that every new vertex and edge was properly connected by iterating over the mesh and checking halfedge cycles. I also leveraged visualization tools to render the mesh after each split to confirm that the topology was correctly updated. Additionally, I tracked the isNew flags to ensure new edges were only flipped when necessary, preventing unintended mesh distortions.</p>
-        <p><strong>2. Take some notes, as well as some screenshots, of your observations on how meshes behave after loop subdivision. What happens to sharp corners and edges? Can you reduce this effect by pre-splitting some edges? </strong><br>
-        <p>After applying Loop subdivision, sharp edges and corners become increasingly rounded, and the overall shape appears smoother. By introducing additional edge loops (i.e., pre-splitting edges) around sharp features, we can preserve more of the original form by concentrating additional vertices and maintaining rigidity locally. This approach mitigates the otherwise pronounced smoothing effect, allowing us to retain crisp edges where desired.</p>
-        <div class="grid-container">
-            <div class="image-container">
-                <h3>Original Cube</h3>
-                <img src="media/6.1.png" alt="Original Cube">
-                <p>The original cube.</p>
-            </div>
-    
-            <div class="image-container">
-                <h3>Upsampled twice</h3>
-                <img src="media/6.4.png" alt="Cube Upsampled twice">
-                <p>The cube after two upsampling.</p>
-            </div>
-    
-            <div class="image-container">
-                <h3>Upsampled three times</h3>
-                <img src="media/6.5.png" alt="Upsampled Three Times">
-                <p>The cube after three upsampling.</p>
-            </div>
-        </div>
-        <p><strong>3. Load dae/cube.dae. Perform several iterations of loop subdivision on the cube. Notice that the cube becomes slightly asymmetric after repeated subdivisions. Can you pre-process the cube with edge flips and splits so that the cube subdivides symmetrically? Document these effects and explain why they occur. Also explain how your pre-processing helps alleviate the effects. </strong><br>
-        <p>The cube becomes slightly asymmetric after repeated Loop subdivision due to inconsistent initial triangulation, which causes uneven vertex placement. This happens because loop subdivision operates on triangles, and if the diagonals within the cube’s quad faces are not consistently aligned, different areas subdivide differently. To ensure symmetry, I pre-processed the cube by consistently flipping diagonal edges across all faces, ensuring a uniform triangulation pattern. Additionally, I strategically splitted the edges by adding supportive edge loops to help guide vertex placement evenly. </p>
-        <div class="grid-container">
-            <div class="image-container">
-                <h3>Original Cube</h3>
-                <img src="media/6.1.png" alt="Original Cube">
-                <p>The original cube.</p>
-            </div>
-    
-            <div class="image-container">
-                <h3>Upsampled once after pre-processing</h3>
-                <img src="media/6.2.png" alt="Cube Upsampled Once">
-                <p>The cube after one upsampling.</p>
-            </div>
-    
-            <div class="image-container">
-                <h3>Upsampled twice after pre-processing</h3>
-                <img src="media/6.3.png" alt="Upsampled Twice">
-                <p>The cube after two upsampling.</p>
-            </div>
-        </div>
+        <p><strong>1. Explain adaptive sampling. Walk through your implementation of the adaptive sampling.</strong><br><p>
+        <p>...</p>
+        <p><strong>2. Pick two scenes and render them with at least 2048 samples per pixel. Show a good sampling rate image with clearly visible differences in sampling rate over various regions and pixels. 
+            Include both your sample rate image, which shows your how your adaptive sampling changes depending on which part of the image you are rendering, and your noise-free rendered result. Use 1 sample per light and at least 5 for max ray depth.</strong><br></p>
+        <p>...</p>
     </div>
 </body>
 </html>
