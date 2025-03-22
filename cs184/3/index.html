@@ -247,11 +247,40 @@
     <h2>Part 4: Global Illumination</h2>
     <div class="algorithm-steps">
         <p><strong>1. Walk through your implementation of the indirect lighting function.</strong><br></p>
-        <p>...</p>
+        <p>My implementation of indirect lighting follows a recursive Monte Carlo path tracing approach. When a ray hits a surface, I first handle direct illumination, then sample new rays for indirect light. I use the BSDF's sample_f function to generate a random direction based on the material's properties, transform it to world space, and cast a new ray. 
+            If this ray hits another object, I recursively evaluate the light at that point, continuing until I hit the ray depth limit or terminate via Russian Roulette. For each bounce, I properly account for BSDF value, cosine term, and PDF to calculate the contribution according to the rendering equation. This recursive approach elegantly captures all light transport paths through the scene, including subtle effects like color bleeding from colored walls onto the bunny.</p>
         <p><strong>2. Show some images rendered with global (direct and indirect) illumination. Use 1024 samples per pixel.</strong><br></p>
-        <p>...</p>
+        <div class="grid-container grid-2x2">
+            <div class="image-container">
+                <h3>CB Bunny - Global Illumination / 1024 samples per pixel</h3>
+                <img src="media/4.6.png" alt="Bunny Global">
+            </div>
+            <div class="image-container">
+                <h3>CB Sphere - Global Sampling / 1024 samples per pixel</h3>
+                <img src="media/4.5.png" alt="Sphere Global">
+            </div>
+        </div>
         <p><strong>3. Pick one scene and compare rendered views first with only direct illumination, then only indirect illumination. Use 1024 samples per pixel. (You will have to edit PathTracer::at_least_one_bounce_radiance(...) in your code to generate these views.)</strong><br></p>
-        <p>...</p>
+        <div class="grid-container grid-2x2">
+            <div class="image-container">
+                <h3>CB Bunny - Indirect Illumination / 1024 samples per pixel</h3>
+                <img src="media/4.3.png" alt="Bunny Indirect">
+            </div>
+            <div class="image-container">
+                <h3>CB Bunny - Direct Illumination / 1024 samples per pixel</h3>
+                <img src="media/4.2.png" alt="Bunny Direct">
+            </div>
+        </div>
+        <div class="grid-container grid-2x2">
+            <div class="image-container">
+                <h3>CB Sphere - Global Indirect Illumination / 1024 samples per pixel</h3>
+                <img src="media/4.4.png" alt="Sphere Indirect">
+            </div>
+            <div class="image-container">
+                <h3>CB Sphere - Global Direct Sampling / 1024 samples per pixel</h3>
+                <img src="media/4.1.png" alt="Sphere Direct">
+            </div>
+        </div>
         <p><strong>4. For CBbunny.dae, render the mth bounce of light with max_ray_depth set to 0, 1, 2, 3, 4, and 5 (the -m flag), and isAccumBounces=false. Explain in your write-up what you see for the 2nd and 3rd bounce of light, and how it contributes to the quality of the rendered image compared to rasterization. Use 1024 samples per pixel.</strong><br></p>
         <p>...</p>
         <p><strong>5. Compare rendered views of accumulated and unaccumulated bounces for CBbunny.dae with max_ray_depth set to 0, 1, 2, 3, 4, and 5 (the -m flag). Use 1024 samples per pixel.</strong><br></p>
