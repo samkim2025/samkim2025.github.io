@@ -196,23 +196,24 @@
                 If there's no occlusion, I compute the contribution using the BSDF value, light intensity, cosine term, and PDF. For area lights, I average the contributions by dividing by the number of samples. This approach is significantly more efficient than hemisphere sampling because every ray we cast is directed toward a potential light contribution, dramatically reducing noise for the same number of samples and making it possible to render scenes with small light sources like point lights.</li>
         </ul>
         <p><strong>2. Show some images rendered with both implementations of the direct lighting function.</strong><br></p>
-        <div class="grid-container">
+        <div class="grid-container grid-2x2">
             <div class="image-container">
-                <h3>Level 3</h3>
-                <img src="media/1.4.png" alt="Level 3">
-                <p>After three steps, we have 3 intermediate points (blue).</p>
+                <h3>CB Lucy - Importance Sampling</h3>
+                <img src="media/3.4.png" alt="Lucy Importance">
             </div>
-    
             <div class="image-container">
-                <h3>Level 4</h3>
-                <img src="media/1.5.png" alt="Level 4">
-                <p>After four steps, we have 2 intermediate points (blue).</p>
+                <h3>CB Lucy - Hemisphere Sampling</h3>
+                <img src="media/3.3.png" alt="Lucy Hemisphere">
             </div>
-    
+        </div>
+        <div class="grid-container grid-2x2">
             <div class="image-container">
-                <h3>Level 5</h3>
-                <img src="media/1.6.png" alt="Level 5">
-                <p>After five steps, we have the final point (red) that lies on the Bezier curve at parameter t.</p>
+                <h3>CB Bunny - Importance Sampling</h3>
+                <img src="media/3.2.png" alt="Bunny Importance">
+            </div>
+            <div class="image-container">
+                <h3>CB Bunny - Hemisphere Sampling</h3>
+                <img src="media/3.1.png" alt="Bunny Hemisphere">
             </div>
         </div>
         <p><strong>3. Focus on one particular scene with at least one area light and compare the noise levels in soft shadows when rendering with 1, 4, 16, and 64 light rays (the -l flag) and with 1 sample per pixel (the -s flag) using light sampling, not uniform hemisphere sampling.</strong><br></p>
