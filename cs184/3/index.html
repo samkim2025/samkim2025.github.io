@@ -166,25 +166,24 @@
         <p><strong>2. Show images with normal shading for a few large .dae files that you can only render with BVH acceleration.</strong><br>
         <div class="grid-container">
             <div class="image-container">
-                <h3>Level 3</h3>
-                <img src="media/1.4.png" alt="Level 3">
-                <p>After three steps, we have 3 intermediate points (blue).</p>
+                <h3>Wall-E</h3>
+                <img src="media/2.3.png" alt="Wall-E">
             </div>
     
             <div class="image-container">
-                <h3>Level 4</h3>
-                <img src="media/1.5.png" alt="Level 4">
-                <p>After four steps, we have 2 intermediate points (blue).</p>
+                <h3>Max Planck</h3>
+                <img src="media/2.1.png" alt="Max Planck">
             </div>
     
             <div class="image-container">
-                <h3>Level 5</h3>
-                <img src="media/1.6.png" alt="Level 5">
-                <p>After five steps, we have the final point (red) that lies on the Bezier curve at parameter t.</p>
+                <h3>Peter</h3>
+                <img src="media/2.2.png" alt="Peter">
             </div>
         </div>
         <p><strong>3. Compare rendering times on a few scenes with moderately complex geometries with and without BVH acceleration. Present your results in a one-paragraph analysis.</strong><br></p>
-        <p> ... </p>
+        <p> My BVH implementation dramatically improved rendering performance across all test scenes. Testing three models of increasing complexity, I found that the speedup becomes more significant as scene complexity grows. The cow model (5,856 primitives) rendered 370× faster, dropping from 25.38s to just 0.069s. The teapot (2,464 primitives) improved by 185×, from 11.25s to 0.061s. 
+            Most impressive was the beast model (64,618 primitives), which saw a 5,250× speedup - from nearly 5 minutes to just 0.055s. These improvements directly correlate with the reduction in intersection tests per ray: the cow model dropped from 672 to 2.4 tests, the teapot from 307 to 2.1, and the beast from 8,575 to just 1.9. 
+            Ray processing efficiency increased by over 250× in all cases, with the beast model reaching 5.65 million rays/second compared to its previous 0.0016 million. These results confirm the expected O(log n) vs. O(n) complexity improvement and show why BVH acceleration is essential for practical path tracing. Previously unrenderable scenes now process in less than a tenth of a second. </p>
     </div>
     
     <h2>Part 3: Direct Illumination</h2>
