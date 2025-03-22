@@ -189,7 +189,12 @@
     <h2>Part 3: Direct Illumination</h2>
     <div class="algorithm-steps">
         <p><strong>1. Walk through both implementations of the direct lighting function.</strong><br></p>
-        <p>... </p>
+        <ul>
+            <li><strong>Uniform Hemisphere Sampling:</strong><br> For uniform hemisphere sampling, I create a local coordinate system at the intersection point with the normal as the z-axis. I then randomly sample directions across the hemisphere using the sampler's <span class="code">get_sample()</span> function, with each direction having equal probability (PDF = 1/2π). For each sampled direction, I cast a ray from the hit point and check if it intersects a light source. 
+                When a ray hits a light, I calculate its contribution by multiplying the light's emission, the BSDF value, and the cosine term, then dividing by the PDF. After processing all samples, I average the results by dividing by the sample count. While straightforward to implement, this approach is inefficient because most randomly sampled rays never hit any light sources, especially in scenes with small or distant lights.</li>
+            <li><strong>Importance sampling:</strong><br> With importance sampling, I focus directly on the light sources rather than randomly sampling the hemisphere. I iterate through each light in the scene, taking one sample for point lights or multiple samples for area lights. For each sample, I ask the light source itself where to cast a ray by calling <span class="code">light->sample_L()</span>, which returns the direction, distance, and PDF. I then cast a shadow ray to check if the light is actually visible from the hit point.
+                If there's no occlusion, I compute the contribution using the BSDF value, light intensity, cosine term, and PDF. For area lights, I average the contributions by dividing by the number of samples. This approach is significantly more efficient than hemisphere sampling because every ray we cast is directed toward a potential light contribution, dramatically reducing noise for the same number of samples and making it possible to render scenes with small light sources like point lights.</li>
+        </ul>
         <p><strong>2. Show some images rendered with both implementations of the direct lighting function.</strong><br></p>
         <div class="grid-container">
             <div class="image-container">
