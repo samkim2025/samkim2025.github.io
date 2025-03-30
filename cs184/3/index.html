@@ -296,20 +296,6 @@
                 <img src="media/4.4.2.png" alt="Bounce 2">
             </div>
         </div>
-        <div class="grid-container">
-            <div class="image-container">
-                <h3>Unaccumulated Bunny - Max Ray Depth 3</h3>
-                <img src="media/4.4.3.png" alt="Bounce 3">
-            </div>
-            <div class="image-container">
-                <h3>Unaccumulated Bunny - Max Ray Depth 4</h3>
-                <img src="media/4.4.4.png" alt="Bounce 4">
-            </div>
-            <div class="image-container">
-                <h3>Unaccumulated Bunny - Max Ray Depth 5</h3>
-                <img src="media/4.4.5.png" alt="Bounce 5">
-            </div>
-        </div>
         <p><strong>5. Compare rendered views of accumulated and unaccumulated bounces for CBbunny.dae with max_ray_depth set to 0, 1, 2, 3, 4, and 5 (the -m flag). Use 1024 samples per pixel.</strong><br></p>
         <div class="grid-container grid-2x2">
             <div class="image-container">
@@ -371,10 +357,71 @@
                 <img src="media/4.5.5.png" alt="Accumulated Bounce 5">
             </div>
         </div>
-        <p><strong>6. Pick one scene and compare rendered views with various sample-per-pixel rates, including at least 1, 2, 4, 8, 16, 64, and 1024. Use 4 light rays.</strong><br></p>
-        <p>...</p>
+        <p><strong>6. For CBbunny.dae, output the Russian Roulette rendering with max_ray_depth set to 0, 1, 2, 3, 4, and 100(the -m flag). Use 1024 samples per pixel.</strong><br></p>
+        <div class="grid-container">
+            <div class="image-container">
+                <h3>Russian Roulette Bunny - Max Ray Depth 0</h3>
+                <img src="media/4.6.0.png" alt="Russian Roulette - 0">
+            </div>
+            <div class="image-container">
+                <h3>Russian Roulette Bunny - Max Ray Depth 1</h3>
+                <img src="media/4.6.1.png" alt="Russian Roulette - 1">
+            </div>
+            <div class="image-container">
+                <h3>Russian Roulette Bunny - Max Ray Depth 2</h3>
+                <img src="media/4.6.2.png" alt="Russian Roulette - 2">
+            </div>
+        </div>
+        <div class="grid-container">
+            <div class="image-container">
+                <h3>Russian Roulette Bunny - Max Ray Depth 3</h3>
+                <img src="media/4.6.3.png" alt="Russian Roulette - 3">
+            </div>
+            <div class="image-container">
+                <h3>Russian Roulette Bunny - Max Ray Depth 4</h3>
+                <img src="media/4.6.4.png" alt="Russian Roulette - 4">
+            </div>
+            <div class="image-container">
+                <h3>Russian Roulette Bunny - Max Ray Depth 5</h3>
+                <img src="media/4.6.5.png" alt="Russian Roulette - 5">
+            </div>
+        </div>
+        <p><strong>7. Pick one scene and compare rendered views with various sample-per-pixel rates, including at least 1, 2, 4, 8, 16, 64, and 1024. Use 4 light rays.</strong><br></p>
+        <div class="grid-container">
+            <div class="image-container">
+                <h3>1 Sample-per-pixel/h3>
+                <img src="media/4.7.0.png" alt="1 SPP">
+            </div>
+            <div class="image-container">
+                <h3>2 Sample-per-pixel</h3>
+                <img src="media/4.7.1.png" alt="2 SPP">
+            </div>
+            <div class="image-container">
+                <h3>4 Sample-per-pixel</h3>
+                <img src="media/4.7.2.png" alt="4 SPP">
+            </div>
+        </div>
+        <div class="grid-container grid-2x2">
+            <div class="image-container">
+                <h3>8 Sample-per-pixel</h3>
+                <img src="media/4.7.3.png" alt="8 SPP">
+            </div>
+            <div class="image-container">
+                <h3>16 Sample-per-pixel</h3>
+                <img src="media/4.7.4.png" alt="16 SPP">
+            </div>
+        </div>
+        <div class="grid-container grid-2x2">
+            <div class="image-container">
+                <h3>64 Sample-per-pixel</h3>
+                <img src="media/4.7.5.png" alt="64 SPP">
+            </div>
+            <div class="image-container">
+                <h3>1024 Sample-per-pixel</h3>
+                <img src="media/4.7.6.png" alt="1024 SPP">
+            </div>
+        </div>
     </div>
-
     <h2>Part 5: Adaptive Sampling</h2>
     <div class="algorithm-steps">
         <p><strong>1. Explain adaptive sampling. Walk through your implementation of the adaptive sampling.</strong><br><p>
