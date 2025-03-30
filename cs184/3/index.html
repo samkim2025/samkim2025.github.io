@@ -310,6 +310,8 @@
                 <img src="media/4.4.5.png" alt="Bounce 5">
             </div>
         </div>
+        <p>The 2nd bounce shows clear color bleeding from the walls onto the bunny. Red and blue tints appear on the sides of the bunny and along the floor. This is indirect lighting at work - light bouncing off one surface onto another. The 3rd bounce builds on this by bringing subtle illumination to shadowed areas that were missed by earlier bounces, especially in crevices and corners.
+Traditional rasterization can't naturally handle these effects. While it might fake them with ambient lighting or environment maps, it can't properly simulate how light physically bounces between surfaces, carrying color with each reflection. These multiple bounces are what make path-traced images look convincing and natural rather than artificially lit.</p>
         <p><strong>5. Compare rendered views of accumulated and unaccumulated bounces for CBbunny.dae with max_ray_depth set to 0, 1, 2, 3, 4, and 5 (the -m flag). Use 1024 samples per pixel.</strong><br></p>
         <div class="grid-container grid-2x2">
             <div class="image-container">
