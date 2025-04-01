@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CS184 Project 3 - PathTracer</title>
+    <style>
+        :root {
+            --primary-color: #4a148c;
+            --secondary-color: #6a1b9a;
+            --accent-color: #9c27b0;
+            --text-color: #2d3748;
+            --bg-color: #f8f9fa;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.8;
+            margin: 40px auto;
+            padding: 0 40px;
+            max-width: 1200px;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+        }
+
+        h1 {
+            color: var(--primary-color);
+            text-align: center;
+            font-size: 2.5em;
+            margin-bottom: 1.5em;
+            border-bottom: 3px solid var(--accent-color);
+            padding-bottom: 0.5em;
+        }
+
+        h2 {
+            color: var(--secondary-color);
+            margin-top: 2em;
+            font-size: 1.8em;
+            border-left: 4px solid var(--accent-color);
+            padding-left: 15px;
+        }
+
+        .image-container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 40px;
+            transition: transform 0.3s ease;
+        }
+
+        .image-container:hover {
+            transform: translateY(-5px);
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 5px;
+            display: block;
+            margin: 20px auto;
+        }
+
+        p {
+            text-align: justify;
+            margin-bottom: 1.5em;
+        }
+
+        .algorithm-steps {
+            background-color: #f3e5f5;
+            padding: 20px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .grid-2x2 {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .code {
+            font-family: 'Courier New', Courier, monospace;
+            background-color: #f8f9fa;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 20px;
+            }
+            
+            .grid-container, .grid-2x2 {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>CS184 Project 4: Cloth Simulator</h1>
+    <h2>https://samkim2025.github.io/cs184/4/index.html</h2>
+
+    <h2>Overview</h2>
+    <p>In this assignment, I implemented core algorithms for Bézier curve and surface evaluation, vertex normal computation, and mesh subdivision techniques, including edge flips, splits, and Loop subdivision. The Bézier curve and patch implementations use de Casteljau’s algorithm to recursively compute intermediate points, ensuring smooth interpolation. The vertex normal calculation uses area-weighted triangle normals to provide a better approximation of smooth shading. The mesh subdivision methods allow for refining geometry while maintaining consistency, leveraging edge flips and splits for uniformity. Through this work, I gained insight into the mathematical foundations of geometric modeling and the impact of different data structures on computational efficiency and accuracy.</p>
+    
+    <h2>Part 1: Masses and Springs</h2>
+    <div class="algorithm-steps">
+        <p><strong>1. Take some screenshots of scene/pinned2.json from a viewing angle where you can clearly see the cloth wireframe to show the structure of your point masses and springs.</strong><br>
+        <p><strong>2. Show us what the wireframe looks like (1) without any shearing constraints, (2) with only shearing constraints, and (3) with all constraints.</strong><br>
+        <div class="grid-container">
+            <div class="image-container">
+                <h3>Wireframe without any shearing constraints</h3>
+                <img src="media/4.4.3.png" alt="Bounce 3">
+            </div>
+            <div class="image-container">
+                <h3>Wireframe with only shearing constraints</h3>
+                <img src="media/4.4.4.png" alt="Bounce 4">
+            </div>
+            <div class="image-container">
+                <h3>Wireframe with all constraints</h3>
+                <img src="media/4.4.5.png" alt="Bounce 5">
+            </div>
+        </div>
+    </div>
+    
+    <h2>Part 2: Simulation via Numerical Integration</h2>
+    <div class="algorithm-steps">
+        <p><strong>1. Experiment with some the parameters in the simulation. To do so, pause the simulation at the start with P, modify the values of interest, and then resume by pressing P again. You can also restart the simulation at any time from the cloth’s starting position by pressing R.
+          Describe the effects of changing the spring constant ks; how does the cloth behave from start to rest with a very low ks? A high ks? What about for density? What about for damping? For each of the above, observe any noticeable differences in the cloth compared to the default parameters and show us some screenshots of those interesting differences and describe when they occur.</strong><br>
+        <p><strong>2. Show us a screenshot of your shaded cloth from scene/pinned4.json in its final resting state! If you choose to use different parameters than the default ones, please list them.</strong><br>
+        <div class="image-container">
+          <h3>Wall-E</h3>
+          <img src="media/2.3.png" alt="Wall-E">
+        </div>
+    </div>
+    
+    <h2>Part 3: Handling collisions with other objects</h2>
+    <div class="algorithm-steps">
+        <p><strong>1. Describe your implementation of handling collisions with spheres and planes.</strong><br></p>
+        <p><strong>2. Show us screenshots of your shaded cloth from scene/sphere.json in its final resting state on the sphere using the default ks = 5000 as well as with ks = 500 and ks = 50000. Describe the differences in the results.</strong><br></p>
+        <div class="grid-container">
+            <div class="image-container">
+                <h3>Wireframe without any shearing constraints</h3>
+                <img src="media/4.4.3.png" alt="Bounce 3">
+            </div>
+            <div class="image-container">
+                <h3>Wireframe with only shearing constraints</h3>
+                <img src="media/4.4.4.png" alt="Bounce 4">
+            </div>
+            <div class="image-container">
+                <h3>Wireframe with all constraints</h3>
+                <img src="media/4.4.5.png" alt="Bounce 5">
+            </div>
+        </div>
+        <p><strong>3. Show us a screenshot of your shaded cloth lying peacefully at rest on the plane. If you haven’t by now, feel free to express your colorful creativity with the cloth! (You will need to complete the shaders portion first to show custom colors.)</strong><br></p>
+        <div class="image-container">
+          <h3>CB Bunny - 1 Light Ray</h3>
+          <img src="media/3.5.png" alt="Bunny 1">
+        </div>
+    </div>
+
+  
+    <h2>Part 4: Handling self-collisions</h2>
+    <div class="algorithm-steps">
+        <p><strong>1. Describe your implementation of handling self-collisions.</strong><br></p>
+        <p>My implementation of indirect lighting follows a recursive Monte Carlo path tracing approach. When a ray hits a surface, I first handle direct illumination, then sample new rays for indirect light. I use the BSDF's sample_f function to generate a random direction based on the material's properties, transform it to world space, and cast a new ray. 
+            If this ray hits another object, I recursively evaluate the light at that point, continuing until I hit the ray depth limit or terminate via Russian Roulette. For each bounce, I properly account for BSDF value, cosine term, and PDF to calculate the contribution according to the rendering equation. This recursive approach elegantly captures all light transport paths through the scene, including subtle effects like color bleeding from colored walls onto the bunny.</p>
+        <p><strong>2. Show us at least 3 screenshots that document how your cloth falls and folds on itself, starting with an early, initial self-collision and ending with the cloth at a more restful state (even if it is still slightly bouncy on the ground).</strong><br></p>
+        <div class="grid-container">
+            <div class="image-container">
+                <h3>Wireframe without any shearing constraints</h3>
+                <img src="media/4.4.3.png" alt="Bounce 3">
+            </div>
+            <div class="image-container">
+                <h3>Wireframe with only shearing constraints</h3>
+                <img src="media/4.4.4.png" alt="Bounce 4">
+            </div>
+            <div class="image-container">
+                <h3>Wireframe with all constraints</h3>
+                <img src="media/4.4.5.png" alt="Bounce 5">
+            </div>
+        </div>
+        <p><strong>3. Vary the density as well as ks and describe with words and screenshots how they affect the behavior of the cloth as it falls on itself.</strong><br></p>
+        <div class="grid-container grid-2x2">
+            <div class="image-container">
+                <h3>Bunny - Indirect Illumination: 1024 samples/pixel</h3>
+                <img src="media/4.3.png" alt="Bunny Indirect">
+            </div>
+            <div class="image-container">
+                <h3>Bunny - Direct Illumination: 1024 samples/pixel</h3>
+                <img src="media/4.2.png" alt="Bunny Direct">
+            </div>
+        </div>
+        <div class="grid-container grid-2x2">
+            <div class="image-container">
+                <h3>Sphere - Global Indirect Illumination: 1024 samples/pixel</h3>
+                <img src="media/4.4.png" alt="Sphere Indirect">
+            </div>
+            <div class="image-container">
+                <h3>Sphere - Global Direct Sampling: 1024 samples/pixel</h3>
+                <img src="media/4.1.png" alt="Sphere Direct">
+            </div>
+        </div>
+    </div>
+  
+    <h2>Part 5: Cloth Sim</h2>
+    <div class="algorithm-steps">
+        <p><strong>1. Explain in your own words what is a shader program and how vertex and fragment shaders work together to create lighting and material effects.</strong><br><p>
+        <p><strong>2. Explain the Blinn-Phong shading model in your own words. Show a screenshot of your Blinn-Phong shader outputting only the ambient component, a screen shot only outputting the diffuse component, a screen shot only outputting the specular component, and one using the entire Blinn-Phong model.</strong><br></p>
+        <p><strong>3. Explain in your own words what is a shader program and how vertex and fragment shaders work together to create lighting and material effects.</strong><br></p>
+        <p><strong>4. Show a screenshot of your texture mapping shader using your own custom texture by modifying the textures in /textures/.</strong><br></p>
+        <p><strong>5. Show a screenshot of bump mapping on the cloth and on the sphere. Show a screenshot of displacement mapping on the sphere. Use the same texture for both renders. You can either provide your own texture or use one of the ones in the textures directory, BUT choose one that’s not the default texture_2.png. Compare the two approaches and resulting renders in your own words. Compare how your the two shaders react to the sphere by changing the sphere mesh’s coarseness by using -o 16 -a 16 and then -o 128 -a 128.</strong><br></p>
+        <p><strong>6. Show a screenshot of your mirror shader on the cloth and on the sphere.</strong><br></p>
+        <p><strong>7. Explain what you did in your custom shader, if you made one.</strong><br></p>
+    </div>
+</body>
+</html>
