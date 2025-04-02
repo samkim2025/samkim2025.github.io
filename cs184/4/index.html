@@ -61,6 +61,15 @@
             margin: 20px auto;
         }
 
+        /* Make videos responsive */
+        video {
+            width: 100%;
+            height: auto;
+            border-radius: 5px;
+            display: block;
+            margin: 20px auto;
+        }
+
         p {
             text-align: justify;
             margin-bottom: 1.5em;
@@ -71,6 +80,7 @@
             padding: 20px;
             border-radius: 5px;
             margin: 20px 0;
+            overflow: hidden; /* Prevents content from protruding */
         }
 
         .grid-container {
@@ -78,6 +88,7 @@
             grid-template-columns: repeat(3, 1fr);
             gap: 20px;
             margin-top: 20px;
+            width: 100%;
         }
 
         .grid-2x2 {
@@ -89,6 +100,12 @@
             background-color: #f8f9fa;
             padding: 2px 4px;
             border-radius: 3px;
+        }
+
+        @media (max-width: 992px) {
+            .grid-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
         }
 
         @media (max-width: 768px) {
@@ -107,16 +124,16 @@
     <h2>https://samkim2025.github.io/cs184/4/index.html</h2>
 
     <h2>Overview</h2>
-    <p>In this assignment, I implemented core algorithms for Bézier curve and surface evaluation, vertex normal computation, and mesh subdivision techniques, including edge flips, splits, and Loop subdivision. The Bézier curve and patch implementations use de Casteljau’s algorithm to recursively compute intermediate points, ensuring smooth interpolation. The vertex normal calculation uses area-weighted triangle normals to provide a better approximation of smooth shading. The mesh subdivision methods allow for refining geometry while maintaining consistency, leveraging edge flips and splits for uniformity. Through this work, I gained insight into the mathematical foundations of geometric modeling and the impact of different data structures on computational efficiency and accuracy.</p>
+    <p>In this assignment, I implemented core algorithms for Bézier curve and surface evaluation, vertex normal computation, and mesh subdivision techniques, including edge flips, splits, and Loop subdivision. The Bézier curve and patch implementations use de Casteljau's algorithm to recursively compute intermediate points, ensuring smooth interpolation. The vertex normal calculation uses area-weighted triangle normals to provide a better approximation of smooth shading. The mesh subdivision methods allow for refining geometry while maintaining consistency, leveraging edge flips and splits for uniformity. Through this work, I gained insight into the mathematical foundations of geometric modeling and the impact of different data structures on computational efficiency and accuracy.</p>
     
     <h2>Part 1: Masses and Springs</h2>
     <div class="algorithm-steps">
-        <p><strong>1. Take some screenshots of scene/pinned2.json from a viewing angle where you can clearly see the cloth wireframe to show the structure of your point masses and springs.</strong><br>
+        <p><strong>1. Take some screenshots of scene/pinned2.json from a viewing angle where you can clearly see the cloth wireframe to show the structure of your point masses and springs.</strong></p>
         <div class="image-container">
             <h3>Wireframe Structure</h3>
             <img src="media/1.1.png" alt="Wireframe">
         </div>
-        <p><strong>2. Show us what the wireframe looks like (1) without any shearing constraints, (2) with only shearing constraints, and (3) with all constraints.</strong><br>
+        <p><strong>2. Show us what the wireframe looks like (1) without any shearing constraints, (2) with only shearing constraints, and (3) with all constraints.</strong></p>
         <div class="grid-container">
             <div class="image-container">
                 <h3>Wireframe without any shearing constraints</h3>
@@ -135,61 +152,69 @@
     
     <h2>Part 2: Simulation via Numerical Integration</h2>
     <div class="algorithm-steps">
-        <p><strong>1. Experiment with some the parameters in the simulation. To do so, pause the simulation at the start with P, modify the values of interest, and then resume by pressing P again. You can also restart the simulation at any time from the cloth’s starting position by pressing R.
-          Describe the effects of changing the spring constant ks; how does the cloth behave from start to rest with a very low ks? A high ks? What about for density? What about for damping? For each of the above, observe any noticeable differences in the cloth compared to the default parameters and show us some screenshots of those interesting differences and describe when they occur.</strong><br>
-        <div class="grid-container grid-2x2">
+        <p><strong>1. Experiment with some the parameters in the simulation. To do so, pause the simulation at the start with P, modify the values of interest, and then resume by pressing P again. You can also restart the simulation at any time from the cloth's starting position by pressing R.
+          Describe the effects of changing the spring constant ks; how does the cloth behave from start to rest with a very low ks? A high ks? What about for density? What about for damping? For each of the above, observe any noticeable differences in the cloth compared to the default parameters and show us some screenshots of those interesting differences and describe when they occur.</strong></p>
+        
+        <h3>Spring Constant (ks) Effects</h3>
+        <div class="grid-2x2 grid-container">
             <div class="image-container">
                 <h3>Low ks value: 10</h3>
-                <video width="640" height="360" controls>
+                <video controls>
                     <source src="media/2.1.mp4" type="video/mp4">
-                    <p>When the spring constant is low, the cloth moves more elastically. There is less tension on the cloth, and it takes longer to settle into a rest position.</p>
                 </video>
+                <p>When the spring constant is low, the cloth moves more elastically. There is less tension on the cloth, and it takes longer to settle into a rest position.</p>
             </div>
             <div class="image-container">
                 <h3>High ks value: 10000</h3>
-                <video width="640" height="360" controls>
+                <video controls>
                     <source src="media/2.2.mp4" type="video/mp4">
-                    <p>When the spring constant is high, the cloth becomes remarkably stiff and rigid. The movement appears more suddent, with the cloth seeming to "snap" into its final position. The cloth reaches a rest state much more quickly.</p>
                 </video>
+                <p>When the spring constant is high, the cloth becomes remarkably stiff and rigid. The movement appears more suddent, with the cloth seeming to "snap" into its final position. The cloth reaches a rest state much more quickly.</p>
             </div>
         </div>
-        <div class="grid-container grid-2x2">
+        
+        <h3>Density Effects</h3>
+        <div class="grid-2x2 grid-container">
             <div class="image-container">
                 <h3>Low density value: 1 g/cm^2</h3>
-                <video width="640" height="360" controls>
+                <video controls>
                     <source src="media/2.6.mp4" type="video/mp4">
-                    <p>When the density value is low, the cloth seems to float more lightly. The overall movement appears more delicate.</p>
                 </video>
+                <p>When the density value is low, the cloth seems to float more lightly. The overall movement appears more delicate.</p>
             </div>
             <div class="image-container">
                 <h3>High density value: 250 g/cm^2</h3>
-                <video width="640" height="360" controls>
+                <video controls>
                     <source src="media/2.5.mp4" type="video/mp4">
-                    <p>When the density value is high, we have an extremely heavy-looking cloth. It falls very quickly with greater momentum and stretches significantly more under its own weight. </p>
                 </video>
+                <p>When the density value is high, we have an extremely heavy-looking cloth. It falls very quickly with greater momentum and stretches significantly more under its own weight.</p>
             </div>
         </div>
-        <div class="grid-container grid-2x2">
+        
+        <h3>Damping Effects</h3>
+        <div class="grid-2x2 grid-container">
             <div class="image-container">
                 <h3>Low damping value: ~0.02%</h3>
-                <video width="640" height="360" controls>
+                <video controls>
                     <source src="media/2.3.mp4" type="video/mp4">
-                    <p>When the damping value is low, we see the cloth making very violent oscillations. The cloth appears bouncy, swinging back and forth continuously. </p>
                 </video>
+                <p>When the damping value is low, we see the cloth making very violent oscillations. The cloth appears bouncy, swinging back and forth continuously.</p>
             </div>
             <div class="image-container">
                 <h3>High damping value: 1%</h3>
-                <video width="640" height="360" controls>
+                <video controls>
                     <source src="media/2.4.mp4" type="video/mp4">
-                    <p>When the damping value is high, we see the cloth fall very slowly into a rest position, but the overall movement appears more elegant and graceful./p>
                 </video>
+                <p>When the damping value is high, we see the cloth fall very slowly into a rest position, but the overall movement appears more elegant and graceful.</p>
             </div>
         </div>
+        
         <p>When we change these parameters, the most dramatic differences occur during the initial fall and the first few oscillations. The final rest state can still look quite different between extreme parameter values (ex. density).</p>
-        <p><strong>2. Show us a screenshot of your shaded cloth from scene/pinned4.json in its final resting state! If you choose to use different parameters than the default ones, please list them.</strong><br>
+        
+        <p><strong>2. Show us a screenshot of your shaded cloth from scene/pinned4.json in its final resting state! If you choose to use different parameters than the default ones, please list them.</strong></p>
         <div class="image-container">
             <h3>Shaded Cloth</h3>
-            <video width="640" height="360" controls>
+            <video controls>
                 <source src="media/2.7.mp4" type="video/mp4">
             </video>
         </div>
@@ -197,21 +222,23 @@
     
     <h2>Part 3: Handling collisions with other objects</h2>
     <div class="algorithm-steps">
-        <p><strong>1. Describe your implementation of handling collisions with spheres and planes.</strong><br></p>
+        <p><strong>1. Describe your implementation of handling collisions with spheres and planes.</strong></p>
         <p>For the sphere collision handling, I implemented a solution that detects when a point mass enters the sphere by checking if the distance between the point and the sphere center is less than the radius. 
             When this happens, I calculate the tangent point on the sphere's surface by extending a ray from the center through the point mass's position. 
             Then I compute a correction vector from the point's last position to this tangent point, and apply this correction scaled by (1-friction) to account for the friction between cloth and sphere. 
-            This ensures points stay outside the sphere while preserving the cloth's momentum.
-            For the plane collision handling, I use signed distances to detect when a point mass has crossed the plane since the last timestep. This occurs when the current signed distance and the previous signed distance have opposite signs (or one is zero). 
+            This ensures points stay outside the sphere while preserving the cloth's momentum.</p>
+        <p>For the plane collision handling, I use signed distances to detect when a point mass has crossed the plane since the last timestep. This occurs when the current signed distance and the previous signed distance have opposite signs (or one is zero). 
             I then calculated the exact intersection point where the point's trajectory crossed the plane. To prevent the point from exactly resting on the plane (which can cause numerical instability), I add a small offset in the normal direction to ensure the point stays slightly on its original side. 
             The correction vector is calculated and scaled by (1-friction) to simulate friction with the plane surface.</p>
-        <p><strong>2. Show us screenshots of your shaded cloth from scene/sphere.json in its final resting state on the sphere using the default ks = 5000 as well as with ks = 500 and ks = 50000. Describe the differences in the results.</strong><br></p>
+            
+        <p><strong>2. Show us screenshots of your shaded cloth from scene/sphere.json in its final resting state on the sphere using the default ks = 5000 as well as with ks = 500 and ks = 50000. Describe the differences in the results.</strong></p>
         <div class="image-container">
             <h3>Video of a cloth falling on a sphere at ks = 500</h3>
-            <video width="640" height="360" controls>
+            <video controls>
                 <source src="media/3.1.mp4" type="video/mp4">
             </video>
         </div>
+        
         <div class="grid-container">
             <div class="image-container">
                 <h3>Shaded cloth, ks = 5000</h3>
@@ -226,24 +253,25 @@
                 <img src="media/3.4.png" alt="ks = 50000">
             </div>
         </div>
-        <p><strong>3. Show us a screenshot of your shaded cloth lying peacefully at rest on the plane. If you haven’t by now, feel free to express your colorful creativity with the cloth! (You will need to complete the shaders portion first to show custom colors.)</strong><br></p>
+        
+        <p><strong>3. Show us a screenshot of your shaded cloth lying peacefully at rest on the plane. If you haven't by now, feel free to express your colorful creativity with the cloth! (You will need to complete the shaders portion first to show custom colors.)</strong></p>
         <div class="image-container">
-          <h3>Cloth on plane</h3>
-          <video width="640" height="360" controls>
-              <source src="media/3.5.mp4" type="video/mp4">
-          </video>
+            <h3>Cloth on plane</h3>
+            <video controls>
+                <source src="media/3.5.mp4" type="video/mp4">
+            </video>
         </div>
     </div>
 
-  
     <h2>Part 4: Handling self-collisions</h2>
     <div class="algorithm-steps">
-        <p><strong>1. Describe your implementation of handling self-collisions.</strong><br></p>
-        <p>My implementation uses spatial hashing to efficiently detect and resolve cloth self-collisions. This approach divides the 3D space into box volumes and groups point masses that occupy the same volume, dramatically reducing the number of collision checks needed compared to testing all pairs.
-            The hash_position function creates a unique float identifier for each 3D box volume by calculating which box a point mass belongs to based on its position. I set the box dimensions proportional to the cloth's dimensions, using width and height parameters scaled by a factor of 3 divided by the number of points. This creates appropriately sized spatial partitions for collision detection.
-            The build_spatial_map function populates a hash table where each entry contains all point masses within the same spatial box. By clearing and rebuilding this map each simulation step, I ensure accurate spatial relationships as the cloth moves and deforms.
-            The self_collide function handles the actual collision detection and response. For each point mass, it looks up potential collision candidates from the same spatial box and checks if any are closer than twice the cloth thickness. When such a collision is detected, it calculates a correction vector to push the point masses apart. The final correction is the average of all individual corrections, scaled by the simulation steps to ensure stable movement without sudden jumps.</p>
-        <p><strong>2. Show us at least 3 screenshots that document how your cloth falls and folds on itself, starting with an early, initial self-collision and ending with the cloth at a more restful state (even if it is still slightly bouncy on the ground).</strong><br></p>
+        <p><strong>1. Describe your implementation of handling self-collisions.</strong></p>
+        <p>My implementation uses spatial hashing to efficiently detect and resolve cloth self-collisions. This approach divides the 3D space into box volumes and groups point masses that occupy the same volume, dramatically reducing the number of collision checks needed compared to testing all pairs.</p>
+        <p>The hash_position function creates a unique float identifier for each 3D box volume by calculating which box a point mass belongs to based on its position. I set the box dimensions proportional to the cloth's dimensions, using width and height parameters scaled by a factor of 3 divided by the number of points. This creates appropriately sized spatial partitions for collision detection.</p>
+        <p>The build_spatial_map function populates a hash table where each entry contains all point masses within the same spatial box. By clearing and rebuilding this map each simulation step, I ensure accurate spatial relationships as the cloth moves and deforms.</p>
+        <p>The self_collide function handles the actual collision detection and response. For each point mass, it looks up potential collision candidates from the same spatial box and checks if any are closer than twice the cloth thickness. When such a collision is detected, it calculates a correction vector to push the point masses apart. The final correction is the average of all individual corrections, scaled by the simulation steps to ensure stable movement without sudden jumps.</p>
+        
+        <p><strong>2. Show us at least 3 screenshots that document how your cloth falls and folds on itself, starting with an early, initial self-collision and ending with the cloth at a more restful state (even if it is still slightly bouncy on the ground).</strong></p>
         <div class="grid-container">
             <div class="image-container">
                 <h3>Initial Collision</h3>
@@ -258,37 +286,41 @@
                 <img src="media/4.3.png" alt="Final">
             </div>
         </div>
-        <p><strong>3. Vary the density as well as ks and describe with words and screenshots how they affect the behavior of the cloth as it falls on itself.</strong><br></p>
-        <div class="grid-container grid-2x2">
+        
+        <p><strong>3. Vary the density as well as ks and describe with words and screenshots how they affect the behavior of the cloth as it falls on itself.</strong></p>
+        <h3>Density Variation</h3>
+        <div class="grid-2x2 grid-container">
             <div class="image-container">
                 <h3>Density = 250 g/cm^2</h3>
-                <video width="640" height="360" controls>
+                <video controls>
                     <source src="media/4.4.mp4" type="video/mp4">
                 </video>
             </div>
             <div class="image-container">
                 <h3>Density = 1 g/cm^2</h3>
-                <video width="640" height="360" controls>
+                <video controls>
                     <source src="media/4.5.mp4" type="video/mp4">
                 </video>
             </div>
         </div>
+        
+        <h3>Spring Constant Variation</h3>
         <div class="grid-container">
             <div class="image-container">
                 <h3>Shaded cloth, ks = 5000</h3>
-                <video width="640" height="360" controls>
+                <video controls>
                     <source src="media/4.6.mp4" type="video/mp4">
                 </video>
             </div>
             <div class="image-container">
                 <h3>Shaded cloth, ks = 500</h3>
-                <video width="640" height="360" controls>
+                <video controls>
                     <source src="media/4.7.mp4" type="video/mp4">
                 </video>
             </div>
             <div class="image-container">
                 <h3>Shaded cloth, ks = 50000</h3>
-                <video width="640" height="360" controls>
+                <video controls>
                     <source src="media/4.8.mp4" type="video/mp4">
                 </video>
             </div>
@@ -297,13 +329,13 @@
   
     <h2>Part 5: Cloth Sim</h2>
     <div class="algorithm-steps">
-        <p><strong>1. Explain in your own words what is a shader program and how vertex and fragment shaders work together to create lighting and material effects.</strong><br><p>
-        <p><strong>2. Explain the Blinn-Phong shading model in your own words. Show a screenshot of your Blinn-Phong shader outputting only the ambient component, a screen shot only outputting the diffuse component, a screen shot only outputting the specular component, and one using the entire Blinn-Phong model.</strong><br></p>
-        <p><strong>3. Explain in your own words what is a shader program and how vertex and fragment shaders work together to create lighting and material effects.</strong><br></p>
-        <p><strong>4. Show a screenshot of your texture mapping shader using your own custom texture by modifying the textures in /textures/.</strong><br></p>
-        <p><strong>5. Show a screenshot of bump mapping on the cloth and on the sphere. Show a screenshot of displacement mapping on the sphere. Use the same texture for both renders. You can either provide your own texture or use one of the ones in the textures directory, BUT choose one that’s not the default texture_2.png. Compare the two approaches and resulting renders in your own words. Compare how your the two shaders react to the sphere by changing the sphere mesh’s coarseness by using -o 16 -a 16 and then -o 128 -a 128.</strong><br></p>
-        <p><strong>6. Show a screenshot of your mirror shader on the cloth and on the sphere.</strong><br></p>
-        <p><strong>7. Explain what you did in your custom shader, if you made one.</strong><br></p>
+        <p><strong>1. Explain in your own words what is a shader program and how vertex and fragment shaders work together to create lighting and material effects.</strong></p>
+        <p><strong>2. Explain the Blinn-Phong shading model in your own words. Show a screenshot of your Blinn-Phong shader outputting only the ambient component, a screen shot only outputting the diffuse component, a screen shot only outputting the specular component, and one using the entire Blinn-Phong model.</strong></p>
+        <p><strong>3. Explain in your own words what is a shader program and how vertex and fragment shaders work together to create lighting and material effects.</strong></p>
+        <p><strong>4. Show a screenshot of your texture mapping shader using your own custom texture by modifying the textures in /textures/.</strong></p>
+        <p><strong>5. Show a screenshot of bump mapping on the cloth and on the sphere. Show a screenshot of displacement mapping on the sphere. Use the same texture for both renders. You can either provide your own texture or use one of the ones in the textures directory, BUT choose one that's not the default texture_2.png. Compare the two approaches and resulting renders in your own words. Compare how your the two shaders react to the sphere by changing the sphere mesh's coarseness by using -o 16 -a 16 and then -o 128 -a 128.</strong></p>
+        <p><strong>6. Show a screenshot of your mirror shader on the cloth and on the sphere.</strong></p>
+        <p><strong>7. Explain what you did in your custom shader, if you made one.</strong></p>
     </div>
 </body>
 </html>
