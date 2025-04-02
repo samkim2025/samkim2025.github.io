@@ -198,25 +198,38 @@
     <h2>Part 3: Handling collisions with other objects</h2>
     <div class="algorithm-steps">
         <p><strong>1. Describe your implementation of handling collisions with spheres and planes.</strong><br></p>
+        <p>For the sphere collision handling, I implemented a solution that detects when a point mass enters the sphere by checking if the distance between the point and the sphere center is less than the radius. 
+            When this happens, I calculate the tangent point on the sphere's surface by extending a ray from the center through the point mass's position. 
+            Then I compute a correction vector from the point's last position to this tangent point, and apply this correction scaled by (1-friction) to account for the friction between cloth and sphere. 
+            This ensures points stay outside the sphere while preserving the cloth's momentum.
+            For the plane collision handling, I use signed distances to detect when a point mass has crossed the plane since the last timestep. This occurs when the current signed distance and the previous signed distance have opposite signs (or one is zero). 
+            I then calculated the exact intersection point where the point's trajectory crossed the plane. To prevent the point from exactly resting on the plane (which can cause numerical instability), I add a small offset in the normal direction to ensure the point stays slightly on its original side. 
+            The correction vector is calculated and scaled by (1-friction) to simulate friction with the plane surface.</p>
         <p><strong>2. Show us screenshots of your shaded cloth from scene/sphere.json in its final resting state on the sphere using the default ks = 5000 as well as with ks = 500 and ks = 50000. Describe the differences in the results.</strong><br></p>
+        <h3>Cloth Falling On Sphere at ks = 5000</h3>
+        <video width="640" height="360" controls>
+            <source src="media/3.1.mp4" type="video/mp4">
+        </video>
         <div class="grid-container">
             <div class="image-container">
-                <h3>Wireframe without any shearing constraints</h3>
-                <img src="media/4.4.3.png" alt="Bounce 3">
+                <h3>Shaded cloth, ks = 5000</h3>
+                <img src="media/3.2.png" alt="ks = 5000">
             </div>
             <div class="image-container">
-                <h3>Wireframe with only shearing constraints</h3>
-                <img src="media/4.4.4.png" alt="Bounce 4">
+                <h3>Shaded cloth, ks = 500</h3>
+                <img src="media/3.3.png" alt="ks = 500">
             </div>
             <div class="image-container">
-                <h3>Wireframe with all constraints</h3>
-                <img src="media/4.4.5.png" alt="Bounce 5">
+                <h3>Shaded cloth, ks = 50000</h3>
+                <img src="media/3.4.png" alt="ks = 50000">
             </div>
         </div>
         <p><strong>3. Show us a screenshot of your shaded cloth lying peacefully at rest on the plane. If you haven’t by now, feel free to express your colorful creativity with the cloth! (You will need to complete the shaders portion first to show custom colors.)</strong><br></p>
         <div class="image-container">
-          <h3>CB Bunny - 1 Light Ray</h3>
-          <img src="media/3.5.png" alt="Bunny 1">
+          <h3>Cloth on plane</h3>
+          <video width="640" height="360" controls>
+              <source src="media/3.5.mp4" type="video/mp4">
+          </video>
         </div>
     </div>
 
