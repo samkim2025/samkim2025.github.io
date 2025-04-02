@@ -334,12 +334,20 @@
     <h2>Part 5: Cloth Sim</h2>
     <div class="algorithm-steps">
         <p><strong>1. Explain in your own words what is a shader program and how vertex and fragment shaders work together to create lighting and material effects.</strong></p>
+        <p>A shader program is a specialized piece of code that runs directly on the GPU, controlling how objects are processed and rendered in a graphics pipeline. Vertex and fragment shaders work together in a sequential pipeline.
+        <p>Vertex shaders process each vertex of a 3D model, handling position transformations, normal transformations, and passing data like texture coordinates to the next stage. They transform vertices from model space through world space to screen space.</p>
+        <p>Fragment shaders (also called pixel shaders) operate after the rasterization step, determining the final color for each pixel or fragment. They handle lighting calculations, texture sampling, and all visual material properties that determine an object's appearance.</p>
+        <p>This division of labor is efficient: vertex shaders handle the geometry (relatively fewer vertices), while fragment shaders focus on the color and lighting of each pixel (much more numerous). Together, they create a complete rendering system where the vertex shader prepares the scene geometry and the fragment shader applies the visual characteristics.</p>
         <p><strong>2. Explain the Blinn-Phong shading model in your own words. Show a screenshot of your Blinn-Phong shader outputting only the ambient component, a screen shot only outputting the diffuse component, a screen shot only outputting the specular component, and one using the entire Blinn-Phong model.</strong></p>
+        <p>The Blinn-Phong shading model calculates lighting by combining three components: ambient lighting, diffuse lighting, and specular lighting. Ambient lighting is a constant illumination representing indirect light bouncing throughout the scene, ensuring objects are never completely dark. 
+            Diffuse lighting represents light reflecting equally in all directions from rough surfaces. It's calculated using the dot product between the surface normal and light direction vectors, producing a soft gradient based on surface orientation.
+            Specular lighting creates highlights on shiny surfaces by using the halfway vector between the view direction and light direction. The specular power parameter controls the size and sharpness of these highlights.
+            Each component has separate coefficients (ka, kd, ks) that control their contribution to the final color, allowing for different material appearances.</p>
         <p><strong>3. Explain in your own words what is a shader program and how vertex and fragment shaders work together to create lighting and material effects.</strong></p>
+        <p>Texture mapping applies 2D image data onto 3D surfaces, giving objects detailed appearance without increasing geometric complexity. By mapping each vertex to texture coordinates (UVs), the fragment shader can sample the appropriate texel for each fragment.</p>
         <p><strong>4. Show a screenshot of your texture mapping shader using your own custom texture by modifying the textures in /textures/.</strong></p>
         <p><strong>5. Show a screenshot of bump mapping on the cloth and on the sphere. Show a screenshot of displacement mapping on the sphere. Use the same texture for both renders. You can either provide your own texture or use one of the ones in the textures directory, BUT choose one that's not the default texture_2.png. Compare the two approaches and resulting renders in your own words. Compare how your the two shaders react to the sphere by changing the sphere mesh's coarseness by using -o 16 -a 16 and then -o 128 -a 128.</strong></p>
         <p><strong>6. Show a screenshot of your mirror shader on the cloth and on the sphere.</strong></p>
-        <p><strong>7. Explain what you did in your custom shader, if you made one.</strong></p>
     </div>
 </body>
 </html>
