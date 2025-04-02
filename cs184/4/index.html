@@ -206,10 +206,12 @@
             I then calculated the exact intersection point where the point's trajectory crossed the plane. To prevent the point from exactly resting on the plane (which can cause numerical instability), I add a small offset in the normal direction to ensure the point stays slightly on its original side. 
             The correction vector is calculated and scaled by (1-friction) to simulate friction with the plane surface.</p>
         <p><strong>2. Show us screenshots of your shaded cloth from scene/sphere.json in its final resting state on the sphere using the default ks = 5000 as well as with ks = 500 and ks = 50000. Describe the differences in the results.</strong><br></p>
-        <h3>Cloth Falling On Sphere at ks = 5000</h3>
-        <video width="640" height="360" controls>
-            <source src="media/3.1.mp4" type="video/mp4">
-        </video>
+        <div class="image-container">
+            <h3>Cloth Falling On Sphere at ks = 5000</h3>
+            <video width="640" height="360" controls>
+                <source src="media/3.1.mp4" type="video/mp4">
+            </video>
+        </div>
         <div class="grid-container">
             <div class="image-container">
                 <h3>Shaded cloth, ks = 5000</h3>
