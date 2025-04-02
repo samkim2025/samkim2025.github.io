@@ -239,42 +239,58 @@
     <h2>Part 4: Handling self-collisions</h2>
     <div class="algorithm-steps">
         <p><strong>1. Describe your implementation of handling self-collisions.</strong><br></p>
-        <p>My implementation of indirect lighting follows a recursive Monte Carlo path tracing approach. When a ray hits a surface, I first handle direct illumination, then sample new rays for indirect light. I use the BSDF's sample_f function to generate a random direction based on the material's properties, transform it to world space, and cast a new ray. 
-            If this ray hits another object, I recursively evaluate the light at that point, continuing until I hit the ray depth limit or terminate via Russian Roulette. For each bounce, I properly account for BSDF value, cosine term, and PDF to calculate the contribution according to the rendering equation. This recursive approach elegantly captures all light transport paths through the scene, including subtle effects like color bleeding from colored walls onto the bunny.</p>
+        <p>My implementation uses spatial hashing to efficiently detect and resolve cloth self-collisions. This approach divides the 3D space into box volumes and groups point masses that occupy the same volume, dramatically reducing the number of collision checks needed compared to testing all pairs.
+            The hash_position function creates a unique float identifier for each 3D box volume by calculating which box a point mass belongs to based on its position. I set the box dimensions proportional to the cloth's dimensions, using width and height parameters scaled by a factor of 3 divided by the number of points. This creates appropriately sized spatial partitions for collision detection.
+            The build_spatial_map function populates a hash table where each entry contains all point masses within the same spatial box. By clearing and rebuilding this map each simulation step, I ensure accurate spatial relationships as the cloth moves and deforms.
+            The self_collide function handles the actual collision detection and response. For each point mass, it looks up potential collision candidates from the same spatial box and checks if any are closer than twice the cloth thickness. When such a collision is detected, it calculates a correction vector to push the point masses apart. The final correction is the average of all individual corrections, scaled by the simulation steps to ensure stable movement without sudden jumps.</p>
         <p><strong>2. Show us at least 3 screenshots that document how your cloth falls and folds on itself, starting with an early, initial self-collision and ending with the cloth at a more restful state (even if it is still slightly bouncy on the ground).</strong><br></p>
         <div class="grid-container">
             <div class="image-container">
-                <h3>Wireframe without any shearing constraints</h3>
-                <img src="media/4.4.3.png" alt="Bounce 3">
+                <h3>Initial Collision</h3>
+                <img src="media/4.1.png" alt="Initial">
             </div>
             <div class="image-container">
-                <h3>Wireframe with only shearing constraints</h3>
-                <img src="media/4.4.4.png" alt="Bounce 4">
+                <h3>Halfway collision</h3>
+                <img src="media/4.2.png" alt="Halfway">
             </div>
             <div class="image-container">
-                <h3>Wireframe with all constraints</h3>
-                <img src="media/4.4.5.png" alt="Bounce 5">
+                <h3>Final Restful State</h3>
+                <img src="media/4.3.png" alt="Final">
             </div>
         </div>
         <p><strong>3. Vary the density as well as ks and describe with words and screenshots how they affect the behavior of the cloth as it falls on itself.</strong><br></p>
         <div class="grid-container grid-2x2">
             <div class="image-container">
-                <h3>Bunny - Indirect Illumination: 1024 samples/pixel</h3>
-                <img src="media/4.3.png" alt="Bunny Indirect">
+                <h3>Density = 250 g/cm^2</h3>
+                <video width="640" height="360" controls>
+                    <source src="media/4.4.mp4" type="video/mp4">
+                </video>
             </div>
             <div class="image-container">
-                <h3>Bunny - Direct Illumination: 1024 samples/pixel</h3>
-                <img src="media/4.2.png" alt="Bunny Direct">
+                <h3>Density = 1 g/cm^2</h3>
+                <video width="640" height="360" controls>
+                    <source src="media/4.5.mp4" type="video/mp4">
+                </video>
             </div>
         </div>
-        <div class="grid-container grid-2x2">
+        <div class="grid-container">
             <div class="image-container">
-                <h3>Sphere - Global Indirect Illumination: 1024 samples/pixel</h3>
-                <img src="media/4.4.png" alt="Sphere Indirect">
+                <h3>Shaded cloth, ks = 5000</h3>
+                <video width="640" height="360" controls>
+                    <source src="media/4.6.mp4" type="video/mp4">
+                </video>
             </div>
             <div class="image-container">
-                <h3>Sphere - Global Direct Sampling: 1024 samples/pixel</h3>
-                <img src="media/4.1.png" alt="Sphere Direct">
+                <h3>Shaded cloth, ks = 500</h3>
+                <video width="640" height="360" controls>
+                    <source src="media/4.7.mp4" type="video/mp4">
+                </video>
+            </div>
+            <div class="image-container">
+                <h3>Shaded cloth, ks = 50000</h3>
+                <video width="640" height="360" controls>
+                    <source src="media/4.8.mp4" type="video/mp4">
+                </video>
             </div>
         </div>
     </div>
