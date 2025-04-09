@@ -124,7 +124,7 @@
     <h2>https://samkim2025.github.io/cs184/4/index.html</h2>
 
     <h2>Overview</h2>
-    <p>In this assignment, I implemented core algorithms for Bézier curve and surface evaluation, vertex normal computation, and mesh subdivision techniques, including edge flips, splits, and Loop subdivision. The Bézier curve and patch implementations use de Casteljau's algorithm to recursively compute intermediate points, ensuring smooth interpolation. The vertex normal calculation uses area-weighted triangle normals to provide a better approximation of smooth shading. The mesh subdivision methods allow for refining geometry while maintaining consistency, leveraging edge flips and splits for uniformity. Through this work, I gained insight into the mathematical foundations of geometric modeling and the impact of different data structures on computational efficiency and accuracy.</p>
+    <p>In this assignment, I implemented a cloth simulation using a mass-spring model, where point masses are interconnected by structural, shearing, and bending springs to simulate realistic cloth behavior. I explored the effects of different constraints on the cloth's wireframe structure, observing how each type of constraint contributes to the overall stability and flexibility of the cloth. Through this process, I learned about the intricate balance between computational efficiency and physical realism in simulations, as well as the importance of visualizing underlying structures to understand complex systems.</p>
     
     <h2>Part 1: Masses and Springs</h2>
     <div class="algorithm-steps">
@@ -209,7 +209,7 @@
             </div>
         </div>
         
-        <p>When we change these parameters, the most dramatic differences occur during the initial fall and the first few oscillations. The final rest state can still look quite different between extreme parameter values (ex. density).</p>
+        <p>When we change these parameters, we can see the most dramatic differences during the initial fall and the first few "swings". The final rest state does still look quite different between extreme parameter values (ex. density).</p>
         
         <p><strong>2. Show us a screenshot of your shaded cloth from scene/pinned4.json in its final resting state! If you choose to use different parameters than the default ones, please list them.</strong></p>
         <div class="image-container">
@@ -268,8 +268,8 @@
         <p><strong>1. Describe your implementation of handling self-collisions.</strong></p>
         <p>My implementation uses spatial hashing to efficiently detect and resolve cloth self-collisions. This approach divides the 3D space into box volumes and groups point masses that occupy the same volume, dramatically reducing the number of collision checks needed compared to testing all pairs.</p>
         <p>The hash_position function creates a unique float identifier for each 3D box volume by calculating which box a point mass belongs to based on its position. I set the box dimensions proportional to the cloth's dimensions, using width and height parameters scaled by a factor of 3 divided by the number of points. This creates appropriately sized spatial partitions for collision detection.</p>
-        <p>The build_spatial_map function populates a hash table where each entry contains all point masses within the same spatial box. By clearing and rebuilding this map each simulation step, I ensure accurate spatial relationships as the cloth moves and deforms.</p>
-        <p>The self_collide function handles the actual collision detection and response. For each point mass, it looks up potential collision candidates from the same spatial box and checks if any are closer than twice the cloth thickness. When such a collision is detected, it calculates a correction vector to push the point masses apart. The final correction is the average of all individual corrections, scaled by the simulation steps to ensure stable movement without sudden jumps.</p>
+        <p>The build_spatial_map function populates a hash table where each entry contains all point masses within the same spatial box. By clearing and rebuilding this map each simulation step, I made sure to sustain accurate spatial relationships even as the cloth moves and deforms.</p>
+        <p>The self_collide function handles the actual collision detection and response. For each point mass, it looks up potential collision candidates from the same spatial box and checks if any are closer than twice the thickness of the cloth. When such a collision is detected, it calculates a correction vector to push the point masses apart. The final correction is the average of all individual corrections, scaled by the simulation steps to ensure that movement is stable and without sudden jumps.</p>
         
         <p><strong>2. Show us at least 3 screenshots that document how your cloth falls and folds on itself, starting with an early, initial self-collision and ending with the cloth at a more restful state (even if it is still slightly bouncy on the ground).</strong></p>
         <div class="grid-container">
@@ -327,8 +327,8 @@
                 </video>
             </div>
         </div>
-        <p>When using a low spring constant, the cloth behaves like a soft, lightweight material. During self-collision, it creates gentle, rounded folds with significant deformation. The cloth stretches considerably as it falls, and when parts collide, they compress easily against each other. This creates a fluid-like folding pattern with smooth curves rather than sharp creases. The final resting state shows a cloth that appears almost melted onto itself, with wide, shallow folds.</p>
-        <p>With a high spring constant, the cloth behaves much more rigidly. During self-collision, it forms sharp, defined creases and maintains its structure more stubbornly. When folding occurs, the material creates more prominent peaks and valleys with angular formations. The cloth strongly resists stretching, resulting in more pronounced buckling and wrinkling when parts collide. The final resting state shows a cloth with distinct, well-defined folds that maintain their shape rather than flattening out.</p>
+        <p>With a high spring constant, the cloth behaves rigidly. During self-collision, it forms sharp, defined creases and maintains its structure more stubbornly. When folding occurs, the material creates more prominent peaks and valleys with angular formations. The cloth strongly resists stretching, resulting in more pronounced buckling and wrinkling when parts collide. The final resting state shows a cloth with distinct, well-defined folds that maintain their shape rather than flattening out.</p>
+        <p>With a low spring constant, the cloth is crushed with significant deformation seen during self-collision. In other words, when parts collide, they compress easily against each other. The final resting state shows a cloth that appears almost melted onto itself.</p>
     </div>
   
     <h2>Part 5: Cloth Sim</h2>
